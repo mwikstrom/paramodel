@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-setupMeta<T extends Type<any>>(this: void, type: T): MetaDomainBuilder<T>;
+setupMeta<T extends Type<unknown>>(this: void, type: T): MetaDomainBuilder<T>;
 ```
 
 ## Parameters

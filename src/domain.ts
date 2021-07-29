@@ -7,15 +7,15 @@ import { Projection } from "./projection";
 export const createDomainBuilder = (): MetaDomainBuilder<Type<unknown>> => createMetaBuilder(voidType);
 
 /** @public */
-export interface MetaDomainBuilder<M extends Type<any>> extends MetaDomain<M> {
-    setupMeta<T extends Type<any>>(this: void, type: T): MetaDomainBuilder<T>;
+export interface MetaDomainBuilder<M extends Type<unknown>> extends MetaDomain<M> {
+    setupMeta<T extends Type<unknown>>(this: void, type: T): MetaDomainBuilder<T>;
     addEvents<T extends DomainEvents>(this: void, events: T): EventsDomainBuilder<M, T>;
     createDomain(this: void): Domain<M, {}, {}, {}, {}>;
 }
 
 /** @public */
-export interface EventsDomainBuilder<M extends Type<any>, E extends DomainEvents> extends EventsDomain<M, E> {
-    setupMeta<T extends Type<any>>(this: void, type: T): EventsDomainBuilder<T, E>;
+export interface EventsDomainBuilder<M extends Type<unknown>, E extends DomainEvents> extends EventsDomain<M, E> {
+    setupMeta<T extends Type<unknown>>(this: void, type: T): EventsDomainBuilder<T, E>;
     addEvents<T extends DomainEvents>(this: void, events: T): EventsDomainBuilder<M, E & T>;
     addActions<T extends DomainActions<ProjectionsDomain<M, E, {}, {}>>>(
         this: void,
@@ -34,7 +34,7 @@ export interface EventsDomainBuilder<M extends Type<any>, E extends DomainEvents
 
 /** @public */
 export interface ProjectionsDomainBuilder<
-    M extends Type<any>,
+    M extends Type<unknown>,
     E extends DomainEvents,
     P extends DomainProjections<EventsDomain<M, E>>,
     C extends DomainCollections<EventsDomain<M, E>>,
@@ -56,7 +56,7 @@ export interface ProjectionsDomainBuilder<
 
 /** @public */
 export interface ActionsDomainBuilder<
-    M extends Type<any>,
+    M extends Type<unknown>,
     E extends DomainEvents,
     P extends DomainProjections<EventsDomain<M, E>>,
     C extends DomainCollections<EventsDomain<M, E>>,
@@ -71,7 +71,7 @@ export interface ActionsDomainBuilder<
 
 /** @public */
 export interface MetaDomain<
-    M extends Type<any> = Type<any>,
+    M extends Type<any> = Type<unknown>,
 > {
     readonly meta: M;
 }
@@ -138,15 +138,15 @@ const createEventsBuilder = <M extends Type<any>, E extends DomainEvents>(
     meta: M,
     events: E, 
 ): EventsDomainBuilder<M, E> => Object.freeze({
-    events,
-    meta,
-    setupMeta: type => createEventsBuilder(type, events),
-    addActions: actions => createActionsBuilder(meta, events, {}, {}, actions),
-    addEvents: other => createEventsBuilder(meta, Object.freeze({ ...events, ...other })),
-    addCollections: collections => createProjectionsBuilder(meta, events, {}, collections),
-    addProjections: projections => createProjectionsBuilder(meta, events, projections, {}),
-    createDomain: () => createDomain(meta, events, {}, {}, {}),
-});
+        events,
+        meta,
+        setupMeta: type => createEventsBuilder(type, events),
+        addActions: actions => createActionsBuilder(meta, events, {}, {}, actions),
+        addEvents: other => createEventsBuilder(meta, Object.freeze({ ...events, ...other })),
+        addCollections: collections => createProjectionsBuilder(meta, events, {}, collections),
+        addProjections: projections => createProjectionsBuilder(meta, events, projections, {}),
+        createDomain: () => createDomain(meta, events, {}, {}, {}),
+    });
 
 const createProjectionsBuilder = <
     M extends Type<any>,
@@ -154,30 +154,30 @@ const createProjectionsBuilder = <
     P extends DomainProjections<EventsDomain<M, E>>,
     C extends DomainCollections<EventsDomain<M, E>>
 >(
-    meta: M,
-    events: E, 
-    projections: P,
-    collections: C,
-): ProjectionsDomainBuilder<M, E, P, C> => Object.freeze({
-    events,
-    meta,
-    projections,
-    collections,
-    addActions: actions => createActionsBuilder(meta, events, projections, collections, actions),
-    addCollections: other => createProjectionsBuilder(
-        meta,
+        meta: M,
+        events: E, 
+        projections: P,
+        collections: C,
+    ): ProjectionsDomainBuilder<M, E, P, C> => Object.freeze({
         events,
+        meta,
         projections,
-        Object.freeze({ ...collections, ...other })
-    ),
-    addProjections: other => createProjectionsBuilder(
-        meta,
-        events,
-        Object.freeze({ ...projections, ...other }),
-        collections
-    ),
-    createDomain: () => createDomain(meta, events, projections, collections, {}),
-});
+        collections,
+        addActions: actions => createActionsBuilder(meta, events, projections, collections, actions),
+        addCollections: other => createProjectionsBuilder(
+            meta,
+            events,
+            projections,
+            Object.freeze({ ...collections, ...other })
+        ),
+        addProjections: other => createProjectionsBuilder(
+            meta,
+            events,
+            Object.freeze({ ...projections, ...other }),
+            collections
+        ),
+        createDomain: () => createDomain(meta, events, projections, collections, {}),
+    });
 
 const createActionsBuilder = <
     M extends Type<any>,
@@ -186,26 +186,26 @@ const createActionsBuilder = <
     C extends DomainCollections<EventsDomain<M, E>>,
     A extends DomainActions<ProjectionsDomain<M, E, P, C>> = DomainActions<ProjectionsDomain<M, E, P, C>>,
 >(
-    meta: M,
-    events: E, 
-    projections: P,
-    collections: C,
-    actions: A,
-): ActionsDomainBuilder<M, E, P, C, A> => Object.freeze({
-    events,
-    meta,
-    projections,
-    collections,
-    actions,
-    addActions: other => createActionsBuilder(
-        meta, 
-        events, 
-        projections, 
-        collections, 
-        Object.freeze({ ...actions, ...other }),
-    ),
-    createDomain: () => createDomain(meta, events, projections, collections, actions),
-});
+        meta: M,
+        events: E, 
+        projections: P,
+        collections: C,
+        actions: A,
+    ): ActionsDomainBuilder<M, E, P, C, A> => Object.freeze({
+        events,
+        meta,
+        projections,
+        collections,
+        actions,
+        addActions: other => createActionsBuilder(
+            meta, 
+            events, 
+            projections, 
+            collections, 
+            Object.freeze({ ...actions, ...other }),
+        ),
+        createDomain: () => createDomain(meta, events, projections, collections, actions),
+    });
 
 const createDomain = <
     M extends Type<any>,
@@ -214,9 +214,9 @@ const createDomain = <
     C extends DomainCollections<EventsDomain<M, E>>,
     A extends DomainActions<ProjectionsDomain<M, E, P, C>> = DomainActions<ProjectionsDomain<M, E, P, C>>,
 >(
-    meta: M,
-    events: E,
-    projections: P,
-    collections: C,
-    actions: A,
-): Domain<M, E, P, C, A> => Object.freeze({meta, events, projections, collections, actions});
+        meta: M,
+        events: E,
+        projections: P,
+        collections: C,
+        actions: A,
+    ): Domain<M, E, P, C, A> => Object.freeze({meta, events, projections, collections, actions});

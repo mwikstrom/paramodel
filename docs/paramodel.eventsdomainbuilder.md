@@ -8,7 +8,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface EventsDomainBuilder<M extends Type<any>, E extends DomainEvents> extends EventsDomain<M, E> 
+export interface EventsDomainBuilder<M extends Type<unknown>, E extends DomainEvents> extends EventsDomain<M, E> 
 ```
 <b>Extends:</b> [EventsDomain](./paramodel.eventsdomain.md)<!-- -->&lt;M, E&gt;
 

@@ -8,7 +8,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface MetaDomainBuilder<M extends Type<any>> extends MetaDomain<M> 
+export interface MetaDomainBuilder<M extends Type<unknown>> extends MetaDomain<M> 
 ```
 <b>Extends:</b> [MetaDomain](./paramodel.metadomain.md)<!-- -->&lt;M&gt;
 

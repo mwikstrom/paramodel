@@ -61,7 +61,7 @@ export interface ActionsDomain<M extends Type<any> = Type<any>, E extends Domain
 }
 
 // @public (undocumented)
-export interface ActionsDomainBuilder<M extends Type<any>, E extends DomainEvents, P extends DomainProjections<EventsDomain<M, E>>, C extends DomainCollections<EventsDomain<M, E>>, A extends DomainActions<ProjectionsDomain<M, E, P, C>> = DomainActions<ProjectionsDomain<M, E, P, C>>> extends ActionsDomain<M, E, P, C, A> {
+export interface ActionsDomainBuilder<M extends Type<unknown>, E extends DomainEvents, P extends DomainProjections<EventsDomain<M, E>>, C extends DomainCollections<EventsDomain<M, E>>, A extends DomainActions<ProjectionsDomain<M, E, P, C>> = DomainActions<ProjectionsDomain<M, E, P, C>>> extends ActionsDomain<M, E, P, C, A> {
     // (undocumented)
     addActions<T extends DomainActions<ProjectionsDomain<M, E, P, C>>>(this: void, actions: T): ActionsDomainBuilder<M, E, P, C, A & T>;
     // (undocumented)
@@ -182,7 +182,7 @@ export interface EventsDomain<M extends Type<any> = Type<any>, E extends DomainE
 }
 
 // @public (undocumented)
-export interface EventsDomainBuilder<M extends Type<any>, E extends DomainEvents> extends EventsDomain<M, E> {
+export interface EventsDomainBuilder<M extends Type<unknown>, E extends DomainEvents> extends EventsDomain<M, E> {
     // (undocumented)
     addActions<T extends DomainActions<ProjectionsDomain<M, E, {}, {}>>>(this: void, actions: T): ActionsDomainBuilder<M, E, {}, {}, T>;
     // (undocumented)
@@ -194,7 +194,7 @@ export interface EventsDomainBuilder<M extends Type<any>, E extends DomainEvents
     // (undocumented)
     createDomain(this: void): Domain<M, E, {}, {}, {}>;
     // (undocumented)
-    setupMeta<T extends Type<any>>(this: void, type: T): EventsDomainBuilder<T, E>;
+    setupMeta<T extends Type<unknown>>(this: void, type: T): EventsDomainBuilder<T, E>;
 }
 
 // @public (undocumented)
@@ -224,19 +224,19 @@ export interface EventStream<D extends Domain> {
 }
 
 // @public (undocumented)
-export interface MetaDomain<M extends Type<any> = Type<any>> {
+export interface MetaDomain<M extends Type<any> = Type<unknown>> {
     // (undocumented)
     readonly meta: M;
 }
 
 // @public (undocumented)
-export interface MetaDomainBuilder<M extends Type<any>> extends MetaDomain<M> {
+export interface MetaDomainBuilder<M extends Type<unknown>> extends MetaDomain<M> {
     // (undocumented)
     addEvents<T extends DomainEvents>(this: void, events: T): EventsDomainBuilder<M, T>;
     // (undocumented)
     createDomain(this: void): Domain<M, {}, {}, {}, {}>;
     // (undocumented)
-    setupMeta<T extends Type<any>>(this: void, type: T): MetaDomainBuilder<T>;
+    setupMeta<T extends Type<unknown>>(this: void, type: T): MetaDomainBuilder<T>;
 }
 
 // @public (undocumented)
@@ -281,7 +281,7 @@ export interface ProjectionsDomain<M extends Type<any> = Type<any>, E extends Do
 }
 
 // @public (undocumented)
-export interface ProjectionsDomainBuilder<M extends Type<any>, E extends DomainEvents, P extends DomainProjections<EventsDomain<M, E>>, C extends DomainCollections<EventsDomain<M, E>>> extends ProjectionsDomain<M, E, P, C> {
+export interface ProjectionsDomainBuilder<M extends Type<unknown>, E extends DomainEvents, P extends DomainProjections<EventsDomain<M, E>>, C extends DomainCollections<EventsDomain<M, E>>> extends ProjectionsDomain<M, E, P, C> {
     // (undocumented)
     addActions<T extends DomainActions<ProjectionsDomain<M, E, P, C>>>(this: void, actions: T): ActionsDomainBuilder<M, E, P, C, T>;
     // (undocumented)
