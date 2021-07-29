@@ -9,7 +9,11 @@ import { ProjectionView } from "./projection";
 export interface Snapshot<D extends ProjectionsDomain> {
     read(this: void): Promise<SnapshotData<D>>;
     view<K extends keyof D["projections"]>(this: void, key: K, options?: AbortOptions): Promise<ProjectionView<D, K>>;
-    entities<K extends keyof D["collections"]>(this: void, key: K, options?: AbortOptions): Promise<CollectionView<D, K>>;
+    entities<K extends keyof D["collections"]>(
+        this: void,
+        key: K, 
+        options?: AbortOptions
+    ): Promise<CollectionView<D, K>>;
 }
 
 /** @public */

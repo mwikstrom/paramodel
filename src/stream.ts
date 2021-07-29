@@ -22,7 +22,11 @@ export interface EventStream<D extends Domain> {
     read(this: void, options?: ReadOptions): AsyncIterable<SnapshotData<D>>;
     peek(this: void, options?: PeekOptions): Promise<Snapshot<D> | null>;
     view<K extends keyof D["projections"]>(this: void, key: K, options?: PeekOptions): Promise<ProjectionView<D, K>>;
-    entities<K extends keyof D["collections"]>(this: void, key: K, options?: PeekOptions): Promise<CollectionView<D, K>>;
+    entities<K extends keyof D["collections"]>(
+        this: void, 
+        key: K, 
+        options?: PeekOptions
+    ): Promise<CollectionView<D, K>>;
 }
 
 /** @public */

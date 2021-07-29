@@ -4,32 +4,32 @@ import { Collection } from "./collection";
 import { Projection } from "./projection";
 
 /** @public */
-export const createDomainBuilder = (): MetaDomainBuilder<Type<unknown>> => createMetaBuilder(voidType);
+export const createDomainBuilder = (): MetaDomainBuilder<Type<void>> => createMetaBuilder(voidType);
 
 /** @public */
 export interface MetaDomainBuilder<M extends Type<unknown>> extends MetaDomain<M> {
     setupMeta<T extends Type<unknown>>(this: void, type: T): MetaDomainBuilder<T>;
     addEvents<T extends DomainEvents>(this: void, events: T): EventsDomainBuilder<M, T>;
-    createDomain(this: void): Domain<M, {}, {}, {}, {}>;
+    createDomain(this: void): Domain<M>;
 }
 
 /** @public */
 export interface EventsDomainBuilder<M extends Type<unknown>, E extends DomainEvents> extends EventsDomain<M, E> {
     setupMeta<T extends Type<unknown>>(this: void, type: T): EventsDomainBuilder<T, E>;
     addEvents<T extends DomainEvents>(this: void, events: T): EventsDomainBuilder<M, E & T>;
-    addActions<T extends DomainActions<ProjectionsDomain<M, E, {}, {}>>>(
+    addActions<T extends DomainActions<ProjectionsDomain<M, E>>>(
         this: void,
         actions: T
-    ): ActionsDomainBuilder<M, E, {}, {}, T>;
+    ): ActionsDomainBuilder<M, E, DomainProjections<EventsDomain<M, E>>, DomainCollections<EventsDomain<M, E>>, T>;
     addCollections<T extends DomainCollections<EventsDomain<M, E>>>(
         this: void,
         collections: T
-    ): ProjectionsDomainBuilder<M, E, {}, T>;
+    ): ProjectionsDomainBuilder<M, E, DomainProjections<EventsDomain<M, E>>, T>;
     addProjections<T extends DomainProjections<EventsDomain<M, E>>>(
         this: void,
         projections: T
-    ): ProjectionsDomainBuilder<M, E, T, {}>;
-    createDomain(this: void): Domain<M, E, {}, {}, {}>;
+    ): ProjectionsDomainBuilder<M, E, T>;
+    createDomain(this: void): Domain<M, E>;
 }
 
 /** @public */
@@ -37,7 +37,7 @@ export interface ProjectionsDomainBuilder<
     M extends Type<unknown>,
     E extends DomainEvents,
     P extends DomainProjections<EventsDomain<M, E>>,
-    C extends DomainCollections<EventsDomain<M, E>>,
+    C extends DomainCollections<EventsDomain<M, E>> = DomainCollections<EventsDomain<M, E>>,
 > extends ProjectionsDomain<M, E, P, C> {
     addActions<T extends DomainActions<ProjectionsDomain<M, E, P, C>>>(
         this: void,
@@ -51,7 +51,7 @@ export interface ProjectionsDomainBuilder<
         this: void,
         projections: T
     ): ProjectionsDomainBuilder<M, E, P & T, C>;
-    createDomain(this: void): Domain<M, E, P, C, {}>;
+    createDomain(this: void): Domain<M, E, P, C>;
 }
 
 /** @public */
@@ -71,14 +71,14 @@ export interface ActionsDomainBuilder<
 
 /** @public */
 export interface MetaDomain<
-    M extends Type<any> = Type<unknown>,
+    M extends Type<unknown> = Type<unknown>,
 > {
     readonly meta: M;
 }
 
 /** @public */
 export interface EventsDomain<
-    M extends Type<any> = Type<any>,
+    M extends Type<unknown> = Type<unknown>,
     E extends DomainEvents = DomainEvents,
 > extends MetaDomain<M> {
     readonly events: E;
@@ -86,7 +86,7 @@ export interface EventsDomain<
 
 /** @public */
 export interface ProjectionsDomain<
-    M extends Type<any> = Type<any>,
+    M extends Type<unknown> = Type<unknown>,
     E extends DomainEvents = DomainEvents,
     P extends DomainProjections<EventsDomain<M, E>> = DomainProjections<EventsDomain<M, E>>,
     C extends DomainCollections<EventsDomain<M, E>> = DomainCollections<EventsDomain<M, E>>,
@@ -97,7 +97,7 @@ export interface ProjectionsDomain<
 
 /** @public */
 export interface ActionsDomain<
-    M extends Type<any> = Type<any>,
+    M extends Type<unknown> = Type<unknown>,
     E extends DomainEvents = DomainEvents,
     P extends DomainProjections<EventsDomain<M, E>> = DomainProjections<EventsDomain<M, E>>,
     C extends DomainCollections<EventsDomain<M, E>> = DomainCollections<EventsDomain<M, E>>,
@@ -108,7 +108,7 @@ export interface ActionsDomain<
 
 /** @public */
 export type Domain<
-    M extends Type<any> = Type<any>,
+    M extends Type<unknown> = Type<unknown>,
     E extends DomainEvents = DomainEvents,
     P extends DomainProjections<EventsDomain<M, E>> = DomainProjections<EventsDomain<M, E>>,
     C extends DomainCollections<EventsDomain<M, E>> = DomainCollections<EventsDomain<M, E>>,
@@ -116,25 +116,26 @@ export type Domain<
 > = ActionsDomain<M, E, P, C, A>;
 
 /** @public */
-export type DomainEvents = Record<string, Type<any>>;
+export type DomainEvents = Readonly<Record<string, Type<unknown>>>;
 
 /** @public */
-export type DomainProjections<D extends EventsDomain> = Record<string, Projection<D, Type<any>>>;
+export type DomainProjections<D extends EventsDomain> = Readonly<Record<string, Projection<D, Type<unknown>>>>;
 
 /** @public */
-export type DomainCollections<D extends EventsDomain> = Record<string, Collection<D, Type<any>>>;
+export type DomainCollections<D extends EventsDomain> = Readonly<Record<string, Collection<D, Type<unknown>>>>;
 
 /** @public */
-export type DomainActions<D extends ProjectionsDomain> = Record<string, Action<D, Type<any>, Type<any>>>;
+export type DomainActions<D extends ProjectionsDomain> = 
+    Readonly<Record<string, Action<D, Type<unknown>, Type<unknown>>>>;
 
-const createMetaBuilder = <M extends Type<any>>(meta: M): MetaDomainBuilder<M> => Object.freeze({
+const createMetaBuilder = <M extends Type<unknown>>(meta: M): MetaDomainBuilder<M> => Object.freeze({
     meta,
     setupMeta: type => createMetaBuilder(type),
     addEvents: events => createEventsBuilder(meta, events),
     createDomain: () => createDomain(meta, {}, {}, {}, {}),
 });
 
-const createEventsBuilder = <M extends Type<any>, E extends DomainEvents>(
+const createEventsBuilder = <M extends Type<unknown>, E extends DomainEvents>(
     meta: M,
     events: E, 
 ): EventsDomainBuilder<M, E> => Object.freeze({
@@ -149,7 +150,7 @@ const createEventsBuilder = <M extends Type<any>, E extends DomainEvents>(
     });
 
 const createProjectionsBuilder = <
-    M extends Type<any>,
+    M extends Type<unknown>,
     E extends DomainEvents,
     P extends DomainProjections<EventsDomain<M, E>>,
     C extends DomainCollections<EventsDomain<M, E>>
@@ -180,7 +181,7 @@ const createProjectionsBuilder = <
     });
 
 const createActionsBuilder = <
-    M extends Type<any>,
+    M extends Type<unknown>,
     E extends DomainEvents,
     P extends DomainProjections<EventsDomain<M, E>>,
     C extends DomainCollections<EventsDomain<M, E>>,
@@ -208,7 +209,7 @@ const createActionsBuilder = <
     });
 
 const createDomain = <
-    M extends Type<any>,
+    M extends Type<unknown>,
     E extends DomainEvents,
     P extends DomainProjections<EventsDomain<M, E>>,
     C extends DomainCollections<EventsDomain<M, E>>,

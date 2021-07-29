@@ -4,14 +4,14 @@ import { EventsDomain, ProjectionsDomain } from "./domain";
 import { Snapshot } from "./snapshot";
 
 /** @public */
-export interface Action<D extends ProjectionsDomain, I extends Type<any>, O extends Type<any> = Type<void>> {
+export interface Action<D extends ProjectionsDomain, I extends Type<unknown>, O extends Type<unknown> = Type<void>> {
     input: I;
     output?: O;
     run: ActionRunner<D, I, O>,
 }
 
 /** @public */
-export type ActionRunner<D extends ProjectionsDomain, I extends Type<any>, O extends Type<any> = Type<void>> = (
+export type ActionRunner<D extends ProjectionsDomain, I extends Type<unknown>, O extends Type<unknown> = Type<void>> = (
     context: ActionContext<D, TypeOf<I>>
 ) => Promise<TypeOf<O>>;
 

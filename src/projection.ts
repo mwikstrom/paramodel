@@ -4,18 +4,18 @@ import { EventsDomain, ProjectionsDomain } from "./domain";
 import { Snapshot } from "./snapshot";
 
 /** @public */
-export interface Projection<D extends EventsDomain, T extends Type<any>> {
+export interface Projection<D extends EventsDomain, T extends Type<unknown>> {
     readonly type: T;
     readonly on: Partial<ProjectionHandlers<D, T>>;
     init(): TypeOf<T>;
 }
 
 /** @public */
-export type ProjectionType<P extends Projection<EventsDomain, Type<any>>> =
+export type ProjectionType<P extends Projection<EventsDomain, Type<unknown>>> =
     P extends Projection<EventsDomain, infer T> ? TypeOf<T> : never;
 
 /** @public */
-export type ProjectionHandlers<D extends EventsDomain, T extends Type<any>> = {
+export type ProjectionHandlers<D extends EventsDomain, T extends Type<unknown>> = {
     [K in keyof D["events"]]: ProjectionFunc<TypeOf<D["events"][K]>, T, K, TypeOf<D["meta"]>>;
 };
 

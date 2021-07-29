@@ -4,24 +4,24 @@ import { EventsDomain, ProjectionsDomain } from "./domain";
 import { Snapshot } from "./snapshot";
 
 /** @public */
-export interface Collection<D extends EventsDomain, T extends Type<any>> {
+export interface Collection<D extends EventsDomain, T extends Type<unknown>> {
     readonly entity: T;
     readonly on: Partial<CollectionHandlers<D, T>>;
 }
 
 /** @public */
-export type CollectionHandlers<D extends EventsDomain, T extends Type<any>> = {
+export type CollectionHandlers<D extends EventsDomain, T extends Type<unknown>> = {
     [K in keyof D["events"]]: CollectionFunc<D, T, K>;
 };
 
 /** @public */
-export type CollectionFunc<D extends EventsDomain, T extends Type<any>, K extends keyof D["events"]> = (
+export type CollectionFunc<D extends EventsDomain, T extends Type<unknown>, K extends keyof D["events"]> = (
     this: void,
     context: CollectionContext<D, T, K>,
 ) => Promise<void>;
 
 /** @public */
-export interface CollectionContext<D extends EventsDomain, T extends Type<any>, K extends keyof D["events"]> {
+export interface CollectionContext<D extends EventsDomain, T extends Type<unknown>, K extends keyof D["events"]> {
     readonly commit: Commit<TypeOf<D["meta"]>>;
     readonly change: K;
     readonly input: TypeOf<D["events"][K]>;
