@@ -8,7 +8,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type ProjectionHandlers<D extends EventsDomain, T extends Type<any>> = {
+export declare type ProjectionHandlers<D extends EventsDomain, T extends Type<unknown>> = {
     [K in keyof D["events"]]: ProjectionFunc<TypeOf<D["events"][K]>, T, K, TypeOf<D["meta"]>>;
 };
 ```

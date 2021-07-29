@@ -8,7 +8,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type ProjectionType<P extends Projection<EventsDomain, Type<any>>> = P extends Projection<EventsDomain, infer T> ? TypeOf<T> : never;
+export declare type ProjectionType<P extends Projection<EventsDomain, Type<unknown>>> = P extends Projection<EventsDomain, infer T> ? TypeOf<T> : never;
 ```
 <b>References:</b> [Projection](./paramodel.projection.md)<!-- -->, [EventsDomain](./paramodel.eventsdomain.md)
 

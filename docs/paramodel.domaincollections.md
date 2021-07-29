@@ -8,7 +8,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type DomainCollections<D extends EventsDomain> = Record<string, Collection<D, Type<any>>>;
+export declare type DomainCollections<D extends EventsDomain> = Readonly<Record<string, Collection<D, Type<unknown>>>>;
 ```
 <b>References:</b> [EventsDomain](./paramodel.eventsdomain.md)<!-- -->, [Collection](./paramodel.collection.md)
 

@@ -8,7 +8,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface Collection<D extends EventsDomain, T extends Type<any>> 
+export interface Collection<D extends EventsDomain, T extends Type<unknown>> 
 ```
 
 ## Properties

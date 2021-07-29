@@ -8,7 +8,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type ActionRunner<D extends ProjectionsDomain, I extends Type<any>, O extends Type<any> = Type<void>> = (context: ActionContext<D, TypeOf<I>>) => Promise<TypeOf<O>>;
+export declare type ActionRunner<D extends ProjectionsDomain, I extends Type<unknown>, O extends Type<unknown> = Type<void>> = (context: ActionContext<D, TypeOf<I>>) => Promise<TypeOf<O>>;
 ```
 <b>References:</b> [ProjectionsDomain](./paramodel.projectionsdomain.md)<!-- -->, [ActionContext](./paramodel.actioncontext.md)
 

@@ -8,5 +8,5 @@
 <b>Signature:</b>
 
 ```typescript
-createDomainBuilder: () => MetaDomainBuilder<Type<unknown>>
+createDomainBuilder: () => MetaDomainBuilder<Type<void>>
 ```

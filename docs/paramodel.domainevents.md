@@ -8,5 +8,5 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type DomainEvents = Record<string, Type<any>>;
+export declare type DomainEvents = Readonly<Record<string, Type<unknown>>>;
 ```

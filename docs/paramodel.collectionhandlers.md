@@ -8,7 +8,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type CollectionHandlers<D extends EventsDomain, T extends Type<any>> = {
+export declare type CollectionHandlers<D extends EventsDomain, T extends Type<unknown>> = {
     [K in keyof D["events"]]: CollectionFunc<D, T, K>;
 };
 ```

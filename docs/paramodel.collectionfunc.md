@@ -8,7 +8,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type CollectionFunc<D extends EventsDomain, T extends Type<any>, K extends keyof D["events"]> = (this: void, context: CollectionContext<D, T, K>) => Promise<void>;
+export declare type CollectionFunc<D extends EventsDomain, T extends Type<unknown>, K extends keyof D["events"]> = (this: void, context: CollectionContext<D, T, K>) => Promise<void>;
 ```
 <b>References:</b> [EventsDomain](./paramodel.eventsdomain.md)<!-- -->, [CollectionContext](./paramodel.collectioncontext.md)
 

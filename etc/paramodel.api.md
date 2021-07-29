@@ -16,7 +16,7 @@ export interface AbortOptions {
 }
 
 // @public (undocumented)
-export interface Action<D extends ProjectionsDomain, I extends Type<any>, O extends Type<any> = Type<void>> {
+export interface Action<D extends ProjectionsDomain, I extends Type<unknown>, O extends Type<unknown> = Type<void>> {
     // (undocumented)
     input: I;
     // (undocumented)
@@ -52,10 +52,10 @@ export interface ActionResult<D extends ProjectionsDomain, T> {
 }
 
 // @public (undocumented)
-export type ActionRunner<D extends ProjectionsDomain, I extends Type<any>, O extends Type<any> = Type<void>> = (context: ActionContext<D, TypeOf<I>>) => Promise<TypeOf<O>>;
+export type ActionRunner<D extends ProjectionsDomain, I extends Type<unknown>, O extends Type<unknown> = Type<void>> = (context: ActionContext<D, TypeOf<I>>) => Promise<TypeOf<O>>;
 
 // @public (undocumented)
-export interface ActionsDomain<M extends Type<any> = Type<any>, E extends DomainEvents = DomainEvents, P extends DomainProjections<EventsDomain<M, E>> = DomainProjections<EventsDomain<M, E>>, C extends DomainCollections<EventsDomain<M, E>> = DomainCollections<EventsDomain<M, E>>, A extends DomainActions<ProjectionsDomain<M, E, P, C>> = DomainActions<ProjectionsDomain<M, E, P, C>>> extends ProjectionsDomain<M, E, P, C> {
+export interface ActionsDomain<M extends Type<unknown> = Type<unknown>, E extends DomainEvents = DomainEvents, P extends DomainProjections<EventsDomain<M, E>> = DomainProjections<EventsDomain<M, E>>, C extends DomainCollections<EventsDomain<M, E>> = DomainCollections<EventsDomain<M, E>>, A extends DomainActions<ProjectionsDomain<M, E, P, C>> = DomainActions<ProjectionsDomain<M, E, P, C>>> extends ProjectionsDomain<M, E, P, C> {
     // (undocumented)
     readonly actions: A;
 }
@@ -79,7 +79,7 @@ export interface Batch<D extends ActionsDomain> {
 }
 
 // @public (undocumented)
-export interface Collection<D extends EventsDomain, T extends Type<any>> {
+export interface Collection<D extends EventsDomain, T extends Type<unknown>> {
     // (undocumented)
     readonly entity: T;
     // (undocumented)
@@ -87,7 +87,7 @@ export interface Collection<D extends EventsDomain, T extends Type<any>> {
 }
 
 // @public (undocumented)
-export interface CollectionContext<D extends EventsDomain, T extends Type<any>, K extends keyof D["events"]> {
+export interface CollectionContext<D extends EventsDomain, T extends Type<unknown>, K extends keyof D["events"]> {
     // (undocumented)
     readonly change: K;
     // (undocumented)
@@ -103,10 +103,10 @@ export interface CollectionContext<D extends EventsDomain, T extends Type<any>, 
 }
 
 // @public (undocumented)
-export type CollectionFunc<D extends EventsDomain, T extends Type<any>, K extends keyof D["events"]> = (this: void, context: CollectionContext<D, T, K>) => Promise<void>;
+export type CollectionFunc<D extends EventsDomain, T extends Type<unknown>, K extends keyof D["events"]> = (this: void, context: CollectionContext<D, T, K>) => Promise<void>;
 
 // @public (undocumented)
-export type CollectionHandlers<D extends EventsDomain, T extends Type<any>> = {
+export type CollectionHandlers<D extends EventsDomain, T extends Type<unknown>> = {
     [K in keyof D["events"]]: CollectionFunc<D, T, K>;
 };
 
@@ -153,22 +153,22 @@ export interface CommitSearchOptions {
 }
 
 // @public (undocumented)
-export const createDomainBuilder: () => MetaDomainBuilder<Type<unknown>>;
+export const createDomainBuilder: () => MetaDomainBuilder<Type<void>>;
 
 // @public (undocumented)
-export type Domain<M extends Type<any> = Type<any>, E extends DomainEvents = DomainEvents, P extends DomainProjections<EventsDomain<M, E>> = DomainProjections<EventsDomain<M, E>>, C extends DomainCollections<EventsDomain<M, E>> = DomainCollections<EventsDomain<M, E>>, A extends DomainActions<ProjectionsDomain<M, E, P, C>> = DomainActions<ProjectionsDomain<M, E, P, C>>> = ActionsDomain<M, E, P, C, A>;
+export type Domain<M extends Type<unknown> = Type<unknown>, E extends DomainEvents = DomainEvents, P extends DomainProjections<EventsDomain<M, E>> = DomainProjections<EventsDomain<M, E>>, C extends DomainCollections<EventsDomain<M, E>> = DomainCollections<EventsDomain<M, E>>, A extends DomainActions<ProjectionsDomain<M, E, P, C>> = DomainActions<ProjectionsDomain<M, E, P, C>>> = ActionsDomain<M, E, P, C, A>;
 
 // @public (undocumented)
-export type DomainActions<D extends ProjectionsDomain> = Record<string, Action<D, Type<any>, Type<any>>>;
+export type DomainActions<D extends ProjectionsDomain> = Readonly<Record<string, Action<D, Type<unknown>, Type<unknown>>>>;
 
 // @public (undocumented)
-export type DomainCollections<D extends EventsDomain> = Record<string, Collection<D, Type<any>>>;
+export type DomainCollections<D extends EventsDomain> = Readonly<Record<string, Collection<D, Type<unknown>>>>;
 
 // @public (undocumented)
-export type DomainEvents = Record<string, Type<any>>;
+export type DomainEvents = Readonly<Record<string, Type<unknown>>>;
 
 // @public (undocumented)
-export type DomainProjections<D extends EventsDomain> = Record<string, Projection<D, Type<any>>>;
+export type DomainProjections<D extends EventsDomain> = Readonly<Record<string, Projection<D, Type<unknown>>>>;
 
 // @public (undocumented)
 export type Emitter<D extends EventsDomain> = {
@@ -176,7 +176,7 @@ export type Emitter<D extends EventsDomain> = {
 };
 
 // @public (undocumented)
-export interface EventsDomain<M extends Type<any> = Type<any>, E extends DomainEvents = DomainEvents> extends MetaDomain<M> {
+export interface EventsDomain<M extends Type<unknown> = Type<unknown>, E extends DomainEvents = DomainEvents> extends MetaDomain<M> {
     // (undocumented)
     readonly events: E;
 }
@@ -184,15 +184,15 @@ export interface EventsDomain<M extends Type<any> = Type<any>, E extends DomainE
 // @public (undocumented)
 export interface EventsDomainBuilder<M extends Type<unknown>, E extends DomainEvents> extends EventsDomain<M, E> {
     // (undocumented)
-    addActions<T extends DomainActions<ProjectionsDomain<M, E, {}, {}>>>(this: void, actions: T): ActionsDomainBuilder<M, E, {}, {}, T>;
+    addActions<T extends DomainActions<ProjectionsDomain<M, E>>>(this: void, actions: T): ActionsDomainBuilder<M, E, DomainProjections<EventsDomain<M, E>>, DomainCollections<EventsDomain<M, E>>, T>;
     // (undocumented)
-    addCollections<T extends DomainCollections<EventsDomain<M, E>>>(this: void, collections: T): ProjectionsDomainBuilder<M, E, {}, T>;
+    addCollections<T extends DomainCollections<EventsDomain<M, E>>>(this: void, collections: T): ProjectionsDomainBuilder<M, E, DomainProjections<EventsDomain<M, E>>, T>;
     // (undocumented)
     addEvents<T extends DomainEvents>(this: void, events: T): EventsDomainBuilder<M, E & T>;
     // (undocumented)
-    addProjections<T extends DomainProjections<EventsDomain<M, E>>>(this: void, projections: T): ProjectionsDomainBuilder<M, E, T, {}>;
+    addProjections<T extends DomainProjections<EventsDomain<M, E>>>(this: void, projections: T): ProjectionsDomainBuilder<M, E, T>;
     // (undocumented)
-    createDomain(this: void): Domain<M, E, {}, {}, {}>;
+    createDomain(this: void): Domain<M, E>;
     // (undocumented)
     setupMeta<T extends Type<unknown>>(this: void, type: T): EventsDomainBuilder<T, E>;
 }
@@ -224,7 +224,7 @@ export interface EventStream<D extends Domain> {
 }
 
 // @public (undocumented)
-export interface MetaDomain<M extends Type<any> = Type<unknown>> {
+export interface MetaDomain<M extends Type<unknown> = Type<unknown>> {
     // (undocumented)
     readonly meta: M;
 }
@@ -234,7 +234,7 @@ export interface MetaDomainBuilder<M extends Type<unknown>> extends MetaDomain<M
     // (undocumented)
     addEvents<T extends DomainEvents>(this: void, events: T): EventsDomainBuilder<M, T>;
     // (undocumented)
-    createDomain(this: void): Domain<M, {}, {}, {}, {}>;
+    createDomain(this: void): Domain<M>;
     // (undocumented)
     setupMeta<T extends Type<unknown>>(this: void, type: T): MetaDomainBuilder<T>;
 }
@@ -243,7 +243,7 @@ export interface MetaDomainBuilder<M extends Type<unknown>> extends MetaDomain<M
 export type PeekOptions = CommitSearchOptions & AbortOptions;
 
 // @public (undocumented)
-export interface Projection<D extends EventsDomain, T extends Type<any>> {
+export interface Projection<D extends EventsDomain, T extends Type<unknown>> {
     // (undocumented)
     init(): TypeOf<T>;
     // (undocumented)
@@ -268,12 +268,12 @@ export interface ProjectionContext<E, T, K, M> {
 export type ProjectionFunc<E, T, K, M> = (this: void, context: ProjectionContext<E, T, K, M>) => T;
 
 // @public (undocumented)
-export type ProjectionHandlers<D extends EventsDomain, T extends Type<any>> = {
+export type ProjectionHandlers<D extends EventsDomain, T extends Type<unknown>> = {
     [K in keyof D["events"]]: ProjectionFunc<TypeOf<D["events"][K]>, T, K, TypeOf<D["meta"]>>;
 };
 
 // @public (undocumented)
-export interface ProjectionsDomain<M extends Type<any> = Type<any>, E extends DomainEvents = DomainEvents, P extends DomainProjections<EventsDomain<M, E>> = DomainProjections<EventsDomain<M, E>>, C extends DomainCollections<EventsDomain<M, E>> = DomainCollections<EventsDomain<M, E>>> extends EventsDomain<M, E> {
+export interface ProjectionsDomain<M extends Type<unknown> = Type<unknown>, E extends DomainEvents = DomainEvents, P extends DomainProjections<EventsDomain<M, E>> = DomainProjections<EventsDomain<M, E>>, C extends DomainCollections<EventsDomain<M, E>> = DomainCollections<EventsDomain<M, E>>> extends EventsDomain<M, E> {
     // (undocumented)
     readonly collections: C;
     // (undocumented)
@@ -281,7 +281,7 @@ export interface ProjectionsDomain<M extends Type<any> = Type<any>, E extends Do
 }
 
 // @public (undocumented)
-export interface ProjectionsDomainBuilder<M extends Type<unknown>, E extends DomainEvents, P extends DomainProjections<EventsDomain<M, E>>, C extends DomainCollections<EventsDomain<M, E>>> extends ProjectionsDomain<M, E, P, C> {
+export interface ProjectionsDomainBuilder<M extends Type<unknown>, E extends DomainEvents, P extends DomainProjections<EventsDomain<M, E>>, C extends DomainCollections<EventsDomain<M, E>> = DomainCollections<EventsDomain<M, E>>> extends ProjectionsDomain<M, E, P, C> {
     // (undocumented)
     addActions<T extends DomainActions<ProjectionsDomain<M, E, P, C>>>(this: void, actions: T): ActionsDomainBuilder<M, E, P, C, T>;
     // (undocumented)
@@ -289,11 +289,11 @@ export interface ProjectionsDomainBuilder<M extends Type<unknown>, E extends Dom
     // (undocumented)
     addProjections<T extends DomainProjections<EventsDomain<M, E>>>(this: void, projections: T): ProjectionsDomainBuilder<M, E, P & T, C>;
     // (undocumented)
-    createDomain(this: void): Domain<M, E, P, C, {}>;
+    createDomain(this: void): Domain<M, E, P, C>;
 }
 
 // @public (undocumented)
-export type ProjectionType<P extends Projection<EventsDomain, Type<any>>> = P extends Projection<EventsDomain, infer T> ? TypeOf<T> : never;
+export type ProjectionType<P extends Projection<EventsDomain, Type<unknown>>> = P extends Projection<EventsDomain, infer T> ? TypeOf<T> : never;
 
 // @public (undocumented)
 export interface ProjectionView<D extends ProjectionsDomain, K extends keyof D["projections"]> {

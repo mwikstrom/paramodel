@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-addCollections<T extends DomainCollections<EventsDomain<M, E>>>(this: void, collections: T): ProjectionsDomainBuilder<M, E, {}, T>;
+addCollections<T extends DomainCollections<EventsDomain<M, E>>>(this: void, collections: T): ProjectionsDomainBuilder<M, E, DomainProjections<EventsDomain<M, E>>, T>;
 ```
 
 ## Parameters
@@ -19,5 +19,5 @@ addCollections<T extends DomainCollections<EventsDomain<M, E>>>(this: void, coll
 
 <b>Returns:</b>
 
-[ProjectionsDomainBuilder](./paramodel.projectionsdomainbuilder.md)<!-- -->&lt;M, E, {}, T&gt;
+[ProjectionsDomainBuilder](./paramodel.projectionsdomainbuilder.md)<!-- -->&lt;M, E, [DomainProjections](./paramodel.domainprojections.md)<!-- -->&lt;[EventsDomain](./paramodel.eventsdomain.md)<!-- -->&lt;M, E&gt;&gt;, T&gt;
 

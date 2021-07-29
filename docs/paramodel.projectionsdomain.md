@@ -8,7 +8,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface ProjectionsDomain<M extends Type<any> = Type<any>, E extends DomainEvents = DomainEvents, P extends DomainProjections<EventsDomain<M, E>> = DomainProjections<EventsDomain<M, E>>, C extends DomainCollections<EventsDomain<M, E>> = DomainCollections<EventsDomain<M, E>>> extends EventsDomain<M, E> 
+export interface ProjectionsDomain<M extends Type<unknown> = Type<unknown>, E extends DomainEvents = DomainEvents, P extends DomainProjections<EventsDomain<M, E>> = DomainProjections<EventsDomain<M, E>>, C extends DomainCollections<EventsDomain<M, E>> = DomainCollections<EventsDomain<M, E>>> extends EventsDomain<M, E> 
 ```
 <b>Extends:</b> [EventsDomain](./paramodel.eventsdomain.md)<!-- -->&lt;M, E&gt;
 

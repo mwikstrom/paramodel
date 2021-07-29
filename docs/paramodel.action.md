@@ -8,7 +8,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface Action<D extends ProjectionsDomain, I extends Type<any>, O extends Type<any> = Type<void>> 
+export interface Action<D extends ProjectionsDomain, I extends Type<unknown>, O extends Type<unknown> = Type<void>> 
 ```
 
 ## Properties

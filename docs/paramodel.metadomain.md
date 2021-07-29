@@ -8,7 +8,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface MetaDomain<M extends Type<any> = Type<unknown>> 
+export interface MetaDomain<M extends Type<unknown> = Type<unknown>> 
 ```
 
 ## Properties

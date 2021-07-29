@@ -8,7 +8,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type DomainProjections<D extends EventsDomain> = Record<string, Projection<D, Type<any>>>;
+export declare type DomainProjections<D extends EventsDomain> = Readonly<Record<string, Projection<D, Type<unknown>>>>;
 ```
 <b>References:</b> [EventsDomain](./paramodel.eventsdomain.md)<!-- -->, [Projection](./paramodel.projection.md)
 

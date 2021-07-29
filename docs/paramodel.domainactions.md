@@ -8,7 +8,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type DomainActions<D extends ProjectionsDomain> = Record<string, Action<D, Type<any>, Type<any>>>;
+export declare type DomainActions<D extends ProjectionsDomain> = Readonly<Record<string, Action<D, Type<unknown>, Type<unknown>>>>;
 ```
 <b>References:</b> [ProjectionsDomain](./paramodel.projectionsdomain.md)<!-- -->, [Action](./paramodel.action.md)
 

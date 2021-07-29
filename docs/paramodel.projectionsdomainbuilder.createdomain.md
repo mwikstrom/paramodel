@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-createDomain(this: void): Domain<M, E, P, C, {}>;
+createDomain(this: void): Domain<M, E, P, C>;
 ```
 
 ## Parameters
@@ -18,5 +18,5 @@ createDomain(this: void): Domain<M, E, P, C, {}>;
 
 <b>Returns:</b>
 
-[Domain](./paramodel.domain.md)<!-- -->&lt;M, E, P, C, {}&gt;
+[Domain](./paramodel.domain.md)<!-- -->&lt;M, E, P, C&gt;
 

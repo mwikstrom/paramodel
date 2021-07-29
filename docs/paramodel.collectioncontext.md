@@ -8,7 +8,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface CollectionContext<D extends EventsDomain, T extends Type<any>, K extends keyof D["events"]> 
+export interface CollectionContext<D extends EventsDomain, T extends Type<unknown>, K extends keyof D["events"]> 
 ```
 
 ## Properties
