@@ -8,8 +8,9 @@
 <b>Signature:</b>
 
 ```typescript
-export interface CollectionContext<D extends EventsDomain, T extends Type<unknown>, K extends keyof D["events"]> 
+export interface CollectionContext<D extends EventsDomain, T extends Type<unknown>, K extends keyof D["events"]> extends CollectionQuery<TypeOf<T>> 
 ```
+<b>Extends:</b> [CollectionQuery](./paramodel.collectionquery.md)<!-- -->&lt;TypeOf&lt;T&gt;&gt;
 
 ## Properties
 
@@ -24,6 +25,5 @@ export interface CollectionContext<D extends EventsDomain, T extends Type<unknow
 |  Method | Description |
 |  --- | --- |
 |  [del(id)](./paramodel.collectioncontext.del.md) |  |
-|  [get(id)](./paramodel.collectioncontext.get.md) |  |
 |  [put(id, value)](./paramodel.collectioncontext.put.md) |  |
 

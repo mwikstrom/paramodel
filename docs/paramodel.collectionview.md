@@ -8,14 +8,14 @@
 <b>Signature:</b>
 
 ```typescript
-export interface CollectionView<D extends ProjectionsDomain, K extends keyof D["collections"]> 
+export interface CollectionView<D extends ProjectionsDomain, K extends keyof D["collections"]> extends CollectionQuery<TypeOf<D["collections"][K]["entity"]>> 
 ```
+<b>Extends:</b> [CollectionQuery](./paramodel.collectionquery.md)<!-- -->&lt;TypeOf&lt;D\["collections"\]\[K\]\["entity"\]&gt;&gt;
 
 ## Properties
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [key](./paramodel.collectionview.key.md) | K |  |
 |  [snapshot](./paramodel.collectionview.snapshot.md) | [Snapshot](./paramodel.snapshot.md)<!-- -->&lt;D&gt; |  |
 
 ## Methods
@@ -23,5 +23,4 @@ export interface CollectionView<D extends ProjectionsDomain, K extends keyof D["
 |  Method | Description |
 |  --- | --- |
 |  [alloc()](./paramodel.collectionview.alloc.md) |  |
-|  [get(id)](./paramodel.collectionview.get.md) |  |
 

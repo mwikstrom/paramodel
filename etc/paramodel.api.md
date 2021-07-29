@@ -87,15 +87,13 @@ export interface Collection<D extends EventsDomain, T extends Type<unknown>> {
 }
 
 // @public (undocumented)
-export interface CollectionContext<D extends EventsDomain, T extends Type<unknown>, K extends keyof D["events"]> {
+export interface CollectionContext<D extends EventsDomain, T extends Type<unknown>, K extends keyof D["events"]> extends CollectionQuery<TypeOf<T>> {
     // (undocumented)
     readonly change: K;
     // (undocumented)
     readonly commit: Commit<TypeOf<D["meta"]>>;
     // (undocumented)
     del(id: number): void;
-    // (undocumented)
-    get(id: number): Promise<TypeOf<T> | undefined>;
     // (undocumented)
     readonly input: TypeOf<D["events"][K]>;
     // (undocumented)
@@ -110,14 +108,18 @@ export type CollectionHandlers<D extends EventsDomain, T extends Type<unknown>> 
     [K in keyof D["events"]]: CollectionFunc<D, T, K>;
 };
 
+// Warning: (ae-forgotten-export) The symbol "Query" needs to be exported by the entry point index.d.ts
+//
 // @public (undocumented)
-export interface CollectionView<D extends ProjectionsDomain, K extends keyof D["collections"]> {
+export interface CollectionQuery<T> extends Query<T> {
+    // (undocumented)
+    get(id: number): Promise<T | undefined>;
+}
+
+// @public (undocumented)
+export interface CollectionView<D extends ProjectionsDomain, K extends keyof D["collections"]> extends CollectionQuery<TypeOf<D["collections"][K]["entity"]>> {
     // (undocumented)
     alloc(): number;
-    // (undocumented)
-    get(id: number): Promise<TypeOf<D["collections"][K]["entity"]> | undefined>;
-    // (undocumented)
-    readonly key: K;
     // (undocumented)
     readonly snapshot: Snapshot<D>;
 }

@@ -1,6 +1,7 @@
 import { Type, TypeOf } from "paratype";
 import { Commit } from "./commit";
 import { EventsDomain, ProjectionsDomain } from "./domain";
+import { Query } from "./query";
 import { Snapshot } from "./snapshot";
 
 /** @public */
@@ -21,21 +22,28 @@ export type CollectionFunc<D extends EventsDomain, T extends Type<unknown>, K ex
 ) => Promise<void>;
 
 /** @public */
-export interface CollectionContext<D extends EventsDomain, T extends Type<unknown>, K extends keyof D["events"]> {
+export interface CollectionContext<
+    D extends EventsDomain,
+    T extends Type<unknown>,
+    K extends keyof D["events"]
+> extends CollectionQuery<TypeOf<T>> {
     readonly commit: Commit<TypeOf<D["meta"]>>;
     readonly change: K;
     readonly input: TypeOf<D["events"][K]>;
     del(id: number): void;
-    get(id: number): Promise<TypeOf<T> | undefined>;
     put(id: number, value: TypeOf<T>): void;
-    // TODO: query!
 }
 
 /** @public */
-export interface CollectionView<D extends ProjectionsDomain, K extends keyof D["collections"]> {
+export interface CollectionView<
+    D extends ProjectionsDomain,
+    K extends keyof D["collections"]
+> extends CollectionQuery<TypeOf<D["collections"][K]["entity"]>> {
     readonly snapshot: Snapshot<D>;
-    readonly key: K;
     alloc(): number;
-    get(id: number): Promise<TypeOf<D["collections"][K]["entity"]> | undefined>;
-    // TODO: query!
+}
+
+/** @public */
+export interface CollectionQuery<T> extends Query<T> {
+    get(id: number): Promise<T | undefined>;
 }

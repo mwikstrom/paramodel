@@ -19,6 +19,7 @@ Run-time domain model for event-sourcing.
 |  [Batch](./paramodel.batch.md) |  |
 |  [Collection](./paramodel.collection.md) |  |
 |  [CollectionContext](./paramodel.collectioncontext.md) |  |
+|  [CollectionQuery](./paramodel.collectionquery.md) |  |
 |  [CollectionView](./paramodel.collectionview.md) |  |
 |  [Commit](./paramodel.commit.md) |  |
 |  [CommitOptions](./paramodel.commitoptions.md) |  |
