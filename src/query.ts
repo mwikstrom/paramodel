@@ -1,11 +1,18 @@
 /**
  * @public
  */
-export interface Queryable<T> {
+export interface Queryable<T> extends SortedQueryable<T> {
+    by<P extends keyof SortableProps<T>>(property: P): SortedQueryable<T>;
+}
+
+/**
+ * @public
+ */
+export interface SortedQueryable<T> extends AsyncIterable<T>{
     any(): Promise<boolean>;
     count(): Promise<number>;
-    orderBy<P extends keyof T>(property: P): Queryable<T>;
-    top(count: number): Promise<readonly T[]>;
+    first(): Promise<T | undefined>;
+    page(options?: PageOptions): Promise<Page<T>>;
     where<
         P extends string & keyof T,
         O extends FilterOperator<T[P]>,
@@ -13,9 +20,26 @@ export interface Queryable<T> {
         property: P,
         operator: O,
         operand: FilterOperand<T[P], O>,
-    ): Queryable<T>;
+    ): SortedQueryable<T>;
     // TODO: Support nested filter (stepping into record property)
     // TODO: Support subquery filter (stepping into array)
+}
+
+/**
+ * @public
+ */
+export interface PageOptions {
+    size?: number;
+    fill?: boolean;
+    continuation?: string;
+}
+
+/**
+ * @public
+ */
+export interface Page<T> {
+    readonly items: readonly T[];
+    readonly continuation?: string;
 }
 
 /**
@@ -50,6 +74,13 @@ export type Equatable = null | boolean | Comparable;
  * @public
  */
 export type Comparable = number | string | Date;
+
+/**
+ * @public
+ */
+export type SortableProps<T> = {
+    [P in keyof T]: T[P] extends Comparable ? T[P] : never;
+}
 
 /**
  * @public
