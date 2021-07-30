@@ -17,6 +17,7 @@ export interface ActionContext<D extends ProjectionsDomain, T>
 |  --- | --- | --- |
 |  [base](./paramodel.actioncontext.base.md) | [Snapshot](./paramodel.snapshot.md)<!-- -->&lt;D&gt; |  |
 |  [commit](./paramodel.actioncontext.commit.md) | [Commit](./paramodel.commit.md)<!-- -->&lt;TypeOf&lt;D\["meta"\]&gt;&gt; |  |
+|  [dry](./paramodel.actioncontext.dry.md) | boolean |  |
 |  [emit](./paramodel.actioncontext.emit.md) | [Emitter](./paramodel.emitter.md)<!-- -->&lt;D&gt; |  |
 |  [input](./paramodel.actioncontext.input.md) | T |  |
 
@@ -25,6 +26,6 @@ export interface ActionContext<D extends ProjectionsDomain, T>
 |  Method | Description |
 |  --- | --- |
 |  [conflict(message)](./paramodel.actioncontext.conflict.md) |  |
-|  [conflict(when)](./paramodel.actioncontext.conflict_1.md) |  |
+|  [conflict(when, message)](./paramodel.actioncontext.conflict_1.md) |  |
 |  [conflict(when, message)](./paramodel.actioncontext.conflict_2.md) |  |
 

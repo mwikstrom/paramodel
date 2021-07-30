@@ -16,6 +16,7 @@ export interface CommitOptions<M> extends AbortOptions
 
 |  Property | Type | Description |
 |  --- | --- | --- |
+|  [dry](./paramodel.commitoptions.dry.md) | boolean |  |
 |  [maxAttempts?](./paramodel.commitoptions.maxattempts.md) | number | <i>(Optional)</i> |
 |  [meta?](./paramodel.commitoptions.meta.md) | M | <i>(Optional)</i> |
 

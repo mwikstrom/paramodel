@@ -9,7 +9,7 @@
     "lib"
   ],
   "scripts": {
-    "prebuild": "rimraf temp lib docs && eslint",
+    "prebuild": "rimraf temp lib docs && npm run lint",
     "build": "tsc",
     "postbuild": "npm test && api-extractor run --local && api-documenter markdown --input temp --output docs",
     "lint": "eslint src test",

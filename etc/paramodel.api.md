@@ -32,11 +32,13 @@ export interface ActionContext<D extends ProjectionsDomain, T> {
     // (undocumented)
     readonly commit: Commit<TypeOf<D["meta"]>>;
     // (undocumented)
-    conflict(message?: string): void;
+    conflict(message?: string): never;
     // (undocumented)
-    conflict(when: boolean): void;
+    conflict(when: true, message?: string): never;
     // (undocumented)
-    conflict(when: boolean, message: string): void;
+    conflict(when: false, message?: string): void;
+    // (undocumented)
+    readonly dry: boolean;
     // (undocumented)
     readonly emit: Emitter<D>;
     // (undocumented)
@@ -130,6 +132,8 @@ export interface Commit<M> {
 
 // @public (undocumented)
 export interface CommitOptions<M> extends AbortOptions {
+    // (undocumented)
+    dry: boolean;
     // (undocumented)
     maxAttempts?: number;
     // (undocumented)

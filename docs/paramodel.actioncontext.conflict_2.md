@@ -7,14 +7,14 @@
 <b>Signature:</b>
 
 ```typescript
-conflict(when: boolean, message: string): void;
+conflict(when: false, message?: string): void;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  when | boolean |  |
+|  when | false |  |
 |  message | string |  |
 
 <b>Returns:</b>

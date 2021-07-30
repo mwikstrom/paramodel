@@ -7,16 +7,17 @@
 <b>Signature:</b>
 
 ```typescript
-conflict(when: boolean): void;
+conflict(when: true, message?: string): never;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  when | boolean |  |
+|  when | true |  |
+|  message | string |  |
 
 <b>Returns:</b>
 
-void
+never
 
