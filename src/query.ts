@@ -40,6 +40,7 @@ export interface PageOptions {
 export interface Page<T> {
     readonly items: readonly T[];
     readonly continuation?: string;
+    readonly final?: boolean;
 }
 
 /**
