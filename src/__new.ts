@@ -16,8 +16,15 @@ export interface ActionHandler<
     readonly input: Type<Input>;
     readonly output: Type<Output>;
     readonly dependencies: ReadonlySet<string & keyof Views>;
-    exec(context: ActionContext<Events, Views, Input, Output>): Promise<void>;
+    readonly exec: ActionFunc<Events, Views, Input, Output>;
 }
+
+export type ActionFunc<
+    Events extends ChangeModel = ChangeModel,
+    Views extends ReadModel = ReadModel,
+    Input = unknown,
+    Output = unknown,
+> = (context: ActionContext<Events, Views, Input, Output>) => Promise<void>;
 
 export interface ActionContext<
     Events extends ChangeModel = ChangeModel,
@@ -96,10 +103,14 @@ export function defineAction<
     Views extends ReadModel,
     Input,
     Output,
-    DependencyKeys extends keyof Views,
+    Dependencies extends (keyof Views)[],
 >(
-// TODO: Action definition
-): ActionHandler<Events, Pick<Views, DependencyKeys>, Input, Output> {
+    model: Pick<DomainModel<Events, Views>, "events" | "views">,
+    input: Type<Input>,
+    output: Type<Output>,
+    dependencies: Dependencies,
+    exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Input, Output>,
+): ActionHandler<Events, Pick<Views, Dependencies[number]>, Input, Output> {
     throw new Error("TODO");
 }
 
