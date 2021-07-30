@@ -7,5 +7,5 @@
 <b>Signature:</b>
 
 ```typescript
-readonly exec: ActionFunc<Events, Views, Input, Output>;
+readonly exec: ActionFunc<Events, Views, Scope, Input, Output>;
 ```

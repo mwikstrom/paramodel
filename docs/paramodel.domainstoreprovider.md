@@ -14,5 +14,5 @@ export interface DomainStoreProvider
 
 |  Method | Description |
 |  --- | --- |
-|  [get(id, model)](./paramodel.domainstoreprovider.get.md) |  |
+|  [get(id, model, scope)](./paramodel.domainstoreprovider.get.md) |  |
 

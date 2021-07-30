@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface QueryHandler<P extends Record<string, unknown> = Record<string, unknown>, T = unknown, R extends ReadModel = ReadModel> 
+export interface QueryHandler<P extends Record<string, unknown> = Record<string, unknown>, T = unknown, R extends ReadModel = ReadModel, Scope = unknown> 
 ```
 
 ## Properties
@@ -15,7 +15,7 @@ export interface QueryHandler<P extends Record<string, unknown> = Record<string,
 |  Property | Type | Description |
 |  --- | --- | --- |
 |  [dependencies](./paramodel.queryhandler.dependencies.md) | ReadonlySet&lt;string &amp; keyof R&gt; |  |
-|  [exec](./paramodel.queryhandler.exec.md) | [QueryFunc](./paramodel.queryfunc.md)<!-- -->&lt;R, P, T&gt; |  |
+|  [exec](./paramodel.queryhandler.exec.md) | [QueryFunc](./paramodel.queryfunc.md)<!-- -->&lt;R, P, Scope, T&gt; |  |
 |  [kind](./paramodel.queryhandler.kind.md) | "query" |  |
 |  [params](./paramodel.queryhandler.params.md) | Type&lt;P&gt; |  |
 |  [type](./paramodel.queryhandler.type.md) | Type&lt;T&gt; |  |

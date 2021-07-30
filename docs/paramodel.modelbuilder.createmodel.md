@@ -7,9 +7,9 @@
 <b>Signature:</b>
 
 ```typescript
-createModel(): DomainModel<Events, Views, Actions>;
+createModel(): DomainModel<Events, Views, Actions, Scope>;
 ```
 <b>Returns:</b>
 
-[DomainModel](./paramodel.domainmodel.md)<!-- -->&lt;Events, Views, Actions&gt;
+[DomainModel](./paramodel.domainmodel.md)<!-- -->&lt;Events, Views, Actions, Scope&gt;
 

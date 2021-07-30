@@ -7,10 +7,11 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type DomainModel<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Actions extends WriteModel = WriteModel> = {
+export declare type DomainModel<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Actions extends WriteModel = WriteModel, Scope = unknown> = {
     readonly events: Events;
     readonly views: Views;
     readonly actions: Actions;
+    readonly scope: Type<Scope>;
 };
 ```
 <b>References:</b> [ChangeModel](./paramodel.changemodel.md)<!-- -->, [ReadModel](./paramodel.readmodel.md)<!-- -->, [WriteModel](./paramodel.writemodel.md)

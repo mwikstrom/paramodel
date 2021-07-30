@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-addAction<ActionKey extends string, Handler extends ActionHandler>(key: ActionKey, handler: Handler): ModelBuilder<Events, Views, Actions & WriteModel<ActionKey, ActionHandler>>;
+addAction<ActionKey extends string, Handler extends ActionHandler>(key: ActionKey, handler: Handler): ModelBuilder<Events, Views, Actions & WriteModel<ActionKey, ActionHandler>, Scope>;
 ```
 
 ## Parameters
@@ -19,5 +19,5 @@ addAction<ActionKey extends string, Handler extends ActionHandler>(key: ActionKe
 
 <b>Returns:</b>
 
-[ModelBuilder](./paramodel.modelbuilder.md)<!-- -->&lt;Events, Views, Actions &amp; [WriteModel](./paramodel.writemodel.md)<!-- -->&lt;ActionKey, [ActionHandler](./paramodel.actionhandler.md)<!-- -->&gt;&gt;
+[ModelBuilder](./paramodel.modelbuilder.md)<!-- -->&lt;Events, Views, Actions &amp; [WriteModel](./paramodel.writemodel.md)<!-- -->&lt;ActionKey, [ActionHandler](./paramodel.actionhandler.md)<!-- -->&gt;, Scope&gt;
 

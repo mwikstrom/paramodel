@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare function defineQuery<Views extends ReadModel, Dependencies extends (string & keyof Views)[], Params extends Record<string, unknown>, Result>(type: Type<Result>, params: Type<Params>, dependencies: Dependencies, exec: QueryFunc<Pick<Views, Dependencies[number]>, Params, Result>): QueryHandler<Params, Result, Pick<Views, Dependencies[number]>>;
+export declare function defineQuery<Views extends ReadModel, Scope, Dependencies extends (string & keyof Views)[], Params extends Record<string, unknown>, Result>(type: Type<Result>, params: Type<Params>, dependencies: Dependencies, exec: QueryFunc<Pick<Views, Dependencies[number]>, Params, Scope, Result>): QueryHandler<Params, Result, Pick<Views, Dependencies[number]>, Scope>;
 ```
 
 ## Parameters
@@ -17,9 +17,9 @@ export declare function defineQuery<Views extends ReadModel, Dependencies extend
 |  type | Type&lt;Result&gt; |  |
 |  params | Type&lt;Params&gt; |  |
 |  dependencies | Dependencies |  |
-|  exec | [QueryFunc](./paramodel.queryfunc.md)<!-- -->&lt;Pick&lt;Views, Dependencies\[number\]&gt;, Params, Result&gt; |  |
+|  exec | [QueryFunc](./paramodel.queryfunc.md)<!-- -->&lt;Pick&lt;Views, Dependencies\[number\]&gt;, Params, Scope, Result&gt; |  |
 
 <b>Returns:</b>
 
-[QueryHandler](./paramodel.queryhandler.md)<!-- -->&lt;Params, Result, Pick&lt;Views, Dependencies\[number\]&gt;&gt;
+[QueryHandler](./paramodel.queryhandler.md)<!-- -->&lt;Params, Result, Pick&lt;Views, Dependencies\[number\]&gt;, Scope&gt;
 

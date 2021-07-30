@@ -7,9 +7,9 @@
 <b>Signature:</b>
 
 ```typescript
-export declare function defineState<Events extends ChangeModel, Views extends ReadModel, State, Mutators extends string & keyof Events, Dependencies extends (string & keyof Views)[]>(type: Type<State>, initial: State, dependencies: Dependencies, on: {
+export declare function defineState<Events extends ChangeModel, Views extends ReadModel, Scope, State, Mutators extends string & keyof Events, Dependencies extends (string & keyof Views)[]>(type: Type<State>, initial: State, dependencies: Dependencies, on: {
     [K in Mutators]: StateApplyFunc<ChangeModel<K, Events[K]>, Pick<Views, Dependencies[number]>, State>;
-}): StateProjection<State, Events, Views>;
+}, auth?: StateAuthFunc<Scope, State, Pick<Views, Dependencies[number]>>): StateProjection<State, Events, Views, Scope>;
 ```
 
 ## Parameters
@@ -20,8 +20,9 @@ export declare function defineState<Events extends ChangeModel, Views extends Re
 |  initial | State |  |
 |  dependencies | Dependencies |  |
 |  on | { \[K in Mutators\]: [StateApplyFunc](./paramodel.stateapplyfunc.md)<!-- -->&lt;[ChangeModel](./paramodel.changemodel.md)<!-- -->&lt;K, Events\[K\]&gt;, Pick&lt;Views, Dependencies\[number\]&gt;, State&gt;; } |  |
+|  auth | [StateAuthFunc](./paramodel.stateauthfunc.md)<!-- -->&lt;Scope, State, Pick&lt;Views, Dependencies\[number\]&gt;&gt; |  |
 
 <b>Returns:</b>
 
-[StateProjection](./paramodel.stateprojection.md)<!-- -->&lt;State, Events, Views&gt;
+[StateProjection](./paramodel.stateprojection.md)<!-- -->&lt;State, Events, Views, Scope&gt;
 

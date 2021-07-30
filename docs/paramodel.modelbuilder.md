@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface ModelBuilder<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Actions extends WriteModel = WriteModel> 
+export interface ModelBuilder<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Actions extends WriteModel = WriteModel, Scope = unknown> 
 ```
 
 ## Methods

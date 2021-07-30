@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface ActionHandler<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Input = unknown, Output = unknown> 
+export interface ActionHandler<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Scope = unknown, Input = unknown, Output = unknown> 
 ```
 
 ## Properties
@@ -15,7 +15,7 @@ export interface ActionHandler<Events extends ChangeModel = ChangeModel, Views e
 |  Property | Type | Description |
 |  --- | --- | --- |
 |  [dependencies](./paramodel.actionhandler.dependencies.md) | ReadonlySet&lt;string &amp; keyof Views&gt; |  |
-|  [exec](./paramodel.actionhandler.exec.md) | [ActionFunc](./paramodel.actionfunc.md)<!-- -->&lt;Events, Views, Input, Output&gt; |  |
+|  [exec](./paramodel.actionhandler.exec.md) | [ActionFunc](./paramodel.actionfunc.md)<!-- -->&lt;Events, Views, Scope, Input, Output&gt; |  |
 |  [input](./paramodel.actionhandler.input.md) | Type&lt;Input&gt; |  |
 |  [output](./paramodel.actionhandler.output.md) | Type&lt;Output&gt; |  |
 

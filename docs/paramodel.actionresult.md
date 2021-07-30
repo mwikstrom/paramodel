@@ -17,8 +17,8 @@ export interface ActionResult<Events extends ChangeModel, Output>
 |  [base](./paramodel.actionresult.base.md) | number |  |
 |  [changes](./paramodel.actionresult.changes.md) | readonly [ChangeType](./paramodel.changetype.md)<!-- -->&lt;Events&gt;\[\] |  |
 |  [committed?](./paramodel.actionresult.committed.md) | number | <i>(Optional)</i> |
-|  [conflict?](./paramodel.actionresult.conflict.md) | string | <i>(Optional)</i> |
+|  [message?](./paramodel.actionresult.message.md) | string | <i>(Optional)</i> |
 |  [output?](./paramodel.actionresult.output.md) | Output | <i>(Optional)</i> |
-|  [success](./paramodel.actionresult.success.md) | boolean |  |
+|  [status](./paramodel.actionresult.status.md) | "success" \| "conflict" \| "forbidden" |  |
 |  [timestamp](./paramodel.actionresult.timestamp.md) | Date |  |
 

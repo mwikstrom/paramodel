@@ -7,5 +7,5 @@
 <b>Signature:</b>
 
 ```typescript
-readonly exec: QueryFunc<R, P, T>;
+readonly exec: QueryFunc<R, P, Scope, T>;
 ```

@@ -11,9 +11,9 @@ Run-time domain model for event-sourcing.
 |  Function | Description |
 |  --- | --- |
 |  [defineAction(input, output, dependencies, exec)](./paramodel.defineaction.md) |  |
-|  [defineEntity(type, mutators, dependencies, apply)](./paramodel.defineentity.md) |  |
+|  [defineEntity(type, dependencies, on, auth)](./paramodel.defineentity.md) |  |
 |  [defineQuery(type, params, dependencies, exec)](./paramodel.definequery.md) |  |
-|  [defineState(type, initial, dependencies, on)](./paramodel.definestate.md) |  |
+|  [defineState(type, initial, dependencies, on, auth)](./paramodel.definestate.md) |  |
 
 ## Interfaces
 
@@ -29,6 +29,7 @@ Run-time domain model for event-sourcing.
 |  [EntityCollection](./paramodel.entitycollection.md) |  |
 |  [EntityProjection](./paramodel.entityprojection.md) |  |
 |  [EntityView](./paramodel.entityview.md) |  |
+|  [Filterable](./paramodel.filterable.md) |  |
 |  [ModelBuilder](./paramodel.modelbuilder.md) |  |
 |  [Page](./paramodel.page.md) |  |
 |  [PageOptions](./paramodel.pageoptions.md) |  |
@@ -40,6 +41,12 @@ Run-time domain model for event-sourcing.
 |  [StateProjection](./paramodel.stateprojection.md) |  |
 |  [StateView](./paramodel.stateview.md) |  |
 |  [ViewOptions](./paramodel.viewoptions.md) |  |
+
+## Variables
+
+|  Variable | Description |
+|  --- | --- |
+|  [forbidden](./paramodel.forbidden.md) |  |
 
 ## Type Aliases
 
@@ -55,11 +62,14 @@ Run-time domain model for event-sourcing.
 |  [ComparisonOperator](./paramodel.comparisonoperator.md) |  |
 |  [DomainModel](./paramodel.domainmodel.md) |  |
 |  [Entity](./paramodel.entity.md) |  |
+|  [EntityAuthFunc](./paramodel.entityauthfunc.md) |  |
 |  [EntityProjectionFunc](./paramodel.entityprojectionfunc.md) |  |
 |  [EqualityOperator](./paramodel.equalityoperator.md) |  |
 |  [Equatable](./paramodel.equatable.md) |  |
+|  [Filtered](./paramodel.filtered.md) |  |
 |  [FilterOperand](./paramodel.filteroperand.md) |  |
 |  [FilterOperator](./paramodel.filteroperator.md) |  |
+|  [Forbidden](./paramodel.forbidden.md) |  |
 |  [IsOperand](./paramodel.isoperand.md) |  |
 |  [IsOperator](./paramodel.isoperator.md) |  |
 |  [Projection](./paramodel.projection.md) |  |
@@ -67,10 +77,11 @@ Run-time domain model for event-sourcing.
 |  [ReadModel](./paramodel.readmodel.md) |  |
 |  [SortableProps](./paramodel.sortableprops.md) |  |
 |  [StateApplyFunc](./paramodel.stateapplyfunc.md) |  |
+|  [StateAuthFunc](./paramodel.stateauthfunc.md) |  |
 |  [StringOperator](./paramodel.stringoperator.md) |  |
 |  [VersionAlignment](./paramodel.versionalignment.md) |  |
 |  [View](./paramodel.view.md) |  |
 |  [ViewOf](./paramodel.viewof.md) |  |
-|  [ViewSnapshot](./paramodel.viewsnapshot.md) |  |
+|  [ViewSnapshotFunc](./paramodel.viewsnapshotfunc.md) |  |
 |  [WriteModel](./paramodel.writemodel.md) |  |
 

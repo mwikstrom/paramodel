@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare function defineAction<Events extends ChangeModel, Views extends ReadModel, Input, Output, Dependencies extends (string & keyof Views)[]>(input: Type<Input>, output: Type<Output>, dependencies: Dependencies, exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Input, Output>): ActionHandler<Events, Pick<Views, Dependencies[number]>, Input, Output>;
+export declare function defineAction<Events extends ChangeModel, Views extends ReadModel, Scope, Input, Output, Dependencies extends (string & keyof Views)[]>(input: Type<Input>, output: Type<Output>, dependencies: Dependencies, exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>;
 ```
 
 ## Parameters
@@ -17,9 +17,9 @@ export declare function defineAction<Events extends ChangeModel, Views extends R
 |  input | Type&lt;Input&gt; |  |
 |  output | Type&lt;Output&gt; |  |
 |  dependencies | Dependencies |  |
-|  exec | [ActionFunc](./paramodel.actionfunc.md)<!-- -->&lt;Events, Pick&lt;Views, Dependencies\[number\]&gt;, Input, Output&gt; |  |
+|  exec | [ActionFunc](./paramodel.actionfunc.md)<!-- -->&lt;Events, Pick&lt;Views, Dependencies\[number\]&gt;, Scope, Input, Output&gt; |  |
 
 <b>Returns:</b>
 
-[ActionHandler](./paramodel.actionhandler.md)<!-- -->&lt;Events, Pick&lt;Views, Dependencies\[number\]&gt;, Input, Output&gt;
+[ActionHandler](./paramodel.actionhandler.md)<!-- -->&lt;Events, Pick&lt;Views, Dependencies\[number\]&gt;, Scope, Input, Output&gt;
 

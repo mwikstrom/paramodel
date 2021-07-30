@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface ActionContext<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Input = unknown, Output = unknown> 
+export interface ActionContext<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Scope = unknown, Input = unknown, Output = unknown> 
 ```
 
 ## Properties
@@ -15,9 +15,10 @@ export interface ActionContext<Events extends ChangeModel = ChangeModel, Views e
 |  Property | Type | Description |
 |  --- | --- | --- |
 |  [input](./paramodel.actioncontext.input.md) | Input |  |
+|  [scope](./paramodel.actioncontext.scope.md) | Scope |  |
 |  [timestamp](./paramodel.actioncontext.timestamp.md) | Date |  |
 |  [version](./paramodel.actioncontext.version.md) | number |  |
-|  [view](./paramodel.actioncontext.view.md) | [ViewSnapshot](./paramodel.viewsnapshot.md)<!-- -->&lt;Views&gt; |  |
+|  [view](./paramodel.actioncontext.view.md) | [ViewSnapshotFunc](./paramodel.viewsnapshotfunc.md)<!-- -->&lt;Views&gt; |  |
 
 ## Methods
 
@@ -25,5 +26,6 @@ export interface ActionContext<Events extends ChangeModel = ChangeModel, Views e
 |  --- | --- |
 |  [conflict(message)](./paramodel.actioncontext.conflict.md) |  |
 |  [emit(key, arg)](./paramodel.actioncontext.emit.md) |  |
+|  [forbidden(message)](./paramodel.actioncontext.forbidden.md) |  |
 |  [output(result)](./paramodel.actioncontext.output.md) |  |
 

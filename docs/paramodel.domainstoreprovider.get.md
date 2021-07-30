@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-get<Model extends DomainModel>(id: string, model: Model): DomainStore<Model>;
+get<Model extends DomainModel>(id: string, model: Model, scope: TypeOf<Model["scope"]>): DomainStore<Model>;
 ```
 
 ## Parameters
@@ -16,6 +16,7 @@ get<Model extends DomainModel>(id: string, model: Model): DomainStore<Model>;
 |  --- | --- | --- |
 |  id | string |  |
 |  model | Model |  |
+|  scope | TypeOf&lt;Model\["scope"\]&gt; |  |
 
 <b>Returns:</b>
 

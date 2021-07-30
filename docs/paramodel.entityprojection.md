@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface EntityProjection<T extends Record<string, unknown> = Record<string, unknown>, C extends ChangeModel = ChangeModel, R extends ReadModel = ReadModel> 
+export interface EntityProjection<T extends Record<string, unknown> = Record<string, unknown>, C extends ChangeModel = ChangeModel, R extends ReadModel = ReadModel, Scope = unknown> 
 ```
 
 ## Properties
@@ -15,6 +15,7 @@ export interface EntityProjection<T extends Record<string, unknown> = Record<str
 |  Property | Type | Description |
 |  --- | --- | --- |
 |  [apply](./paramodel.entityprojection.apply.md) | [EntityProjectionFunc](./paramodel.entityprojectionfunc.md)<!-- -->&lt;C, R, T&gt; |  |
+|  [auth](./paramodel.entityprojection.auth.md) | [EntityAuthFunc](./paramodel.entityauthfunc.md)<!-- -->&lt;Scope, T, R&gt; \| undefined |  |
 |  [dependencies](./paramodel.entityprojection.dependencies.md) | ReadonlySet&lt;string &amp; keyof R&gt; |  |
 |  [kind](./paramodel.entityprojection.kind.md) | "entities" |  |
 |  [mutators](./paramodel.entityprojection.mutators.md) | ReadonlySet&lt;string &amp; keyof C&gt; |  |

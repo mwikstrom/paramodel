@@ -7,5 +7,5 @@
 <b>Signature:</b>
 
 ```typescript
-view: ViewSnapshot<Views>;
+view: ViewSnapshotFunc<Views>;
 ```

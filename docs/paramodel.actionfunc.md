@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type ActionFunc<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Input = unknown, Output = unknown> = (context: ActionContext<Events, Views, Input, Output>) => Promise<void>;
+export declare type ActionFunc<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Scope = unknown, Input = unknown, Output = unknown> = (context: ActionContext<Events, Views, Scope, Input, Output>) => Promise<void>;
 ```
 <b>References:</b> [ChangeModel](./paramodel.changemodel.md)<!-- -->, [ReadModel](./paramodel.readmodel.md)<!-- -->, [ActionContext](./paramodel.actioncontext.md)
 

@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type QueryFunc<R extends ReadModel = ReadModel, P extends Record<string, unknown> = Record<string, unknown>, T = unknown> = (view: ViewSnapshot<R>, params: P) => Promise<T>;
+export declare type QueryFunc<R extends ReadModel = ReadModel, P extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, T = unknown> = (view: ViewSnapshotFunc<R>, params: P, scope: Scope) => Promise<T | Forbidden>;
 ```
-<b>References:</b> [ReadModel](./paramodel.readmodel.md)<!-- -->, [ViewSnapshot](./paramodel.viewsnapshot.md)
+<b>References:</b> [ReadModel](./paramodel.readmodel.md)<!-- -->, [ViewSnapshotFunc](./paramodel.viewsnapshotfunc.md)<!-- -->, [Forbidden](./paramodel.forbidden.md)
 

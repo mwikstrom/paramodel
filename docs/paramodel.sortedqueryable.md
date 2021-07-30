@@ -8,9 +8,9 @@
 <b>Signature:</b>
 
 ```typescript
-export interface SortedQueryable<T> extends AsyncIterable<T> 
+export interface SortedQueryable<T> extends Filterable<T>, AsyncIterable<T> 
 ```
-<b>Extends:</b> AsyncIterable&lt;T&gt;
+<b>Extends:</b> [Filterable](./paramodel.filterable.md)<!-- -->&lt;T&gt;, AsyncIterable&lt;T&gt;
 
 ## Methods
 
@@ -20,5 +20,4 @@ export interface SortedQueryable<T> extends AsyncIterable<T>
 |  [count()](./paramodel.sortedqueryable.count.md) |  |
 |  [first()](./paramodel.sortedqueryable.first.md) |  |
 |  [page(options)](./paramodel.sortedqueryable.page.md) |  |
-|  [where(property, operator, operand)](./paramodel.sortedqueryable.where.md) |  |
 
