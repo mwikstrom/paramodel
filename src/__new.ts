@@ -121,15 +121,19 @@ export function defineAction<
     Views extends ReadModel,
     Input,
     Output,
-    Dependencies extends (keyof Views)[],
+    Dependencies extends (string & keyof Views)[],
 >(
-    model: Pick<DomainModel<Events, Views>, "events" | "views">,
     input: Type<Input>,
     output: Type<Output>,
     dependencies: Dependencies,
     exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Input, Output>,
 ): ActionHandler<Events, Pick<Views, Dependencies[number]>, Input, Output> {
-    throw new Error("TODO");
+    return Object.freeze({
+        input,
+        output,
+        dependencies: Object.freeze(new Set(dependencies)),
+        exec,
+    });
 }
 
 export interface ModelBuilder<
