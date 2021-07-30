@@ -1,13 +1,6 @@
 import { Type, TypeOf } from "paratype";
 import { Queryable, SortedQueryable } from "./query";
 
-// DOMAIN MODEL:
-// TODO: define event
-// TODO: define state
-// TODO: define query
-// TODO: define entity
-// TODO: define action
-
 export type ChangeModel<K extends string = string, T = unknown> = Readonly<Record<K, Type<T>>>;
 
 export type ReadModel<K extends string = string, T extends Projection = Projection> = Readonly<Record<K, T>>;
@@ -50,6 +43,19 @@ export type DomainModel<
     readonly views: Views;
     readonly actions: Actions;
 };
+
+// DOMAIN MODEL:
+// TODO: define state
+// TODO: define query
+// TODO: define entity
+// TODO: define action
+export interface ModelBuilder<
+    Events extends ChangeModel = ChangeModel,
+    Views extends ReadModel = ReadModel,
+    Actions extends WriteModel = WriteModel,
+> {
+    addEvent<K extends string, T>(key: K, type: Type<T>): ModelBuilder<Events & ChangeModel<K, T>, Views, Actions>;
+}
 
 // TODO: DomainContext: user auth stuff (expose in action and view handlers)
 
