@@ -6,60 +6,71 @@
 
 Run-time domain model for event-sourcing.
 
+## Functions
+
+|  Function | Description |
+|  --- | --- |
+|  [defineAction(input, output, dependencies, exec)](./paramodel.defineaction.md) |  |
+|  [defineEntity(type, mutators, dependencies, apply)](./paramodel.defineentity.md) |  |
+|  [defineQuery(type, params, dependencies, exec)](./paramodel.definequery.md) |  |
+|  [defineState(type, initial, dependencies, on)](./paramodel.definestate.md) |  |
+
 ## Interfaces
 
 |  Interface | Description |
 |  --- | --- |
-|  [AbortOptions](./paramodel.abortoptions.md) |  |
-|  [Action](./paramodel.action.md) |  |
 |  [ActionContext](./paramodel.actioncontext.md) |  |
+|  [ActionHandler](./paramodel.actionhandler.md) |  |
+|  [ActionOptions](./paramodel.actionoptions.md) |  |
 |  [ActionResult](./paramodel.actionresult.md) |  |
-|  [ActionsDomain](./paramodel.actionsdomain.md) |  |
-|  [ActionsDomainBuilder](./paramodel.actionsdomainbuilder.md) |  |
-|  [Batch](./paramodel.batch.md) |  |
-|  [Collection](./paramodel.collection.md) |  |
-|  [CollectionContext](./paramodel.collectioncontext.md) |  |
-|  [CollectionView](./paramodel.collectionview.md) |  |
-|  [Commit](./paramodel.commit.md) |  |
-|  [CommitOptions](./paramodel.commitoptions.md) |  |
-|  [CommitSearchOptions](./paramodel.commitsearchoptions.md) |  |
-|  [EventsDomain](./paramodel.eventsdomain.md) |  |
-|  [EventsDomainBuilder](./paramodel.eventsdomainbuilder.md) |  |
-|  [EventStore](./paramodel.eventstore.md) |  |
-|  [EventStream](./paramodel.eventstream.md) |  |
-|  [MetaDomain](./paramodel.metadomain.md) |  |
-|  [MetaDomainBuilder](./paramodel.metadomainbuilder.md) |  |
-|  [Projection](./paramodel.projection.md) |  |
-|  [ProjectionContext](./paramodel.projectioncontext.md) |  |
-|  [ProjectionsDomain](./paramodel.projectionsdomain.md) |  |
-|  [ProjectionsDomainBuilder](./paramodel.projectionsdomainbuilder.md) |  |
-|  [ProjectionView](./paramodel.projectionview.md) |  |
-|  [QueryableCollection](./paramodel.queryablecollection.md) |  |
-|  [ReadOptions](./paramodel.readoptions.md) |  |
-|  [Snapshot](./paramodel.snapshot.md) |  |
-|  [SnapshotData](./paramodel.snapshotdata.md) |  |
-
-## Variables
-
-|  Variable | Description |
-|  --- | --- |
-|  [createDomainBuilder](./paramodel.createdomainbuilder.md) |  |
+|  [Change](./paramodel.change.md) |  |
+|  [DomainStore](./paramodel.domainstore.md) |  |
+|  [DomainStoreProvider](./paramodel.domainstoreprovider.md) |  |
+|  [EntityCollection](./paramodel.entitycollection.md) |  |
+|  [EntityProjection](./paramodel.entityprojection.md) |  |
+|  [EntityView](./paramodel.entityview.md) |  |
+|  [ModelBuilder](./paramodel.modelbuilder.md) |  |
+|  [Page](./paramodel.page.md) |  |
+|  [PageOptions](./paramodel.pageoptions.md) |  |
+|  [Queryable](./paramodel.queryable.md) |  |
+|  [QueryHandler](./paramodel.queryhandler.md) |  |
+|  [QueryView](./paramodel.queryview.md) |  |
+|  [ReadonlyEntityCollection](./paramodel.readonlyentitycollection.md) |  |
+|  [SortedQueryable](./paramodel.sortedqueryable.md) |  |
+|  [StateProjection](./paramodel.stateprojection.md) |  |
+|  [StateView](./paramodel.stateview.md) |  |
+|  [ViewOptions](./paramodel.viewoptions.md) |  |
 
 ## Type Aliases
 
 |  Type Alias | Description |
 |  --- | --- |
-|  [ActionRunner](./paramodel.actionrunner.md) |  |
-|  [CollectionFunc](./paramodel.collectionfunc.md) |  |
-|  [CollectionHandlers](./paramodel.collectionhandlers.md) |  |
-|  [Domain](./paramodel.domain.md) |  |
-|  [DomainActions](./paramodel.domainactions.md) |  |
-|  [DomainCollections](./paramodel.domaincollections.md) |  |
-|  [DomainEvents](./paramodel.domainevents.md) |  |
-|  [DomainProjections](./paramodel.domainprojections.md) |  |
-|  [Emitter](./paramodel.emitter.md) |  |
-|  [PeekOptions](./paramodel.peekoptions.md) |  |
-|  [ProjectionFunc](./paramodel.projectionfunc.md) |  |
-|  [ProjectionHandlers](./paramodel.projectionhandlers.md) |  |
-|  [ProjectionType](./paramodel.projectiontype.md) |  |
+|  [ActionFunc](./paramodel.actionfunc.md) |  |
+|  [ActionResultType](./paramodel.actionresulttype.md) |  |
+|  [ArrayAnyOperator](./paramodel.arrayanyoperator.md) |  |
+|  [ArrayOperator](./paramodel.arrayoperator.md) |  |
+|  [ChangeModel](./paramodel.changemodel.md) |  |
+|  [ChangeType](./paramodel.changetype.md) |  |
+|  [Comparable](./paramodel.comparable.md) |  |
+|  [ComparisonOperator](./paramodel.comparisonoperator.md) |  |
+|  [DomainModel](./paramodel.domainmodel.md) |  |
+|  [Entity](./paramodel.entity.md) |  |
+|  [EntityProjectionFunc](./paramodel.entityprojectionfunc.md) |  |
+|  [EqualityOperator](./paramodel.equalityoperator.md) |  |
+|  [Equatable](./paramodel.equatable.md) |  |
+|  [FilterOperand](./paramodel.filteroperand.md) |  |
+|  [FilterOperator](./paramodel.filteroperator.md) |  |
+|  [IsOperand](./paramodel.isoperand.md) |  |
+|  [IsOperator](./paramodel.isoperator.md) |  |
+|  [Projection](./paramodel.projection.md) |  |
+|  [QueryFunc](./paramodel.queryfunc.md) |  |
+|  [ReadModel](./paramodel.readmodel.md) |  |
+|  [SortableProps](./paramodel.sortableprops.md) |  |
+|  [StateApplyFunc](./paramodel.stateapplyfunc.md) |  |
+|  [StringOperator](./paramodel.stringoperator.md) |  |
+|  [VersionAlignment](./paramodel.versionalignment.md) |  |
+|  [View](./paramodel.view.md) |  |
+|  [ViewOf](./paramodel.viewof.md) |  |
+|  [ViewSnapshot](./paramodel.viewsnapshot.md) |  |
+|  [WriteModel](./paramodel.writemodel.md) |  |
 

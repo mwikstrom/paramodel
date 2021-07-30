@@ -8,333 +8,341 @@ import { Type } from 'paratype';
 import { TypeOf } from 'paratype';
 
 // @public (undocumented)
-export interface AbortOptions {
+export interface ActionContext<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Input = unknown, Output = unknown> {
     // (undocumented)
-    signal?: AbortSignal;
+    conflict(message: string): never;
     // (undocumented)
-    timeout?: number;
-}
-
-// @public (undocumented)
-export interface Action<D extends ProjectionsDomain, I extends Type<unknown>, O extends Type<unknown> = Type<void>> {
+    emit<K extends string & keyof Events>(key: K, arg: TypeOf<Events[K]>): void;
     // (undocumented)
-    input: I;
+    readonly input: Input;
     // (undocumented)
-    output?: O;
-    // (undocumented)
-    run: ActionRunner<D, I, O>;
-}
-
-// @public (undocumented)
-export interface ActionContext<D extends ProjectionsDomain, T> {
-    // (undocumented)
-    readonly base: Snapshot<D>;
-    // (undocumented)
-    readonly commit: Commit<TypeOf<D["meta"]>>;
-    // (undocumented)
-    conflict(message?: string): never;
-    // (undocumented)
-    conflict(when: true, message?: string): never;
-    // (undocumented)
-    conflict(when: false, message?: string): void;
-    // (undocumented)
-    readonly dry: boolean;
-    // (undocumented)
-    readonly emit: Emitter<D>;
-    // (undocumented)
-    readonly input: T;
-}
-
-// @public (undocumented)
-export interface ActionResult<D extends ProjectionsDomain, T> {
-    // (undocumented)
-    readonly result: T;
-    // (undocumented)
-    readonly snapshot: Snapshot<D>;
-}
-
-// @public (undocumented)
-export type ActionRunner<D extends ProjectionsDomain, I extends Type<unknown>, O extends Type<unknown> = Type<void>> = (context: ActionContext<D, TypeOf<I>>) => Promise<TypeOf<O>>;
-
-// @public (undocumented)
-export interface ActionsDomain<M extends Type<unknown> = Type<unknown>, E extends DomainEvents = DomainEvents, P extends DomainProjections<EventsDomain<M, E>> = DomainProjections<EventsDomain<M, E>>, C extends DomainCollections<EventsDomain<M, E>> = DomainCollections<EventsDomain<M, E>>, A extends DomainActions<ProjectionsDomain<M, E, P, C>> = DomainActions<ProjectionsDomain<M, E, P, C>>> extends ProjectionsDomain<M, E, P, C> {
-    // (undocumented)
-    readonly actions: A;
-}
-
-// @public (undocumented)
-export interface ActionsDomainBuilder<M extends Type<unknown>, E extends DomainEvents, P extends DomainProjections<EventsDomain<M, E>>, C extends DomainCollections<EventsDomain<M, E>>, A extends DomainActions<ProjectionsDomain<M, E, P, C>> = DomainActions<ProjectionsDomain<M, E, P, C>>> extends ActionsDomain<M, E, P, C, A> {
-    // (undocumented)
-    addActions<T extends DomainActions<ProjectionsDomain<M, E, P, C>>>(this: void, actions: T): ActionsDomainBuilder<M, E, P, C, A & T>;
-    // (undocumented)
-    createDomain(this: void): Domain<M, E, P, C, A>;
-}
-
-// @public (undocumented)
-export interface Batch<D extends ActionsDomain> {
-    // (undocumented)
-    abort(this: void): void;
-    // (undocumented)
-    commit(this: void): Promise<Snapshot<D>>;
-    // (undocumented)
-    do<K extends keyof D["actions"]>(this: void, action: K, input: TypeOf<D["actions"][K]["input"]>): Promise<TypeOf<D["actions"][K]["output"]>>;
-}
-
-// @public (undocumented)
-export interface Collection<D extends EventsDomain, T extends Type<unknown>> {
-    // (undocumented)
-    readonly entity: T;
-    // (undocumented)
-    readonly on: Partial<CollectionHandlers<D, T>>;
-}
-
-// @public (undocumented)
-export interface CollectionContext<D extends EventsDomain, T extends Type<unknown>, K extends keyof D["events"]> extends QueryableCollection<TypeOf<T>> {
-    // (undocumented)
-    readonly change: K;
-    // (undocumented)
-    readonly commit: Commit<TypeOf<D["meta"]>>;
-    // (undocumented)
-    del(id: number): void;
-    // (undocumented)
-    readonly input: TypeOf<D["events"][K]>;
-    // (undocumented)
-    put(id: number, value: TypeOf<T>): void;
-}
-
-// @public (undocumented)
-export type CollectionFunc<D extends EventsDomain, T extends Type<unknown>, K extends keyof D["events"]> = (this: void, context: CollectionContext<D, T, K>) => Promise<void>;
-
-// @public (undocumented)
-export type CollectionHandlers<D extends EventsDomain, T extends Type<unknown>> = {
-    [K in keyof D["events"]]: CollectionFunc<D, T, K>;
-};
-
-// @public (undocumented)
-export interface CollectionView<D extends ProjectionsDomain, K extends keyof D["collections"]> extends QueryableCollection<TypeOf<D["collections"][K]["entity"]>> {
-    // (undocumented)
-    alloc(): number;
-    // (undocumented)
-    readonly snapshot: Snapshot<D>;
-}
-
-// @public (undocumented)
-export interface Commit<M> {
-    // (undocumented)
-    readonly local: boolean;
-    // (undocumented)
-    readonly meta: M;
+    output(result: Output): void;
     // (undocumented)
     readonly timestamp: Date;
     // (undocumented)
-    readonly version: string;
+    readonly version: number;
+    // (undocumented)
+    view: ViewSnapshot<Views>;
 }
 
 // @public (undocumented)
-export interface CommitOptions<M> extends AbortOptions {
+export type ActionFunc<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Input = unknown, Output = unknown> = (context: ActionContext<Events, Views, Input, Output>) => Promise<void>;
+
+// @public (undocumented)
+export interface ActionHandler<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Input = unknown, Output = unknown> {
     // (undocumented)
-    dry: boolean;
+    readonly dependencies: ReadonlySet<string & keyof Views>;
     // (undocumented)
-    maxAttempts?: number;
+    readonly exec: ActionFunc<Events, Views, Input, Output>;
     // (undocumented)
-    meta?: M;
+    readonly input: Type<Input>;
+    // (undocumented)
+    readonly output: Type<Output>;
 }
 
 // @public (undocumented)
-export interface CommitSearchOptions {
+export interface ActionOptions {
     // (undocumented)
-    align?: "exact" | "after" | "before" | "exact-after" | "exact-before";
-    // (undocumented)
-    timestamp?: Date;
-    // (undocumented)
-    version?: string;
+    dry?: boolean;
 }
 
 // @public (undocumented)
-export const createDomainBuilder: () => MetaDomainBuilder<Type<void>>;
-
-// @public (undocumented)
-export type Domain<M extends Type<unknown> = Type<unknown>, E extends DomainEvents = DomainEvents, P extends DomainProjections<EventsDomain<M, E>> = DomainProjections<EventsDomain<M, E>>, C extends DomainCollections<EventsDomain<M, E>> = DomainCollections<EventsDomain<M, E>>, A extends DomainActions<ProjectionsDomain<M, E, P, C>> = DomainActions<ProjectionsDomain<M, E, P, C>>> = ActionsDomain<M, E, P, C, A>;
-
-// @public (undocumented)
-export type DomainActions<D extends ProjectionsDomain> = Readonly<Record<string, Action<D, Type<unknown>, Type<unknown>>>>;
-
-// @public (undocumented)
-export type DomainCollections<D extends EventsDomain> = Readonly<Record<string, Collection<D, Type<unknown>>>>;
-
-// @public (undocumented)
-export type DomainEvents = Readonly<Record<string, Type<unknown>>>;
-
-// @public (undocumented)
-export type DomainProjections<D extends EventsDomain> = Readonly<Record<string, Projection<D, Type<unknown>>>>;
-
-// @public (undocumented)
-export type Emitter<D extends EventsDomain> = {
-    [P in keyof D["events"]]: (arg: TypeOf<D["events"][P]>) => void;
-};
-
-// @public (undocumented)
-export interface EventsDomain<M extends Type<unknown> = Type<unknown>, E extends DomainEvents = DomainEvents> extends MetaDomain<M> {
+export interface ActionResult<Events extends ChangeModel, Output> {
     // (undocumented)
-    readonly events: E;
+    readonly base: number;
+    // (undocumented)
+    readonly changes: readonly ChangeType<Events>[];
+    // (undocumented)
+    readonly committed?: number;
+    // (undocumented)
+    readonly conflict?: string;
+    // (undocumented)
+    readonly output?: Output;
+    // (undocumented)
+    readonly success: boolean;
+    // (undocumented)
+    readonly timestamp: Date;
 }
 
 // @public (undocumented)
-export interface EventsDomainBuilder<M extends Type<unknown>, E extends DomainEvents> extends EventsDomain<M, E> {
-    // (undocumented)
-    addActions<T extends DomainActions<ProjectionsDomain<M, E>>>(this: void, actions: T): ActionsDomainBuilder<M, E, DomainProjections<EventsDomain<M, E>>, DomainCollections<EventsDomain<M, E>>, T>;
-    // (undocumented)
-    addCollections<T extends DomainCollections<EventsDomain<M, E>>>(this: void, collections: T): ProjectionsDomainBuilder<M, E, DomainProjections<EventsDomain<M, E>>, T>;
-    // (undocumented)
-    addEvents<T extends DomainEvents>(this: void, events: T): EventsDomainBuilder<M, E & T>;
-    // (undocumented)
-    addProjections<T extends DomainProjections<EventsDomain<M, E>>>(this: void, projections: T): ProjectionsDomainBuilder<M, E, T>;
-    // (undocumented)
-    createDomain(this: void): Domain<M, E>;
-    // (undocumented)
-    setupMeta<T extends Type<unknown>>(this: void, type: T): EventsDomainBuilder<T, E>;
-}
+export type ActionResultType<Model extends Pick<DomainModel, "actions" | "events">, Action extends string & keyof Model["actions"]> = (ActionResult<Model["events"], TypeOf<Model["actions"][Action]["output"]>>);
 
 // @public (undocumented)
-export interface EventStore {
-    // (undocumented)
-    stream<D extends Domain>(this: void, id: string, domain: D): EventStream<D>;
-}
+export type ArrayAnyOperator = ("includes-any" | "not-includes-any");
 
 // @public (undocumented)
-export interface EventStream<D extends Domain> {
-    // (undocumented)
-    batch(this: void, options?: CommitOptions<TypeOf<D["meta"]>>): Batch<D>;
-    // (undocumented)
-    do<K extends keyof D["actions"]>(this: void, action: K, input: TypeOf<D["actions"][K]["input"]>, options?: CommitOptions<TypeOf<D["meta"]>>): Promise<ActionResult<D, TypeOf<D["actions"][K]["output"]>>>;
-    // (undocumented)
-    readonly domain: D;
-    // (undocumented)
-    entities<K extends keyof D["collections"]>(this: void, key: K, options?: PeekOptions): Promise<CollectionView<D, K>>;
-    // (undocumented)
-    readonly id: string;
-    // (undocumented)
-    peek(this: void, options?: PeekOptions): Promise<Snapshot<D> | null>;
-    // (undocumented)
-    read(this: void, options?: ReadOptions): AsyncIterable<SnapshotData<D>>;
-    // (undocumented)
-    view<K extends keyof D["projections"]>(this: void, key: K, options?: PeekOptions): Promise<ProjectionView<D, K>>;
-}
+export type ArrayOperator = ("includes" | "not-includes" | ArrayAnyOperator);
 
 // @public (undocumented)
-export interface MetaDomain<M extends Type<unknown> = Type<unknown>> {
+export interface Change<K extends string = string, T = unknown> {
     // (undocumented)
-    readonly meta: M;
-}
-
-// @public (undocumented)
-export interface MetaDomainBuilder<M extends Type<unknown>> extends MetaDomain<M> {
-    // (undocumented)
-    addEvents<T extends DomainEvents>(this: void, events: T): EventsDomainBuilder<M, T>;
-    // (undocumented)
-    createDomain(this: void): Domain<M>;
-    // (undocumented)
-    setupMeta<T extends Type<unknown>>(this: void, type: T): MetaDomainBuilder<T>;
-}
-
-// @public (undocumented)
-export type PeekOptions = CommitSearchOptions & AbortOptions;
-
-// @public (undocumented)
-export interface Projection<D extends EventsDomain, T extends Type<unknown>> {
-    // (undocumented)
-    init(): TypeOf<T>;
-    // (undocumented)
-    readonly on: Partial<ProjectionHandlers<D, T>>;
-    // (undocumented)
-    readonly type: T;
-}
-
-// @public (undocumented)
-export interface ProjectionContext<E, T, K, M> {
-    // (undocumented)
-    readonly arg: E;
-    // (undocumented)
-    readonly before: T;
-    // (undocumented)
-    readonly change: K;
-    // (undocumented)
-    readonly commit: Commit<M>;
-}
-
-// @public (undocumented)
-export type ProjectionFunc<E, T, K, M> = (this: void, context: ProjectionContext<E, T, K, M>) => T;
-
-// @public (undocumented)
-export type ProjectionHandlers<D extends EventsDomain, T extends Type<unknown>> = {
-    [K in keyof D["events"]]: ProjectionFunc<TypeOf<D["events"][K]>, T, K, TypeOf<D["meta"]>>;
-};
-
-// @public (undocumented)
-export interface ProjectionsDomain<M extends Type<unknown> = Type<unknown>, E extends DomainEvents = DomainEvents, P extends DomainProjections<EventsDomain<M, E>> = DomainProjections<EventsDomain<M, E>>, C extends DomainCollections<EventsDomain<M, E>> = DomainCollections<EventsDomain<M, E>>> extends EventsDomain<M, E> {
-    // (undocumented)
-    readonly collections: C;
-    // (undocumented)
-    readonly projections: P;
-}
-
-// @public (undocumented)
-export interface ProjectionsDomainBuilder<M extends Type<unknown>, E extends DomainEvents, P extends DomainProjections<EventsDomain<M, E>>, C extends DomainCollections<EventsDomain<M, E>> = DomainCollections<EventsDomain<M, E>>> extends ProjectionsDomain<M, E, P, C> {
-    // (undocumented)
-    addActions<T extends DomainActions<ProjectionsDomain<M, E, P, C>>>(this: void, actions: T): ActionsDomainBuilder<M, E, P, C, T>;
-    // (undocumented)
-    addCollections<T extends DomainCollections<EventsDomain<M, E>>>(this: void, collections: T): ProjectionsDomainBuilder<M, E, P, C & T>;
-    // (undocumented)
-    addProjections<T extends DomainProjections<EventsDomain<M, E>>>(this: void, projections: T): ProjectionsDomainBuilder<M, E, P & T, C>;
-    // (undocumented)
-    createDomain(this: void): Domain<M, E, P, C>;
-}
-
-// @public (undocumented)
-export type ProjectionType<P extends Projection<EventsDomain, Type<unknown>>> = P extends Projection<EventsDomain, infer T> ? TypeOf<T> : never;
-
-// @public (undocumented)
-export interface ProjectionView<D extends ProjectionsDomain, K extends keyof D["projections"]> {
+    readonly arg: T;
     // (undocumented)
     readonly key: K;
     // (undocumented)
-    readonly snapshot: Snapshot<D>;
+    readonly offset: number;
     // (undocumented)
-    readonly value: ProjectionType<D["projections"][K]>;
-}
-
-// Warning: (ae-forgotten-export) The symbol "Queryable" needs to be exported by the entry point index.d.ts
-//
-// @public (undocumented)
-export interface QueryableCollection<T> extends Queryable<T> {
+    readonly timestamp: Date;
     // (undocumented)
-    get(id: number): Promise<T | undefined>;
+    readonly version: number;
 }
 
 // @public (undocumented)
-export interface ReadOptions extends AbortOptions {
+export type ChangeModel<K extends string = string, T = unknown> = Readonly<Record<K, Type<T>>>;
+
+// @public (undocumented)
+export type ChangeType<Model extends ChangeModel> = {
+    [K in keyof Model]: K extends string ? Change<K, TypeOf<Model[K]>> : never;
+}[keyof Model];
+
+// @public (undocumented)
+export type Comparable = number | string | Date;
+
+// @public (undocumented)
+export type ComparisonOperator = ">" | ">=" | "<" | "<=";
+
+// @public (undocumented)
+export function defineAction<Events extends ChangeModel, Views extends ReadModel, Input, Output, Dependencies extends (string & keyof Views)[]>(input: Type<Input>, output: Type<Output>, dependencies: Dependencies, exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Input, Output>): ActionHandler<Events, Pick<Views, Dependencies[number]>, Input, Output>;
+
+// @public (undocumented)
+export function defineEntity<Events extends ChangeModel, Views extends ReadModel, Props extends Record<string, unknown>, Mutators extends (string & keyof Events)[], Dependencies extends (string & keyof Views)[]>(type: Type<Props>, mutators: Mutators, dependencies: Dependencies, apply: EntityProjectionFunc<Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>, Props>): EntityProjection<Props, Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>>;
+
+// @public (undocumented)
+export function defineQuery<Views extends ReadModel, Dependencies extends (string & keyof Views)[], Params extends Record<string, unknown>, Result>(type: Type<Result>, params: Type<Params>, dependencies: Dependencies, exec: QueryFunc<Pick<Views, Dependencies[number]>, Params, Result>): QueryHandler<Params, Result, Pick<Views, Dependencies[number]>>;
+
+// @public (undocumented)
+export function defineState<Events extends ChangeModel, Views extends ReadModel, State, Mutators extends string & keyof Events, Dependencies extends (string & keyof Views)[]>(type: Type<State>, initial: State, dependencies: Dependencies, on: {
+    [K in Mutators]: StateApplyFunc<ChangeModel<K, Events[K]>, Pick<Views, Dependencies[number]>, State>;
+}): StateProjection<State, Events, Views>;
+
+// @public (undocumented)
+export type DomainModel<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Actions extends WriteModel = WriteModel> = {
+    readonly events: Events;
+    readonly views: Views;
+    readonly actions: Actions;
+};
+
+// @public (undocumented)
+export interface DomainStore<Model extends DomainModel> {
     // (undocumented)
-    end?: CommitSearchOptions;
+    readonly changes: SortedQueryable<ChangeType<Model["events"]>>;
     // (undocumented)
-    start?: CommitSearchOptions;
+    do<K extends string & keyof Model["actions"]>(key: K, input: TypeOf<Model["actions"][K]["input"]>, options?: ActionOptions): Promise<ActionResultType<Model, K>>;
+    // (undocumented)
+    view<K extends string & keyof Model["views"]>(key: K, options?: ViewOptions): Promise<ViewOf<Model["views"][K]> | undefined>;
 }
 
 // @public (undocumented)
-export interface Snapshot<D extends ProjectionsDomain> {
+export interface DomainStoreProvider {
     // (undocumented)
-    entities<K extends keyof D["collections"]>(this: void, key: K, options?: AbortOptions): Promise<CollectionView<D, K>>;
-    // (undocumented)
-    read(this: void): Promise<SnapshotData<D>>;
-    // (undocumented)
-    view<K extends keyof D["projections"]>(this: void, key: K, options?: AbortOptions): Promise<ProjectionView<D, K>>;
+    get<Model extends DomainModel>(id: string, model: Model): DomainStore<Model>;
 }
 
 // @public (undocumented)
-export interface SnapshotData<D extends EventsDomain> {
+export type Entity<T extends Record<string, unknown> = Record<string, unknown>> = T & {
+    id: number;
+};
+
+// @public (undocumented)
+export interface EntityCollection<T extends Record<string, unknown> = Record<string, unknown>> extends ReadonlyEntityCollection<T> {
     // (undocumented)
-    readonly changes: ReadonlyArray<[keyof D["events"], D["events"][string]]>;
+    del(id: number): void;
     // (undocumented)
-    readonly commit: Commit<TypeOf<D["meta"]>>;
+    put(id: number, props: T): void;
 }
+
+// @public (undocumented)
+export interface EntityProjection<T extends Record<string, unknown> = Record<string, unknown>, C extends ChangeModel = ChangeModel, R extends ReadModel = ReadModel> {
+    // (undocumented)
+    readonly apply: EntityProjectionFunc<C, R, T>;
+    // (undocumented)
+    readonly dependencies: ReadonlySet<string & keyof R>;
+    // (undocumented)
+    readonly kind: "entities";
+    // (undocumented)
+    readonly mutators: ReadonlySet<string & keyof C>;
+    // (undocumented)
+    readonly type: Type<T>;
+}
+
+// @public (undocumented)
+export type EntityProjectionFunc<C extends ChangeModel = ChangeModel, R extends ReadModel = ReadModel, T extends Record<string, unknown> = Record<string, unknown>> = (change: ChangeType<C>, state: EntityCollection<T>, view: ViewSnapshot<R>) => Promise<void>;
+
+// @public (undocumented)
+export interface EntityView<T extends Record<string, unknown> = Record<string, unknown>> extends ReadonlyEntityCollection<T> {
+    // (undocumented)
+    readonly kind: "entities";
+    // (undocumented)
+    readonly version: number;
+}
+
+// @public (undocumented)
+export type EqualityOperator = "==" | "!=" | "in" | "not-in";
+
+// @public (undocumented)
+export type Equatable = null | boolean | Comparable;
+
+// @public (undocumented)
+export type FilterOperand<T, O> = (O extends IsOperator ? IsOperand<T> : O extends EqualityOperator ? T : O extends ComparisonOperator ? T : O extends ArrayAnyOperator ? T : O extends ArrayOperator ? T extends unknown[infer E] ? E : never : O extends StringOperator ? string : never);
+
+// @public (undocumented)
+export type FilterOperator<T> = ((IsOperand<T> extends never ? never : IsOperator) | (T extends Equatable ? EqualityOperator : never) | (T extends Comparable ? ComparisonOperator : never) | (T extends unknown[] ? ArrayOperator : never) | (T extends string ? StringOperator : never));
+
+// @public (undocumented)
+export type IsOperand<T> = ((T extends undefined ? "defined" : never) | (T extends null ? "null" | "scalar" : never) | (T extends boolean ? "boolean" | "scalar" : never) | (T extends number ? "number" | "scalar" : never) | (T extends string ? "string" | "scalar" : never) | (T extends unknown[] ? "array" : never) | (T extends Record<string, unknown> ? "object" : never));
+
+// @public (undocumented)
+export type IsOperator = "is" | "is-not";
+
+// @public (undocumented)
+export interface ModelBuilder<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Actions extends WriteModel = WriteModel> {
+    // (undocumented)
+    addAction<ActionKey extends string, Handler extends ActionHandler>(key: ActionKey, handler: Handler): ModelBuilder<Events, Views, Actions & WriteModel<ActionKey, ActionHandler>>;
+    // (undocumented)
+    addEvent<EventKey extends string, EventArg>(key: EventKey, type: Type<EventArg>): ModelBuilder<Events & ChangeModel<EventKey, EventArg>, Views, Actions>;
+    // (undocumented)
+    addView<ViewKey extends string, Handler extends Projection>(key: ViewKey, handler: Handler): ModelBuilder<Events, Views & ReadModel<ViewKey, Handler>, Actions>;
+    // (undocumented)
+    createModel(): DomainModel<Events, Views, Actions>;
+}
+
+// @public (undocumented)
+export interface Page<T> {
+    // (undocumented)
+    readonly continuation?: string;
+    // (undocumented)
+    readonly final?: boolean;
+    // (undocumented)
+    readonly items: readonly T[];
+}
+
+// @public (undocumented)
+export interface PageOptions {
+    // (undocumented)
+    continuation?: string;
+    // (undocumented)
+    fill?: boolean;
+    // (undocumented)
+    size?: number;
+}
+
+// @public (undocumented)
+export type Projection = StateProjection | QueryHandler | EntityProjection;
+
+// @public (undocumented)
+export interface Queryable<T> extends SortedQueryable<T> {
+    // (undocumented)
+    by<P extends keyof SortableProps<T>>(property: P): SortedQueryable<T>;
+}
+
+// @public (undocumented)
+export type QueryFunc<R extends ReadModel = ReadModel, P extends Record<string, unknown> = Record<string, unknown>, T = unknown> = (view: ViewSnapshot<R>, params: P) => Promise<T>;
+
+// @public (undocumented)
+export interface QueryHandler<P extends Record<string, unknown> = Record<string, unknown>, T = unknown, R extends ReadModel = ReadModel> {
+    // (undocumented)
+    readonly dependencies: ReadonlySet<string & keyof R>;
+    // (undocumented)
+    readonly exec: QueryFunc<R, P, T>;
+    // (undocumented)
+    readonly kind: "query";
+    // (undocumented)
+    readonly params: Type<P>;
+    // (undocumented)
+    readonly type: Type<T>;
+}
+
+// @public (undocumented)
+export interface QueryView<P = unknown, T = unknown> {
+    // (undocumented)
+    readonly kind: "query";
+    // (undocumented)
+    query(params: P): T;
+    // (undocumented)
+    readonly version: number;
+}
+
+// @public (undocumented)
+export type ReadModel<K extends string = string, T extends Projection = Projection> = Readonly<Record<K, T>>;
+
+// @public (undocumented)
+export interface ReadonlyEntityCollection<T extends Record<string, unknown> = Record<string, unknown>> extends Queryable<Entity<T>> {
+    // (undocumented)
+    get(id: number): Promise<Entity<T> | undefined>;
+}
+
+// @public (undocumented)
+export type SortableProps<T> = {
+    [P in keyof T]: T[P] extends Comparable ? T[P] : never;
+};
+
+// @public (undocumented)
+export interface SortedQueryable<T> extends AsyncIterable<T> {
+    // (undocumented)
+    any(): Promise<boolean>;
+    // (undocumented)
+    count(): Promise<number>;
+    // (undocumented)
+    first(): Promise<T | undefined>;
+    // (undocumented)
+    page(options?: PageOptions): Promise<Page<T>>;
+    // (undocumented)
+    where<P extends string & keyof T, O extends FilterOperator<T[P]>>(property: P, operator: O, operand: FilterOperand<T[P], O>): SortedQueryable<T>;
+}
+
+// @public (undocumented)
+export type StateApplyFunc<C extends ChangeModel = ChangeModel, R extends ReadModel = ReadModel, T = unknown> = (this: void, change: ChangeType<C>, before: T, view: ViewSnapshot<R>) => Promise<T>;
+
+// @public (undocumented)
+export interface StateProjection<T = unknown, C extends ChangeModel = ChangeModel, R extends ReadModel = ReadModel> {
+    // (undocumented)
+    readonly apply: StateApplyFunc<C, R, T>;
+    // (undocumented)
+    readonly dependencies: ReadonlySet<string & keyof R>;
+    // (undocumented)
+    readonly initial: T;
+    // (undocumented)
+    readonly kind: "state";
+    // (undocumented)
+    readonly mutators: ReadonlySet<string & keyof C>;
+    // (undocumented)
+    readonly type: Type<T>;
+}
+
+// @public (undocumented)
+export interface StateView<T = unknown> {
+    // (undocumented)
+    readonly kind: "state";
+    // (undocumented)
+    read(): Promise<T>;
+    // (undocumented)
+    readonly version: number;
+}
+
+// @public (undocumented)
+export type StringOperator = ("contains" | "contains-ignore-case" | "starts-with" | "starts-with-ignore-case" | "ends-with" | "ends-with-ignore-case");
+
+// @public (undocumented)
+export type VersionAlignment<T> = (T extends number ? ("exact" | "fresh-after" | "fresh-before") : ("latest" | "latest-fresh"));
+
+// @public (undocumented)
+export type View = StateView | QueryView | EntityView;
+
+// @public (undocumented)
+export type ViewOf<H extends Projection> = H extends StateProjection<infer T> ? StateView<T> : H extends QueryHandler<infer P, infer T> ? QueryView<P, T> : H extends EntityProjection<infer T> ? EntityView<T> : View;
+
+// @public (undocumented)
+export interface ViewOptions<T extends number | undefined = undefined> {
+    // (undocumented)
+    readonly align?: VersionAlignment<T>;
+    // (undocumented)
+    readonly version?: T;
+}
+
+// @public (undocumented)
+export type ViewSnapshot<R extends ReadModel> = <K extends string & keyof R>(key: K) => Promise<ViewOf<R[K]>>;
+
+// @public (undocumented)
+export type WriteModel<K extends string = string, T extends ActionHandler = ActionHandler> = Readonly<Record<K, T>>;
 
 ```

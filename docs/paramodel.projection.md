@@ -2,25 +2,12 @@
 
 [Home](./index.md) &gt; [paramodel](./paramodel.md) &gt; [Projection](./paramodel.projection.md)
 
-## Projection interface
-
+## Projection type
 
 <b>Signature:</b>
 
 ```typescript
-export interface Projection<D extends EventsDomain, T extends Type<unknown>> 
+export declare type Projection = StateProjection | QueryHandler | EntityProjection;
 ```
-
-## Properties
-
-|  Property | Type | Description |
-|  --- | --- | --- |
-|  [on](./paramodel.projection.on.md) | Partial&lt;[ProjectionHandlers](./paramodel.projectionhandlers.md)<!-- -->&lt;D, T&gt;&gt; |  |
-|  [type](./paramodel.projection.type.md) | T |  |
-
-## Methods
-
-|  Method | Description |
-|  --- | --- |
-|  [init()](./paramodel.projection.init.md) |  |
+<b>References:</b> [StateProjection](./paramodel.stateprojection.md)<!-- -->, [QueryHandler](./paramodel.queryhandler.md)<!-- -->, [EntityProjection](./paramodel.entityprojection.md)
 

@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-conflict(message?: string): never;
+conflict(message: string): never;
 ```
 
 ## Parameters

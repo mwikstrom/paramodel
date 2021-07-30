@@ -4,17 +4,21 @@
 
 ## ActionResult interface
 
-
 <b>Signature:</b>
 
 ```typescript
-export interface ActionResult<D extends ProjectionsDomain, T> 
+export interface ActionResult<Events extends ChangeModel, Output> 
 ```
 
 ## Properties
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [result](./paramodel.actionresult.result.md) | T |  |
-|  [snapshot](./paramodel.actionresult.snapshot.md) | [Snapshot](./paramodel.snapshot.md)<!-- -->&lt;D&gt; |  |
+|  [base](./paramodel.actionresult.base.md) | number |  |
+|  [changes](./paramodel.actionresult.changes.md) | readonly [ChangeType](./paramodel.changetype.md)<!-- -->&lt;Events&gt;\[\] |  |
+|  [committed?](./paramodel.actionresult.committed.md) | number | <i>(Optional)</i> |
+|  [conflict?](./paramodel.actionresult.conflict.md) | string | <i>(Optional)</i> |
+|  [output?](./paramodel.actionresult.output.md) | Output | <i>(Optional)</i> |
+|  [success](./paramodel.actionresult.success.md) | boolean |  |
+|  [timestamp](./paramodel.actionresult.timestamp.md) | Date |  |
 

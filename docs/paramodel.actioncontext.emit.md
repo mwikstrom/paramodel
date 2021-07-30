@@ -2,10 +2,22 @@
 
 [Home](./index.md) &gt; [paramodel](./paramodel.md) &gt; [ActionContext](./paramodel.actioncontext.md) &gt; [emit](./paramodel.actioncontext.emit.md)
 
-## ActionContext.emit property
+## ActionContext.emit() method
 
 <b>Signature:</b>
 
 ```typescript
-readonly emit: Emitter<D>;
+emit<K extends string & keyof Events>(key: K, arg: TypeOf<Events[K]>): void;
 ```
+
+## Parameters
+
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  key | K |  |
+|  arg | TypeOf&lt;Events\[K\]&gt; |  |
+
+<b>Returns:</b>
+
+void
+

@@ -4,28 +4,26 @@
 
 ## ActionContext interface
 
-
 <b>Signature:</b>
 
 ```typescript
-export interface ActionContext<D extends ProjectionsDomain, T> 
+export interface ActionContext<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Input = unknown, Output = unknown> 
 ```
 
 ## Properties
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [base](./paramodel.actioncontext.base.md) | [Snapshot](./paramodel.snapshot.md)<!-- -->&lt;D&gt; |  |
-|  [commit](./paramodel.actioncontext.commit.md) | [Commit](./paramodel.commit.md)<!-- -->&lt;TypeOf&lt;D\["meta"\]&gt;&gt; |  |
-|  [dry](./paramodel.actioncontext.dry.md) | boolean |  |
-|  [emit](./paramodel.actioncontext.emit.md) | [Emitter](./paramodel.emitter.md)<!-- -->&lt;D&gt; |  |
-|  [input](./paramodel.actioncontext.input.md) | T |  |
+|  [input](./paramodel.actioncontext.input.md) | Input |  |
+|  [timestamp](./paramodel.actioncontext.timestamp.md) | Date |  |
+|  [version](./paramodel.actioncontext.version.md) | number |  |
+|  [view](./paramodel.actioncontext.view.md) | [ViewSnapshot](./paramodel.viewsnapshot.md)<!-- -->&lt;Views&gt; |  |
 
 ## Methods
 
 |  Method | Description |
 |  --- | --- |
 |  [conflict(message)](./paramodel.actioncontext.conflict.md) |  |
-|  [conflict(when, message)](./paramodel.actioncontext.conflict_1.md) |  |
-|  [conflict(when, message)](./paramodel.actioncontext.conflict_2.md) |  |
+|  [emit(key, arg)](./paramodel.actioncontext.emit.md) |  |
+|  [output(result)](./paramodel.actioncontext.output.md) |  |
 
