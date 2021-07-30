@@ -76,17 +76,23 @@ export function defineState<
 
 export function defineQuery<
     Views extends ReadModel,
-    Dependencies extends (keyof Views)[],
+    Dependencies extends (string & keyof Views)[],
     Params extends Record<string, unknown>,
     Result,
 >(
     model: Pick<DomainModel<ChangeModel, Views>, "views">,
+    type: Type<Result>,
     params: Type<Params>,
-    result: Type<Result>,
     dependencies: Dependencies,
     exec: QueryFunc<Pick<Views, Dependencies[number]>, Params, Result>,
 ): QueryHandler<Params, Result, Pick<Views, Dependencies[number]>> {
-    throw new Error("TODO");
+    return Object.freeze({
+        kind: "query",
+        type,
+        params,
+        dependencies: Object.freeze(new Set(dependencies)),
+        exec,
+    });
 }
 
 export function defineEntity<
@@ -384,6 +390,8 @@ export interface QueryHandler<
     R extends ReadModel = ReadModel,
 > {
     readonly kind: "query";
+    readonly type: Type<T>;
+    readonly params: Type<P>;
     readonly dependencies: ReadonlySet<string & keyof R>;
     readonly exec: QueryFunc<R, P, T>;
 }
