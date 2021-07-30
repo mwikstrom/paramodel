@@ -21,9 +21,9 @@ export interface ActionContext<D extends ProjectionsDomain, T> {
     readonly commit: Commit<TypeOf<D["meta"]>>;
     readonly input: T;
     readonly emit: Emitter<D>;
-    conflict(message?: string): void;
-    conflict(when: boolean): void;
-    conflict(when: boolean, message: string): void;
+    conflict(message?: string): never;
+    conflict(when: true, message?: string): never;
+    conflict(when: false, message?: string): void;
 }
 
 /** @public */
