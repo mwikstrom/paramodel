@@ -1,7 +1,7 @@
 import { Type } from "paratype";
 import { ChangeType } from "./change";
 import { ChangeModel, ReadModel } from "./model";
-import { ViewSnapshot } from "./projection";
+import { ViewSnapshotFunc } from "./projection";
 
 export interface StateProjection<
     T = unknown,
@@ -20,4 +20,4 @@ export type StateApplyFunc<
     C extends ChangeModel = ChangeModel,
     R extends ReadModel = ReadModel,
     T = unknown,
-> = (this: void, change: ChangeType<C>, before: T, view: ViewSnapshot<R>) => Promise<T>;
+> = (this: void, change: ChangeType<C>, before: T, view: ViewSnapshotFunc<R>) => Promise<T>;

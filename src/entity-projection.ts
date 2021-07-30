@@ -2,7 +2,7 @@ import { Type } from "paratype";
 import { ChangeType } from "./change";
 import { ReadonlyEntityCollection } from "./entity-view";
 import { ChangeModel, ReadModel } from "./model";
-import { ViewSnapshot } from "./projection";
+import { ViewSnapshotFunc } from "./projection";
 
 export interface EntityProjection<
     T extends Record<string, unknown> = Record<string, unknown>,
@@ -20,7 +20,7 @@ export type EntityProjectionFunc<
     C extends ChangeModel = ChangeModel,
     R extends ReadModel = ReadModel,
     T extends Record<string, unknown> = Record<string, unknown>,
-> = (change: ChangeType<C>, state: EntityCollection<T>, view: ViewSnapshot<R>) => Promise<void>;
+> = (change: ChangeType<C>, state: EntityCollection<T>, view: ViewSnapshotFunc<R>) => Promise<void>;
 
 export interface EntityCollection<
     T extends Record<string, unknown> = Record<string, unknown>,

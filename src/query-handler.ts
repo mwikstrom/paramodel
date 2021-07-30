@@ -1,6 +1,6 @@
 import { Type } from "paratype";
 import { ReadModel } from "./model";
-import { ViewSnapshot } from "./projection";
+import { ViewSnapshotFunc } from "./projection";
 
 export interface QueryHandler<
     P extends Record<string, unknown> = Record<string, unknown>,
@@ -18,4 +18,4 @@ export type QueryFunc<
     R extends ReadModel = ReadModel,
     P extends Record<string, unknown> = Record<string, unknown>,
     T = unknown,
-> = (view: ViewSnapshot<R>, params: P) => Promise<T>;
+> = (view: ViewSnapshotFunc<R>, params: P) => Promise<T>;

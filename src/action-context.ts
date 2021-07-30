@@ -1,6 +1,6 @@
 import { TypeOf } from "paratype";
 import { ChangeModel, ReadModel } from "./model";
-import { ViewSnapshot } from "./projection";
+import { ViewSnapshotFunc } from "./projection";
 
 export interface ActionContext<
     Events extends ChangeModel = ChangeModel,
@@ -14,5 +14,5 @@ export interface ActionContext<
     conflict(message: string): never;
     output(result: Output): void;
     emit<K extends string & keyof Events>(key: K, arg: TypeOf<Events[K]>): void;
-    view: ViewSnapshot<Views>;
+    view: ViewSnapshotFunc<Views>;
 }
