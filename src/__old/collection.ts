@@ -1,7 +1,7 @@
 import { Type, TypeOf } from "paratype";
 import { Commit } from "./commit";
 import { EventsDomain, ProjectionsDomain } from "./domain";
-import { Queryable } from "../query";
+import { Queryable } from "../queryable";
 import { Snapshot } from "./snapshot";
 
 /** @public */
