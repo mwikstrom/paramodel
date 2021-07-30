@@ -1,3 +1,7 @@
+import { Type } from "paratype";
+import { ReadModel } from "./model";
+import { QueryFunc, QueryHandler } from "./query-handler";
+
 export function defineQuery<
     Views extends ReadModel,
     Dependencies extends (string & keyof Views)[],

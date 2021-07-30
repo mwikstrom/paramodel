@@ -1,3 +1,7 @@
+import { Type } from "paratype";
+import { ChangeModel, ReadModel } from "./model";
+import { StateApplyFunc, StateProjection } from "./state-projection";
+
 export function defineState<
     Events extends ChangeModel,
     Views extends ReadModel,

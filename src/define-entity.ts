@@ -1,3 +1,7 @@
+import { Type } from "paratype";
+import { EntityProjectionFunc, EntityProjection } from "./entity-projection";
+import { ChangeModel, ReadModel } from "./model";
+
 // TODO: "on" instead of mutators and apply
 export function defineEntity<
     Events extends ChangeModel,

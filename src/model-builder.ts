@@ -1,3 +1,8 @@
+import { Type } from "paratype";
+import { ActionHandler } from "./action-handler";
+import { ChangeModel, ReadModel, WriteModel, DomainModel } from "./model";
+import { Projection } from "./projection";
+
 export interface ModelBuilder<
     Events extends ChangeModel = ChangeModel,
     Views extends ReadModel = ReadModel,

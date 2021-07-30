@@ -1,3 +1,7 @@
+import { Type } from "paratype";
+import { ActionFunc, ActionHandler } from "./action-handler";
+import { ChangeModel, ReadModel } from "./model";
+
 export function defineAction<
     Events extends ChangeModel,
     Views extends ReadModel,
