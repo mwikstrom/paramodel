@@ -87,7 +87,7 @@ export interface Collection<D extends EventsDomain, T extends Type<unknown>> {
 }
 
 // @public (undocumented)
-export interface CollectionContext<D extends EventsDomain, T extends Type<unknown>, K extends keyof D["events"]> extends CollectionQuery<TypeOf<T>> {
+export interface CollectionContext<D extends EventsDomain, T extends Type<unknown>, K extends keyof D["events"]> extends QueryableCollection<TypeOf<T>> {
     // (undocumented)
     readonly change: K;
     // (undocumented)
@@ -108,16 +108,8 @@ export type CollectionHandlers<D extends EventsDomain, T extends Type<unknown>> 
     [K in keyof D["events"]]: CollectionFunc<D, T, K>;
 };
 
-// Warning: (ae-forgotten-export) The symbol "Query" needs to be exported by the entry point index.d.ts
-//
 // @public (undocumented)
-export interface CollectionQuery<T> extends Query<T> {
-    // (undocumented)
-    get(id: number): Promise<T | undefined>;
-}
-
-// @public (undocumented)
-export interface CollectionView<D extends ProjectionsDomain, K extends keyof D["collections"]> extends CollectionQuery<TypeOf<D["collections"][K]["entity"]>> {
+export interface CollectionView<D extends ProjectionsDomain, K extends keyof D["collections"]> extends QueryableCollection<TypeOf<D["collections"][K]["entity"]>> {
     // (undocumented)
     alloc(): number;
     // (undocumented)
@@ -305,6 +297,14 @@ export interface ProjectionView<D extends ProjectionsDomain, K extends keyof D["
     readonly snapshot: Snapshot<D>;
     // (undocumented)
     readonly value: ProjectionType<D["projections"][K]>;
+}
+
+// Warning: (ae-forgotten-export) The symbol "Queryable" needs to be exported by the entry point index.d.ts
+//
+// @public (undocumented)
+export interface QueryableCollection<T> extends Queryable<T> {
+    // (undocumented)
+    get(id: number): Promise<T | undefined>;
 }
 
 // @public (undocumented)

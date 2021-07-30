@@ -19,7 +19,6 @@ Run-time domain model for event-sourcing.
 |  [Batch](./paramodel.batch.md) |  |
 |  [Collection](./paramodel.collection.md) |  |
 |  [CollectionContext](./paramodel.collectioncontext.md) |  |
-|  [CollectionQuery](./paramodel.collectionquery.md) |  |
 |  [CollectionView](./paramodel.collectionview.md) |  |
 |  [Commit](./paramodel.commit.md) |  |
 |  [CommitOptions](./paramodel.commitoptions.md) |  |
@@ -35,6 +34,7 @@ Run-time domain model for event-sourcing.
 |  [ProjectionsDomain](./paramodel.projectionsdomain.md) |  |
 |  [ProjectionsDomainBuilder](./paramodel.projectionsdomainbuilder.md) |  |
 |  [ProjectionView](./paramodel.projectionview.md) |  |
+|  [QueryableCollection](./paramodel.queryablecollection.md) |  |
 |  [ReadOptions](./paramodel.readoptions.md) |  |
 |  [Snapshot](./paramodel.snapshot.md) |  |
 |  [SnapshotData](./paramodel.snapshotdata.md) |  |

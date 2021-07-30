@@ -8,9 +8,9 @@
 <b>Signature:</b>
 
 ```typescript
-export interface CollectionView<D extends ProjectionsDomain, K extends keyof D["collections"]> extends CollectionQuery<TypeOf<D["collections"][K]["entity"]>> 
+export interface CollectionView<D extends ProjectionsDomain, K extends keyof D["collections"]> extends QueryableCollection<TypeOf<D["collections"][K]["entity"]>> 
 ```
-<b>Extends:</b> [CollectionQuery](./paramodel.collectionquery.md)<!-- -->&lt;TypeOf&lt;D\["collections"\]\[K\]\["entity"\]&gt;&gt;
+<b>Extends:</b> [QueryableCollection](./paramodel.queryablecollection.md)<!-- -->&lt;TypeOf&lt;D\["collections"\]\[K\]\["entity"\]&gt;&gt;
 
 ## Properties
 

@@ -1,8 +1,10 @@
 /**
  * @public
  */
-export interface Query<T> {
-    orderBy<P extends keyof T>(property: P): Query<T>;
+export interface Queryable<T> {
+    any(): Promise<boolean>;
+    count(): Promise<number>;
+    orderBy<P extends keyof T>(property: P): Queryable<T>;
     top(count: number): Promise<readonly T[]>;
     where<
         P extends string & keyof T,
@@ -11,7 +13,7 @@ export interface Query<T> {
         property: P,
         operator: O,
         operand: FilterOperand<T[P], O>,
-    ): Query<T>;
+    ): Queryable<T>;
     // TODO: Support nested filter (stepping into record property)
     // TODO: Support subquery filter (stepping into array)
 }

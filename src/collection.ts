@@ -1,7 +1,7 @@
 import { Type, TypeOf } from "paratype";
 import { Commit } from "./commit";
 import { EventsDomain, ProjectionsDomain } from "./domain";
-import { Query } from "./query";
+import { Queryable } from "./query";
 import { Snapshot } from "./snapshot";
 
 /** @public */
@@ -26,7 +26,7 @@ export interface CollectionContext<
     D extends EventsDomain,
     T extends Type<unknown>,
     K extends keyof D["events"]
-> extends CollectionQuery<TypeOf<T>> {
+> extends QueryableCollection<TypeOf<T>> {
     readonly commit: Commit<TypeOf<D["meta"]>>;
     readonly change: K;
     readonly input: TypeOf<D["events"][K]>;
@@ -38,12 +38,12 @@ export interface CollectionContext<
 export interface CollectionView<
     D extends ProjectionsDomain,
     K extends keyof D["collections"]
-> extends CollectionQuery<TypeOf<D["collections"][K]["entity"]>> {
+> extends QueryableCollection<TypeOf<D["collections"][K]["entity"]>> {
     readonly snapshot: Snapshot<D>;
     alloc(): number;
 }
 
 /** @public */
-export interface CollectionQuery<T> extends Query<T> {
+export interface QueryableCollection<T> extends Queryable<T> {
     get(id: number): Promise<T | undefined>;
 }
