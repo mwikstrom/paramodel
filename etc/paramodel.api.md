@@ -210,10 +210,10 @@ export type FilterOperand<T, O> = (O extends IsOperator ? IsOperand<T> : O exten
 export type FilterOperator<T> = ((IsOperand<T> extends never ? never : IsOperator) | (T extends Equatable ? EqualityOperator : never) | (T extends Comparable ? ComparisonOperator : never) | (T extends unknown[] ? ArrayOperator : never) | (T extends string ? StringOperator : never));
 
 // @public (undocumented)
-export type Forbidden = typeof forbidden;
+export const Forbidden: unique symbol;
 
 // @public (undocumented)
-export const forbidden: unique symbol;
+export type Forbidden = typeof Forbidden;
 
 // @public (undocumented)
 export type IsOperand<T> = ((T extends undefined ? "defined" : never) | (T extends null ? "null" | "scalar" : never) | (T extends boolean ? "boolean" | "scalar" : never) | (T extends number ? "number" | "scalar" : never) | (T extends string ? "string" | "scalar" : never) | (T extends unknown[] ? "array" : never) | (T extends Record<string, unknown> ? "object" : never));

@@ -46,7 +46,7 @@ Run-time domain model for event-sourcing.
 
 |  Variable | Description |
 |  --- | --- |
-|  [forbidden](./paramodel.forbidden.md) |  |
+|  [Forbidden](./paramodel.forbidden.md) |  |
 
 ## Type Aliases
 

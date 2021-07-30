@@ -20,5 +20,5 @@ export type DomainModel<
     readonly scope: Type<Scope>;
 };
 
-export const forbidden = Symbol();
-export type Forbidden = typeof forbidden;
+export const Forbidden = Symbol();
+export type Forbidden = typeof Forbidden;
