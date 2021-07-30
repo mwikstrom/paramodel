@@ -1,6 +1,6 @@
 {
   "name": "paramodel",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Run-time domain model for event-sourcing",
   "main": "./lib/index.js",
   "typings": "./lib/index.d.ts",
