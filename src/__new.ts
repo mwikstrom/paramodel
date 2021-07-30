@@ -55,16 +55,23 @@ export function defineState<
     Events extends ChangeModel,
     Views extends ReadModel,
     State,
-    Mutators extends (keyof Events)[],
-    Dependencies extends (keyof Views)[],
+    Mutators extends (string & keyof Events)[],
+    Dependencies extends (string & keyof Views)[],
 >(
-    model: Pick<DomainModel<Events, Views>, "events" | "views">,  
-    state: Type<State>,
+    type: Type<State>,
+    initial: State,
     mutators: Mutators,
     dependencies: Dependencies,
     apply: StateProjectionFunc<Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>, State>,
 ): StateProjection<State, Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>> {
-    throw new Error("TODO");
+    return ({
+        kind: "state",
+        type,
+        initial,
+        mutators: Object.freeze(new Set(mutators)),
+        dependencies: Object.freeze(new Set(dependencies)),
+        apply,
+    });
 }
 
 export function defineQuery<
@@ -345,6 +352,7 @@ export interface StateProjection<
     R extends ReadModel = ReadModel,
 > {
     readonly kind: "state";
+    readonly type: Type<T>;
     readonly mutators: ReadonlySet<string & keyof C>;
     readonly dependencies: ReadonlySet<string & keyof R>;
     readonly initial: T;
