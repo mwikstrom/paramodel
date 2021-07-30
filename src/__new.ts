@@ -48,11 +48,15 @@ export function defineState<
     Events extends ChangeModel,
     Views extends ReadModel,
     State,
-    MutatorKeys extends keyof Events,
-    DependencyKeys extends keyof Views,
+    Mutators extends (keyof Events)[],
+    Dependencies extends (keyof Views)[],
 >(
-// TODO: State definition
-): StateProjection<State, Pick<Events, MutatorKeys>, Pick<Views, DependencyKeys>> {
+    model: Pick<DomainModel<Events, Views>, "events" | "views">,  
+    state: Type<State>,
+    mutators: Mutators,
+    dependencies: Dependencies,
+    apply: StateProjectionFunc<Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>, State>,
+): StateProjection<State, Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>> {
     throw new Error("TODO");
 }
 
@@ -218,8 +222,14 @@ export interface StateProjection<
     readonly mutators: ReadonlySet<string & keyof C>;
     readonly dependencies: ReadonlySet<string & keyof R>;
     readonly initial: T;
-    apply(change: ChangeType<C>, before: T, view: ViewSnapshot<R>): Promise<T>;
+    readonly apply: StateProjectionFunc<C, R, T>;
 }
+
+export type StateProjectionFunc<
+    C extends ChangeModel = ChangeModel,
+    R extends ReadModel = ReadModel,
+    T = unknown,
+> = (change: ChangeType<C>, before: T, view: ViewSnapshot<R>) => Promise<T>;
 
 export type ViewSnapshot<R extends ReadModel> = <K extends string & keyof R>(key: K) => Promise<ViewOf<R[K]>>;
 
