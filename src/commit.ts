@@ -10,6 +10,7 @@ export interface Commit<M> {
 
 /** @public */
 export interface CommitOptions<M> extends AbortOptions {
+    dry: boolean;
     maxAttempts?: number;
     meta?: M;
     // TODO: option for reading dirty?
