@@ -7,7 +7,7 @@ export function defineChange<K extends string, T>(key: K, type: Type<T>): Change
     return Object.fromEntries([[key, type]]) as ChangeModel<K, T>;
 }
 
-export type ReadModel<K extends string = string, T = unknown> = Record<K, T>;
+export type ReadModel<K extends string = string, T extends ReadModelHandler = ReadModelHandler> = Record<K, T>;
 
 // TODO: define state
 /*
@@ -29,7 +29,7 @@ export function defineState<
 
 export interface Repository<C extends ChangeModel, R extends ReadModel> {
     readonly changes: SortedQueryable<ChangeType<C>>;
-    view<K extends string & keyof R>(key: K, options?: ViewOptions): Promise<ReadModelView<R, K> | undefined>;
+    view<K extends string & keyof R>(key: K, options?: ViewOptions): Promise<ViewOf<R[K]> | undefined>;
 }
 
 export type ChangeType<Model extends ChangeModel> = {
@@ -62,13 +62,19 @@ export type VersionAlignment<T> = (
     )
 );
 
-// TODO: Strongly typed read model view
-export type ReadModelView<R extends ReadModel, K extends string & keyof R> = View;
+export type ViewOf<H extends ReadModelHandler> =
+        H extends StateProjection<infer T> ? StateView<T> :
+        H extends QueryHandler<infer P, infer T> ? QueryView<P, T> :
+        H extends EntityProjection<infer T> ? EntityView<T> :
+        View;
+
+export type ReadModelHandler = StateProjection | QueryHandler | EntityProjection;
+
 export type View = StateView | QueryView | EntityView;
 
 export interface StateView<T = unknown> {
-    readonly version: number;
     readonly kind: "state";
+    readonly version: number;
     read(): Promise<T>;
 }
 
@@ -77,25 +83,27 @@ export interface StateProjection<
     C extends ChangeModel = ChangeModel,
     R extends ReadModel = ReadModel,
 > {
+    readonly kind: "state";
     readonly mutators: ReadonlySet<string & keyof C>;
     readonly dependencies: ReadonlySet<string & keyof R>;
     apply(change: ChangeType<C>, before: T, view: ViewSnapshot<R>): Promise<T>;
     init(): T;
 }
 
-export type ViewSnapshot<R extends ReadModel> = <K extends string & keyof R>(key: K) => Promise<ReadModelView<R, K>>;
+export type ViewSnapshot<R extends ReadModel> = <K extends string & keyof R>(key: K) => Promise<ViewOf<R[K]>>;
 
 export interface QueryView<P = unknown, T = unknown> {
-    readonly version: number;
     readonly kind: "query";
+    readonly version: number;
     query(params: P): T;
 }
 
 export interface QueryHandler<
-    R extends ReadModel = ReadModel,
     P = unknown,
-    T = unknown
+    T = unknown,
+    R extends ReadModel = ReadModel,
 > {
+    readonly kind: "query";
     readonly dependencies: ReadonlySet<string & keyof R>;
     exec(view: ViewSnapshot<R>, params: P): Promise<T>;
 }
@@ -103,8 +111,8 @@ export interface QueryHandler<
 export interface EntityView<
     T extends Record<string, unknown> = Record<string, unknown>
 > extends ReadonlyEntityCollection<T> {
-    readonly version: number;
     readonly kind: "entities";    
+    readonly version: number;
 }
 
 export interface ReadonlyEntityCollection<
@@ -118,6 +126,7 @@ export interface EntityProjection<
     C extends ChangeModel = ChangeModel,
     R extends ReadModel = ReadModel
 > {
+    readonly kind: "entities";
     readonly mutators: ReadonlySet<string & keyof C>;
     readonly dependencies: ReadonlySet<string & keyof R>;
     apply(change: ChangeType<C>, state: EntityCollection<T>, view: ViewSnapshot<R>): Promise<void>;
