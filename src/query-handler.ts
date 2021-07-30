@@ -18,4 +18,4 @@ export type QueryFunc<
     R extends ReadModel = ReadModel,
     P extends Record<string, unknown> = Record<string, unknown>,
     T = unknown,
-> = (view: ViewSnapshotFunc<R>, params: P) => Promise<T>;
+> = (view: ViewSnapshotFunc<R>, params: P, scope: Scope) => Promise<T | Forbidden>;

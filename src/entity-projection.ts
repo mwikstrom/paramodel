@@ -3,6 +3,7 @@ import { ChangeType } from "./change";
 import { ReadonlyEntityCollection } from "./entity-view";
 import { ChangeModel, ReadModel } from "./model";
 import { ViewSnapshotFunc } from "./projection";
+import { Filterable } from "./queryable";
 
 export interface EntityProjection<
     T extends Record<string, unknown> = Record<string, unknown>,
@@ -14,7 +15,14 @@ export interface EntityProjection<
     readonly mutators: ReadonlySet<string & keyof C>;
     readonly dependencies: ReadonlySet<string & keyof R>;
     readonly apply: EntityProjectionFunc<C, R, T>;
+    readonly auth: EntityAuthFunc<Scope, T, R>;
 }
+
+export type EntityAuthFunc<
+    Scope,
+    T extends Record<string, unknown> = Record<string, unknown>,
+    R extends ReadModel = ReadModel
+> = (query: Filterable<T>, scope: Scope, view: ViewSnapshotFunc<R>) => Promise<Filterable<T> | Forbidden>;
 
 export type EntityProjectionFunc<
     C extends ChangeModel = ChangeModel,

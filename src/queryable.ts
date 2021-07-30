@@ -8,11 +8,14 @@ export interface Queryable<T> extends SortedQueryable<T> {
 /**
  * @public
  */
-export interface SortedQueryable<T> extends AsyncIterable<T>{
+export interface SortedQueryable<T> extends Filterable<T>, AsyncIterable<T> {
     any(): Promise<boolean>;
     count(): Promise<number>;
     first(): Promise<T | undefined>;
     page(options?: PageOptions): Promise<Page<T>>;
+}
+
+export interface Filterable<T> {
     where<
         P extends string & keyof T,
         O extends FilterOperator<T[P]>,
@@ -20,9 +23,7 @@ export interface SortedQueryable<T> extends AsyncIterable<T>{
         property: P,
         operator: O,
         operand: FilterOperand<T[P], O>,
-    ): SortedQueryable<T>;
-    // TODO: Support nested filter (stepping into record property)
-    // TODO: Support subquery filter (stepping into array)
+    ): this;
 }
 
 /**

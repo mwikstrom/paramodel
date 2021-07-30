@@ -11,7 +11,9 @@ export interface ActionContext<
     readonly version: number;
     readonly timestamp: Date;
     readonly input: Input;
-    conflict(message: string): never;
+    readonly scope: Scope;
+    forbidden(message?: string): never;
+    conflict(message?: string): never;
     output(result: Output): void;
     emit<K extends string & keyof Events>(key: K, arg: TypeOf<Events[K]>): void;
     view: ViewSnapshotFunc<Views>;

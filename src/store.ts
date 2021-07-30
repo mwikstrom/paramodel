@@ -47,9 +47,9 @@ export type ActionResultType<
 export interface ActionResult<Events extends ChangeModel, Output> {
     readonly timestamp: Date;
     readonly base: number;
-    readonly success: boolean;
+    readonly status: "success" | "conflict" | "forbidden";
     readonly changes: readonly ChangeType<Events>[];
     readonly committed?: number;
-    readonly conflict?: string;
+    readonly message?: string;
     readonly output?: Output;
 }
