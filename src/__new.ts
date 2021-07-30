@@ -51,25 +51,38 @@ export type DomainModel<
     readonly actions: Actions;
 };
 
-// TODO: "on" instead of mutators and apply
 export function defineState<
     Events extends ChangeModel,
     Views extends ReadModel,
     State,
-    Mutators extends (string & keyof Events)[],
+    Mutators extends string & keyof Events,
     Dependencies extends (string & keyof Views)[],
 >(
     type: Type<State>,
     initial: State,
-    mutators: Mutators,
     dependencies: Dependencies,
-    apply: StateProjectionFunc<Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>, State>,
-): StateProjection<State, Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>> {
+    on: {
+        [K in Mutators]: StateApplyFunc<ChangeModel<K, Events[K]>, Pick<Views, Dependencies[number]>, State>;
+    },
+): StateProjection<State, Events, Views> {
+    const mutators = Object.freeze(new Set(Object.keys(on)));
+    function isCallable(func: unknown): func is StateApplyFunc<Events, Views, State> {
+        return typeof func === "function";
+    }
+    const apply: StateApplyFunc<Events, Views, State> = async (change, before, ...rest) => {
+        if (change.key in on) {
+            const func = on[change.key as Mutators];
+            if (isCallable(func)) {
+                return await func(change, before, ...rest);
+            }
+        }
+        return before;
+    };
     return Object.freeze({
         kind: "state",
         type,
         initial,
-        mutators: Object.freeze(new Set(mutators)),
+        mutators,
         dependencies: Object.freeze(new Set(dependencies)),
         apply,
     });
@@ -258,14 +271,14 @@ export interface StateProjection<
     readonly mutators: ReadonlySet<string & keyof C>;
     readonly dependencies: ReadonlySet<string & keyof R>;
     readonly initial: T;
-    readonly apply: StateProjectionFunc<C, R, T>;
+    readonly apply: StateApplyFunc<C, R, T>;
 }
 
-export type StateProjectionFunc<
+export type StateApplyFunc<
     C extends ChangeModel = ChangeModel,
     R extends ReadModel = ReadModel,
     T = unknown,
-> = (change: ChangeType<C>, before: T, view: ViewSnapshot<R>) => Promise<T>;
+> = (this: void, change: ChangeType<C>, before: T, view: ViewSnapshot<R>) => Promise<T>;
 
 export type ViewSnapshot<R extends ReadModel> = <K extends string & keyof R>(key: K) => Promise<ViewOf<R[K]>>;
 
