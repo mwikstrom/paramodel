@@ -10,34 +10,40 @@ export function defineChange<K extends string, T>(key: K, type: Type<T>): Change
 export type ReadModel<K extends string = string, T = unknown> = Record<K, T>;
 
 // TODO: define state
+/*
+export function defineState<
+    K extends string,
+    C extends ChangeModel,
+    R extends ReadModel,
+    D extends keyof R,
+>(
+) {
+    throw new Error("TODO");
+}
+*/
+
 // TODO: define query
 // TODO: define entity
 
 // TODO: write model
 
 export interface Repository<C extends ChangeModel, R extends ReadModel> {
-    readonly changes: SortedQueryable<ChangeRecordType<C>>;
+    readonly changes: SortedQueryable<ChangeType<C>>;
     view<K extends keyof R>(key: K, options?: ViewOptions): Promise<View | undefined>;
 }
 
-export type ChangeRecordType<Model extends ChangeModel> = {
-    [K in keyof Model]: K extends string ? ChangeRecord<K, TypeOf<Model[K]>> : never;
+export type ChangeType<Model extends ChangeModel> = {
+    [K in keyof Model]: K extends string ? Change<K, TypeOf<Model[K]>> : never;
 }[keyof Model];
 
-export interface ChangeRecord<K extends string = string, T = unknown> extends ChangeReference {
+export interface Change<K extends string = string, T = unknown> {
+    readonly version: number;
+    readonly offset: number;
     readonly timestamp: Date;
     readonly user: number;
     readonly client: number;
     readonly key: K;
     readonly arg: T;
-}
-
-export interface ChangeReference extends VersionReference {
-    readonly offset: number;
-}
-
-export interface VersionReference {
-    readonly version: number;
 }
 
 export interface ViewOptions<T extends number | undefined = undefined> {
@@ -58,19 +64,22 @@ export type VersionAlignment<T> = (
 
 export type View = StateView | QueryView | EntityView;
 
-export interface StateView<T = unknown> extends VersionReference {
+export interface StateView<T = unknown> {
+    readonly version: number;
     readonly kind: "state";
     read(): Promise<T>;
 }
 
-export interface QueryView<P = unknown, T = unknown> extends VersionReference {
+export interface QueryView<P = unknown, T = unknown> {
+    readonly version: number;
     readonly kind: "query";
     query(params: P): T;
 }
 
 export interface EntityView<
     T extends Record<string, unknown> = Record<string, unknown>
-> extends VersionReference, Queryable<Entity<T>> {
+> extends Queryable<Entity<T>> {
+    readonly version: number;
     readonly kind: "entities";
     get(id: number): Promise<Entity<T> | undefined>;
 }
