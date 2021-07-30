@@ -51,6 +51,7 @@ export type DomainModel<
     readonly actions: Actions;
 };
 
+// TODO: "on" instead of mutators and apply
 export function defineState<
     Events extends ChangeModel,
     Views extends ReadModel,
@@ -95,6 +96,7 @@ export function defineQuery<
     });
 }
 
+// TODO: "on" instead of mutators and apply
 export function defineEntity<
     Events extends ChangeModel,
     Views extends ReadModel,
