@@ -134,7 +134,122 @@ export interface ModelBuilder<
         handler: Handler,
     ): ModelBuilder<Events, Views, Actions & WriteModel<ActionKey, ActionHandler>>;
 
+    addNewAction<
+        ActionKey extends string,
+        Input,
+        Output,
+        Dependencies extends (keyof Views)[],
+    >(
+        key: ActionKey,
+        model: Pick<DomainModel<Events, Views>, "events" | "views">,
+        input: Type<Input>,
+        output: Type<Output>,
+        dependencies: Dependencies,
+        exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Input, Output>,
+    ): ModelBuilder<
+        Events,
+        Views,
+        Actions &
+        WriteModel<ActionKey, ActionHandler<Events, Pick<Views, Dependencies[number]>, Input, Output>>
+    >;
+
+    addNewEntity<
+        ViewKey extends string,
+        Props extends Record<string, unknown>,
+        Mutators extends (keyof Events)[],
+        Dependencies extends (keyof Views)[],
+    >(
+        props: Type<Props>,
+        mutators: Mutators,
+        dependencies: Dependencies,
+        apply: EntityProjectionFunc<Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>, Props>,
+    ): ModelBuilder<
+        Events,
+        Views &
+        ReadModel<ViewKey, EntityProjection<Props, Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>>>,
+        Actions
+    >;
+
+    addNewState<
+        ViewKey extends string,
+        State,
+        Mutators extends (keyof Events)[],
+        Dependencies extends (keyof Views)[],
+    >(
+        state: Type<State>,
+        mutators: Mutators,
+        dependencies: Dependencies,
+        apply: StateProjectionFunc<Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>, State>,
+    ): ModelBuilder<
+        Events,
+        Views &
+        ReadModel<ViewKey, StateProjection<State, Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>>>,
+        Actions
+    >;
+
+    addNewQuery<
+        ViewKey extends string,
+        Dependencies extends (keyof Views)[],
+        Params extends Record<string, unknown>,
+        Result,
+    >(
+        params: Type<Params>,
+        result: Type<Result>,
+        dependencies: Dependencies,
+        exec: QueryFunc<Pick<Views, Dependencies[number]>, Params, Result>,
+    ): ModelBuilder<
+        Events,
+        Views &
+        ReadModel<ViewKey, QueryHandler<Params, Result, Pick<Views, Dependencies[number]>>>,
+        Actions
+    >;
+
     createModel(): DomainModel<Events, Views, Actions>;
+
+    defineAction<
+        Input,
+        Output,
+        Dependencies extends (keyof Views)[],
+    >(
+        model: Pick<DomainModel<Events, Views>, "events" | "views">,
+        input: Type<Input>,
+        output: Type<Output>,
+        dependencies: Dependencies,
+        exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Input, Output>,
+    ): ActionHandler<Events, Pick<Views, Dependencies[number]>, Input, Output>
+
+    defineEntity<
+        Props extends Record<string, unknown>,
+        Mutators extends (keyof Events)[],
+        Dependencies extends (keyof Views)[],
+    >(
+        props: Type<Props>,
+        mutators: Mutators,
+        dependencies: Dependencies,
+        apply: EntityProjectionFunc<Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>, Props>,
+    ): EntityProjection<Props, Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>>;
+
+    defineState<
+        State,
+        Mutators extends (keyof Events)[],
+        Dependencies extends (keyof Views)[],
+    >(
+        state: Type<State>,
+        mutators: Mutators,
+        dependencies: Dependencies,
+        apply: StateProjectionFunc<Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>, State>,
+    ): StateProjection<State, Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>>;
+
+    defineQuery<
+        Dependencies extends (keyof Views)[],
+        Params extends Record<string, unknown>,
+        Result,
+    >(
+        params: Type<Params>,
+        result: Type<Result>,
+        dependencies: Dependencies,
+        exec: QueryFunc<Pick<Views, Dependencies[number]>, Params, Result>,
+    ): QueryHandler<Params, Result, Pick<Views, Dependencies[number]>>;
 }
 
 // TODO: DomainContext: user auth stuff (expose in action and view handlers)
