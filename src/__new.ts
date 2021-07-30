@@ -58,12 +58,17 @@ export function defineState<
 
 export function defineQuery<
     Views extends ReadModel,
-    DependencyKeys extends keyof Views,
+    Dependencies extends (keyof Views)[],
     Params extends Record<string, unknown>,
     Result,
 >(
+    model: Views,
+    params: Type<Params>,
+    result: Type<Result>,
+    dependencies: Dependencies,
+    exec: QueryFunc<Pick<Views, Dependencies[number]>, Params, Result>,
 // TODO: Query definition
-): QueryHandler<Params, Result, Pick<Views, DependencyKeys>> {
+): QueryHandler<Params, Result, Pick<Views, Dependencies[number]>> {
     throw new Error("TODO");
 }
 
@@ -228,8 +233,14 @@ export interface QueryHandler<
 > {
     readonly kind: "query";
     readonly dependencies: ReadonlySet<string & keyof R>;
-    exec(view: ViewSnapshot<R>, params: P): Promise<T>;
+    readonly exec: QueryFunc<R, P, T>;
 }
+
+export type QueryFunc<
+    R extends ReadModel = ReadModel,
+    P extends Record<string, unknown> = Record<string, unknown>,
+    T = unknown,
+> = (view: ViewSnapshot<R>, params: P) => Promise<T>;
 
 export interface EntityView<
     T extends Record<string, unknown> = Record<string, unknown>
