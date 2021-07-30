@@ -1,31 +1,46 @@
 import { Type, TypeOf } from "paratype";
 import { Queryable, SortedQueryable } from "./query";
 
-export type ChangeModel<K extends string = string, T = unknown> = Record<K, Type<T>>;
-
-export function defineChange<K extends string, T>(key: K, type: Type<T>): ChangeModel<K, T> {
-    return Object.fromEntries([[key, type]]) as ChangeModel<K, T>;
-}
-
-export type ReadModel<K extends string = string, T extends ReadModelHandler = ReadModelHandler> = Record<K, T>;
-
+// DOMAIN MODEL:
+// TODO: define event
 // TODO: define state
-/*
-export function defineState<
-    K extends string,
-    C extends ChangeModel,
-    R extends ReadModel,
-    D extends keyof R,
->(
-) {
-    throw new Error("TODO");
-}
-*/
-
 // TODO: define query
 // TODO: define entity
+// TODO: define action
 
-// TODO: write model
+export type ChangeModel<K extends string = string, T = unknown> = Readonly<Record<K, Type<T>>>;
+
+export type ReadModel<K extends string = string, T extends Projection = Projection> = Readonly<Record<K, T>>;
+
+export type WriteModel<K extends string = string, T extends ActionHandler = ActionHandler> = Readonly<Record<K, T>>;
+
+export interface ActionHandler<
+    Events extends ChangeModel = ChangeModel,
+    Views extends ReadModel = ReadModel,
+    Input = unknown,
+    Output = unknown,
+> {
+    readonly inputType: Type<Input>;
+    readonly dependencies: ReadonlySet<string & keyof Views>;
+    exec(context: ActionContext<Events, Views, Input, Output>): Promise<void>;
+}
+
+export interface ActionContext<
+    Events extends ChangeModel = ChangeModel,
+    Views extends ReadModel = ReadModel,
+    Input = unknown,
+    Output = unknown,
+> {
+    readonly version: number;
+    readonly timestamp: Date;
+    readonly user: number;
+    readonly client: number;
+    readonly input: Input;
+    conflict(message: string): never;
+    output(result: Output): void;
+    emit<K extends string & keyof Events>(key: K, arg: TypeOf<Events[K]>): void;
+    view: ViewSnapshot<Views>;
+}
 
 export interface Repository<C extends ChangeModel, R extends ReadModel> {
     readonly changes: SortedQueryable<ChangeType<C>>;
@@ -62,13 +77,13 @@ export type VersionAlignment<T> = (
     )
 );
 
-export type ViewOf<H extends ReadModelHandler> =
+export type ViewOf<H extends Projection> =
         H extends StateProjection<infer T> ? StateView<T> :
         H extends QueryHandler<infer P, infer T> ? QueryView<P, T> :
         H extends EntityProjection<infer T> ? EntityView<T> :
         View;
 
-export type ReadModelHandler = StateProjection | QueryHandler | EntityProjection;
+export type Projection = StateProjection | QueryHandler | EntityProjection;
 
 export type View = StateView | QueryView | EntityView;
 
