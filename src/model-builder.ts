@@ -28,6 +28,8 @@ export interface ModelBuilder<
     ): ModelBuilder<Events, Views, Actions & WriteModel<ActionKey, ActionHandler>, Scope>;
 
     createModel(this: void): DomainModel<Events, Views, Actions, Scope>;
+
+    with<T>(setup: (this: void, builder: this) => T): T;
 }
 
 export function setupDomain(): ModelBuilder<ChangeModel, ReadModel, WriteModel, void>;
@@ -36,6 +38,7 @@ export function setupDomain<Scope>(
     scope: Type<Scope | void> = voidType,
 ): ModelBuilder<ChangeModel, ReadModel, WriteModel, Scope | void> {
     const createModel = () => Object.freeze({
+        
     });
 
     const builder = Object.freeze({
