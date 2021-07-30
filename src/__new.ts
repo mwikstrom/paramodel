@@ -44,17 +44,74 @@ export type DomainModel<
     readonly actions: Actions;
 };
 
-// DOMAIN MODEL:
-// TODO: define state
-// TODO: define query
-// TODO: define entity
-// TODO: define action
+export function defineState<
+    Events extends ChangeModel,
+    Views extends ReadModel,
+    State,
+    MutatorKeys extends keyof Events,
+    DependencyKeys extends keyof Views,
+>(
+// TODO: State definition
+): StateProjection<State, Pick<Events, MutatorKeys>, Pick<Views, DependencyKeys>> {
+    throw new Error("TODO");
+}
+
+export function defineQuery<
+    Views extends ReadModel,
+    DependencyKeys extends keyof Views,
+    Params extends Record<string, unknown>,
+    Result,
+>(
+// TODO: Query definition
+): QueryHandler<Params, Result, Pick<Views, DependencyKeys>> {
+    throw new Error("TODO");
+}
+
+export function defineEntity<
+    Events extends ChangeModel,
+    Views extends ReadModel,
+    Props extends Record<string, unknown>,
+    MutatorKeys extends keyof Events,
+    DependencyKeys extends keyof Views,
+>(
+// TODO: Entity definition
+): EntityProjection<Props, Pick<Events, MutatorKeys>, Pick<Views, DependencyKeys>> {
+    throw new Error("TODO");
+}
+
+export function defineAction<
+    Events extends ChangeModel,
+    Views extends ReadModel,
+    Input,
+    Output,
+    DependencyKeys extends keyof Views,
+>(
+// TODO: Action definition
+): ActionHandler<Events, Pick<Views, DependencyKeys>, Input, Output> {
+    throw new Error("TODO");
+}
+
 export interface ModelBuilder<
     Events extends ChangeModel = ChangeModel,
     Views extends ReadModel = ReadModel,
     Actions extends WriteModel = WriteModel,
 > {
-    addEvent<K extends string, T>(key: K, type: Type<T>): ModelBuilder<Events & ChangeModel<K, T>, Views, Actions>;
+    addEvent<EventKey extends string, EventArg>(
+        key: EventKey, 
+        type: Type<EventArg>,
+    ): ModelBuilder<Events & ChangeModel<EventKey, EventArg>, Views, Actions>;
+
+    addView<ViewKey extends string, Handler extends Projection>(
+        key: ViewKey,
+        handler: Handler,
+    ): ModelBuilder<Events, Views & ReadModel<ViewKey, Handler>, Actions>;
+
+    addAction<ActionKey extends string, Handler extends ActionHandler>(
+        key: ActionKey,
+        handler: Handler,
+    ): ModelBuilder<Events, Views, Actions & WriteModel<ActionKey, ActionHandler>>;
+
+    createModel(): DomainModel<Events, Views, Actions>;
 }
 
 // TODO: DomainContext: user auth stuff (expose in action and view handlers)
@@ -152,8 +209,8 @@ export interface StateProjection<
     readonly kind: "state";
     readonly mutators: ReadonlySet<string & keyof C>;
     readonly dependencies: ReadonlySet<string & keyof R>;
+    readonly initial: T;
     apply(change: ChangeType<C>, before: T, view: ViewSnapshot<R>): Promise<T>;
-    init(): T;
 }
 
 export type ViewSnapshot<R extends ReadModel> = <K extends string & keyof R>(key: K) => Promise<ViewOf<R[K]>>;
@@ -165,7 +222,7 @@ export interface QueryView<P = unknown, T = unknown> {
 }
 
 export interface QueryHandler<
-    P = unknown,
+    P extends Record<string, unknown> = Record<string, unknown>,
     T = unknown,
     R extends ReadModel = ReadModel,
 > {
