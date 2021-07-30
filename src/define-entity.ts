@@ -1,10 +1,11 @@
 import { Type } from "paratype";
-import { EntityProjectionFunc, EntityProjection } from "./entity-projection";
+import { EntityProjectionFunc, EntityProjection, EntityAuthFunc } from "./entity-projection";
 import { ChangeModel, ReadModel } from "./model";
 
 export function defineEntity<
     Events extends ChangeModel,
     Views extends ReadModel,
+    Scope,
     Props extends Record<string, unknown>,
     Mutators extends string & keyof Events,
     Dependencies extends (string & keyof Views)[],
@@ -14,7 +15,8 @@ export function defineEntity<
     on: {
         [K in Mutators]: EntityProjectionFunc<ChangeModel<K, Events[K]>, Pick<Views, Dependencies[number]>, Props>;
     },
-): EntityProjection<Props, Events, Views> {
+    auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number]>>,
+): EntityProjection<Props, Events, Views, Scope> {
     const mutators = Object.freeze(new Set(Object.keys(on)));
     
     function isFunc(thing: unknown): thing is EntityProjectionFunc<Events, Views, Props> {
@@ -36,5 +38,6 @@ export function defineEntity<
         mutators,
         dependencies: Object.freeze(new Set(dependencies)),
         apply,
+        auth,
     });
 }

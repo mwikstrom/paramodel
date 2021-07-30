@@ -5,6 +5,7 @@ import { ChangeModel, ReadModel } from "./model";
 export function defineAction<
     Events extends ChangeModel,
     Views extends ReadModel,
+    Scope,
     Input,
     Output,
     Dependencies extends (string & keyof Views)[],
@@ -12,8 +13,8 @@ export function defineAction<
     input: Type<Input>,
     output: Type<Output>,
     dependencies: Dependencies,
-    exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Input, Output>,
-): ActionHandler<Events, Pick<Views, Dependencies[number]>, Input, Output> {
+    exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>,
+): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output> {
     return Object.freeze({
         input,
         output,

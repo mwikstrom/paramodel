@@ -4,6 +4,7 @@ import { QueryFunc, QueryHandler } from "./query-handler";
 
 export function defineQuery<
     Views extends ReadModel,
+    Scope,
     Dependencies extends (string & keyof Views)[],
     Params extends Record<string, unknown>,
     Result,
@@ -11,8 +12,8 @@ export function defineQuery<
     type: Type<Result>,
     params: Type<Params>,
     dependencies: Dependencies,
-    exec: QueryFunc<Pick<Views, Dependencies[number]>, Params, Result>,
-): QueryHandler<Params, Result, Pick<Views, Dependencies[number]>> {
+    exec: QueryFunc<Pick<Views, Dependencies[number]>, Params, Scope, Result>,
+): QueryHandler<Params, Result, Pick<Views, Dependencies[number]>, Scope> {
     return Object.freeze({
         kind: "query",
         type,

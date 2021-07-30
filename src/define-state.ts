@@ -1,10 +1,11 @@
 import { Type } from "paratype";
 import { ChangeModel, ReadModel } from "./model";
-import { StateApplyFunc, StateProjection } from "./state-projection";
+import { StateApplyFunc, StateAuthFunc, StateProjection } from "./state-projection";
 
 export function defineState<
     Events extends ChangeModel,
     Views extends ReadModel,
+    Scope,
     State,
     Mutators extends string & keyof Events,
     Dependencies extends (string & keyof Views)[],
@@ -15,7 +16,8 @@ export function defineState<
     on: {
         [K in Mutators]: StateApplyFunc<ChangeModel<K, Events[K]>, Pick<Views, Dependencies[number]>, State>;
     },
-): StateProjection<State, Events, Views> {
+    auth?: StateAuthFunc<Scope, State, Pick<Views, Dependencies[number]>>,
+): StateProjection<State, Events, Views, Scope> {
     const mutators = Object.freeze(new Set(Object.keys(on)));
     
     function isFunc(thing: unknown): thing is StateApplyFunc<Events, Views, State> {
@@ -39,5 +41,6 @@ export function defineState<
         mutators,
         dependencies: Object.freeze(new Set(dependencies)),
         apply,
+        auth,
     });
 }

@@ -12,8 +12,13 @@ export type DomainModel<
     Events extends ChangeModel = ChangeModel,
     Views extends ReadModel = ReadModel,
     Actions extends WriteModel = WriteModel,
+    Scope = unknown,
 > = {
     readonly events: Events;
     readonly views: Views;
     readonly actions: Actions;
+    readonly scope: Type<Scope>;
 };
+
+export const forbidden = Symbol();
+export type Forbidden = typeof forbidden;

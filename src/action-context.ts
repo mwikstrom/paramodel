@@ -5,6 +5,7 @@ import { ViewSnapshotFunc } from "./projection";
 export interface ActionContext<
     Events extends ChangeModel = ChangeModel,
     Views extends ReadModel = ReadModel,
+    Scope = unknown,
     Input = unknown,
     Output = unknown,
 > {
