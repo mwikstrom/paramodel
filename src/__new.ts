@@ -29,7 +29,7 @@ export function defineState<
 
 export interface Repository<C extends ChangeModel, R extends ReadModel> {
     readonly changes: SortedQueryable<ChangeType<C>>;
-    view<K extends keyof R>(key: K, options?: ViewOptions): Promise<View | undefined>;
+    view<K extends string & keyof R>(key: K, options?: ViewOptions): Promise<ReadModelView<R, K> | undefined>;
 }
 
 export type ChangeType<Model extends ChangeModel> = {
@@ -62,6 +62,8 @@ export type VersionAlignment<T> = (
     )
 );
 
+// TODO: Strongly typed read model view
+export type ReadModelView<R extends ReadModel, K extends string & keyof R> = View;
 export type View = StateView | QueryView | EntityView;
 
 export interface StateView<T = unknown> {
@@ -70,18 +72,62 @@ export interface StateView<T = unknown> {
     read(): Promise<T>;
 }
 
+export interface StateProjection<
+    T = unknown,
+    C extends ChangeModel = ChangeModel,
+    R extends ReadModel = ReadModel,
+> {
+    readonly mutators: ReadonlySet<string & keyof C>;
+    readonly dependencies: ReadonlySet<string & keyof R>;
+    apply(change: ChangeType<C>, before: T, view: ViewSnapshot<R>): Promise<T>;
+    init(): T;
+}
+
+export type ViewSnapshot<R extends ReadModel> = <K extends string & keyof R>(key: K) => Promise<ReadModelView<R, K>>;
+
 export interface QueryView<P = unknown, T = unknown> {
     readonly version: number;
     readonly kind: "query";
     query(params: P): T;
 }
 
+export interface QueryHandler<
+    R extends ReadModel = ReadModel,
+    P = unknown,
+    T = unknown
+> {
+    readonly dependencies: ReadonlySet<string & keyof R>;
+    exec(view: ViewSnapshot<R>, params: P): Promise<T>;
+}
+
 export interface EntityView<
     T extends Record<string, unknown> = Record<string, unknown>
-> extends Queryable<Entity<T>> {
+> extends ReadonlyEntityCollection<T> {
     readonly version: number;
-    readonly kind: "entities";
+    readonly kind: "entities";    
+}
+
+export interface ReadonlyEntityCollection<
+    T extends Record<string, unknown> = Record<string, unknown>
+> extends Queryable<Entity<T>> {
     get(id: number): Promise<Entity<T> | undefined>;
+}
+
+export interface EntityProjection<
+    T extends Record<string, unknown> = Record<string, unknown>,
+    C extends ChangeModel = ChangeModel,
+    R extends ReadModel = ReadModel
+> {
+    readonly mutators: ReadonlySet<string & keyof C>;
+    readonly dependencies: ReadonlySet<string & keyof R>;
+    apply(change: ChangeType<C>, state: EntityCollection<T>, view: ViewSnapshot<R>): Promise<void>;
+}
+
+export interface EntityCollection<
+    T extends Record<string, unknown> = Record<string, unknown>,
+> extends ReadonlyEntityCollection<T> {
+    put(id: number, props: T): void;
+    del(id: number): void;
 }
 
 export type Entity<
