@@ -64,7 +64,7 @@ export function defineState<
     dependencies: Dependencies,
     apply: StateProjectionFunc<Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>, State>,
 ): StateProjection<State, Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>> {
-    return ({
+    return Object.freeze({
         kind: "state",
         type,
         initial,
@@ -93,16 +93,21 @@ export function defineEntity<
     Events extends ChangeModel,
     Views extends ReadModel,
     Props extends Record<string, unknown>,
-    Mutators extends (keyof Events)[],
-    Dependencies extends (keyof Views)[],
+    Mutators extends (string & keyof Events)[],
+    Dependencies extends (string & keyof Views)[],
 >(
-    model: Pick<DomainModel<Events, Views>, "events" | "views">,
-    props: Type<Props>,
+    type: Type<Props>,
     mutators: Mutators,
     dependencies: Dependencies,
     apply: EntityProjectionFunc<Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>, Props>,
 ): EntityProjection<Props, Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>> {
-    throw new Error("TODO");
+    return Object.freeze({
+        kind: "entities",
+        type,
+        mutators: Object.freeze(new Set(mutators)),
+        dependencies: Object.freeze(new Set(dependencies)),
+        apply,
+    });
 }
 
 export function defineAction<
@@ -408,6 +413,7 @@ export interface EntityProjection<
     R extends ReadModel = ReadModel
 > {
     readonly kind: "entities";
+    readonly type: Type<T>;
     readonly mutators: ReadonlySet<string & keyof C>;
     readonly dependencies: ReadonlySet<string & keyof R>;
     readonly apply: EntityProjectionFunc<C, R, T>;
