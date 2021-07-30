@@ -2,23 +2,38 @@ import { Type } from "paratype";
 import { EntityProjectionFunc, EntityProjection } from "./entity-projection";
 import { ChangeModel, ReadModel } from "./model";
 
-// TODO: "on" instead of mutators and apply
 export function defineEntity<
     Events extends ChangeModel,
     Views extends ReadModel,
     Props extends Record<string, unknown>,
-    Mutators extends (string & keyof Events)[],
+    Mutators extends string & keyof Events,
     Dependencies extends (string & keyof Views)[],
 >(
     type: Type<Props>,
-    mutators: Mutators,
     dependencies: Dependencies,
-    apply: EntityProjectionFunc<Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>, Props>,
-): EntityProjection<Props, Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>> {
+    on: {
+        [K in Mutators]: EntityProjectionFunc<ChangeModel<K, Events[K]>, Pick<Views, Dependencies[number]>, Props>;
+    },
+): EntityProjection<Props, Events, Views> {
+    const mutators = Object.freeze(new Set(Object.keys(on)));
+    
+    function isFunc(thing: unknown): thing is EntityProjectionFunc<Events, Views, Props> {
+        return typeof thing === "function";
+    }
+    
+    const apply: EntityProjectionFunc<Events, Views, Props> = async (change, ...rest) => {
+        if (change.key in on) {
+            const func = on[change.key as Mutators];
+            if (isFunc(func)) {
+                return await func(change, ...rest);
+            }
+        }
+    };
+
     return Object.freeze({
         kind: "entities",
         type,
-        mutators: Object.freeze(new Set(mutators)),
+        mutators,
         dependencies: Object.freeze(new Set(dependencies)),
         apply,
     });
