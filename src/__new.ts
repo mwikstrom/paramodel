@@ -20,7 +20,8 @@ export interface ActionHandler<
     Input = unknown,
     Output = unknown,
 > {
-    readonly inputType: Type<Input>;
+    readonly input: Type<Input>;
+    readonly output: Type<Output>;
     readonly dependencies: ReadonlySet<string & keyof Views>;
     exec(context: ActionContext<Events, Views, Input, Output>): Promise<void>;
 }
@@ -33,8 +34,6 @@ export interface ActionContext<
 > {
     readonly version: number;
     readonly timestamp: Date;
-    readonly user: number;
-    readonly client: number;
     readonly input: Input;
     conflict(message: string): never;
     output(result: Output): void;
@@ -42,9 +41,57 @@ export interface ActionContext<
     view: ViewSnapshot<Views>;
 }
 
-export interface Repository<C extends ChangeModel, R extends ReadModel> {
-    readonly changes: SortedQueryable<ChangeType<C>>;
-    view<K extends string & keyof R>(key: K, options?: ViewOptions): Promise<ViewOf<R[K]> | undefined>;
+export type DomainModel<
+    Events extends ChangeModel = ChangeModel,
+    Views extends ReadModel = ReadModel,
+    Actions extends WriteModel = WriteModel,
+> = {
+    readonly events: Events;
+    readonly views: Views;
+    readonly actions: Actions;
+};
+
+// TODO: DomainContext: user auth stuff (expose in action and view handlers)
+
+export interface DomainStoreProvider {
+    get<Model extends DomainModel>(
+        id: string, 
+        model: Model,
+    ): DomainStore<Model>;
+}
+
+export interface DomainStore<Model extends DomainModel> {
+    readonly changes: SortedQueryable<ChangeType<Model["events"]>>;
+    do<K extends string & keyof Model["actions"]>(
+        key: K,
+        input: TypeOf<Model["actions"][K]["input"]>,
+        options?: ActionOptions,
+    ): Promise<ActionResultType<Model, K>>;
+    view<K extends string & keyof Model["views"]>(
+        key: K,
+        options?: ViewOptions
+    ): Promise<ViewOf<Model["views"][K]> | undefined>;
+}
+
+export interface ActionOptions {
+    dry?: boolean;
+}
+
+export type ActionResultType<
+    Model extends Pick<DomainModel, "actions" | "events">,
+    Action extends string & keyof Model["actions"],
+> = (
+    ActionResult<Model["events"], TypeOf<Model["actions"][Action]["output"]>>
+);
+
+export interface ActionResult<Events extends ChangeModel, Output> {
+    readonly timestamp: Date;
+    readonly base: number;
+    readonly success: boolean;
+    readonly changes: readonly ChangeType<Events>[];
+    readonly committed?: number;
+    readonly conflict?: string;
+    readonly output?: Output;
 }
 
 export type ChangeType<Model extends ChangeModel> = {
@@ -55,8 +102,6 @@ export interface Change<K extends string = string, T = unknown> {
     readonly version: number;
     readonly offset: number;
     readonly timestamp: Date;
-    readonly user: number;
-    readonly client: number;
     readonly key: K;
     readonly arg: T;
 }
