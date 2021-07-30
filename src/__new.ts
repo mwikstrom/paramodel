@@ -66,13 +66,15 @@ export function defineState<
     },
 ): StateProjection<State, Events, Views> {
     const mutators = Object.freeze(new Set(Object.keys(on)));
-    function isCallable(func: unknown): func is StateApplyFunc<Events, Views, State> {
-        return typeof func === "function";
+    
+    function isFunc(thing: unknown): thing is StateApplyFunc<Events, Views, State> {
+        return typeof thing === "function";
     }
+    
     const apply: StateApplyFunc<Events, Views, State> = async (change, before, ...rest) => {
         if (change.key in on) {
             const func = on[change.key as Mutators];
-            if (isCallable(func)) {
+            if (isFunc(func)) {
                 return await func(change, before, ...rest);
             }
         }
