@@ -62,12 +62,11 @@ export function defineQuery<
     Params extends Record<string, unknown>,
     Result,
 >(
-    model: Views,
+    model: Pick<DomainModel<ChangeModel, Views>, "views">,
     params: Type<Params>,
     result: Type<Result>,
     dependencies: Dependencies,
     exec: QueryFunc<Pick<Views, Dependencies[number]>, Params, Result>,
-// TODO: Query definition
 ): QueryHandler<Params, Result, Pick<Views, Dependencies[number]>> {
     throw new Error("TODO");
 }
@@ -76,11 +75,15 @@ export function defineEntity<
     Events extends ChangeModel,
     Views extends ReadModel,
     Props extends Record<string, unknown>,
-    MutatorKeys extends keyof Events,
-    DependencyKeys extends keyof Views,
+    Mutators extends (keyof Events)[],
+    Dependencies extends (keyof Views)[],
 >(
-// TODO: Entity definition
-): EntityProjection<Props, Pick<Events, MutatorKeys>, Pick<Views, DependencyKeys>> {
+    model: Pick<DomainModel<Events, Views>, "events" | "views">,
+    props: Type<Props>,
+    mutators: Mutators,
+    dependencies: Dependencies,
+    apply: EntityProjectionFunc<Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>, Props>,
+): EntityProjection<Props, Pick<Events, Mutators[number]>, Pick<Views, Dependencies[number]>> {
     throw new Error("TODO");
 }
 
@@ -263,8 +266,14 @@ export interface EntityProjection<
     readonly kind: "entities";
     readonly mutators: ReadonlySet<string & keyof C>;
     readonly dependencies: ReadonlySet<string & keyof R>;
-    apply(change: ChangeType<C>, state: EntityCollection<T>, view: ViewSnapshot<R>): Promise<void>;
+    readonly apply: EntityProjectionFunc<C, R, T>;
 }
+
+export type EntityProjectionFunc<
+    C extends ChangeModel = ChangeModel,
+    R extends ReadModel = ReadModel,
+    T extends Record<string, unknown> = Record<string, unknown>,
+> = (change: ChangeType<C>, state: EntityCollection<T>, view: ViewSnapshot<R>) => Promise<void>;
 
 export interface EntityCollection<
     T extends Record<string, unknown> = Record<string, unknown>,
