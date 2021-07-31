@@ -29,7 +29,7 @@ export interface ModelBuilder<
 
     createModel(this: void): DomainModel<Events, Views, Actions, Scope>;
 
-    with<T>(setup: (this: void, builder: this) => T): T;
+    use<T>(setup: (this: void, builder: this) => T): T;
 }
 
 export function setupDomain(): ModelBuilder<ChangeModel, ReadModel, WriteModel, void>;
@@ -37,15 +37,41 @@ export function setupDomain<Scope>(scope: Type<Scope>): ModelBuilder<ChangeModel
 export function setupDomain<Scope>(
     scope: Type<Scope | void> = voidType,
 ): ModelBuilder<ChangeModel, ReadModel, WriteModel, Scope | void> {
+    const events: Record<string, Type> = {};
+    const views: Record<string, Projection> = {};
+    const actions: Record<string, ActionHandler> = {};
+
+    const addEvent = (key: string, type: Type) => {
+        events[key] = type;
+        return builder;
+    };
+
+    const addView = (key: string, projection: Projection) => {
+        views[key] = projection;
+        return builder;
+    };
+
+    const addAction = (key: string, handler: ActionHandler) => {
+        actions[key] = handler;
+        return builder;
+    };
+
     const createModel = () => Object.freeze({
-        
+        scope,
+        events: Object.freeze({...events}),
+        views: Object.freeze({...views}),
+        actions: Object.freeze({...actions}),
     });
 
-    const builder = Object.freeze({
+    const use = <T>(setup: (builder: ModelBuilder) => T) => setup(builder);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const builder: any = Object.freeze({
         addEvent,
         addView,
         addAction,
         createModel,
+        use,
     });
 
     return builder;
