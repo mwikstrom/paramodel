@@ -7,13 +7,14 @@
 <b>Signature:</b>
 
 ```typescript
-addView<ViewKey extends string, Handler extends Projection>(key: ViewKey, handler: Handler): ModelBuilder<Events, Views & ReadModel<ViewKey, Handler>, Actions, Scope>;
+addView<ViewKey extends string, Handler extends Projection>(this: void, key: ViewKey, handler: Handler): ModelBuilder<Events, Views & ReadModel<ViewKey, Handler>, Actions, Scope>;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
+|  this | void |  |
 |  key | ViewKey |  |
 |  handler | Handler |  |
 

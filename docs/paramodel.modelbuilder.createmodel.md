@@ -7,8 +7,15 @@
 <b>Signature:</b>
 
 ```typescript
-createModel(): DomainModel<Events, Views, Actions, Scope>;
+createModel(this: void): DomainModel<Events, Views, Actions, Scope>;
 ```
+
+## Parameters
+
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  this | void |  |
+
 <b>Returns:</b>
 
 [DomainModel](./paramodel.domainmodel.md)<!-- -->&lt;Events, Views, Actions, Scope&gt;

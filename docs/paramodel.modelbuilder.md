@@ -14,8 +14,9 @@ export interface ModelBuilder<Events extends ChangeModel = ChangeModel, Views ex
 
 |  Method | Description |
 |  --- | --- |
-|  [addAction(key, handler)](./paramodel.modelbuilder.addaction.md) |  |
-|  [addEvent(key, type)](./paramodel.modelbuilder.addevent.md) |  |
-|  [addView(key, handler)](./paramodel.modelbuilder.addview.md) |  |
-|  [createModel()](./paramodel.modelbuilder.createmodel.md) |  |
+|  [addAction(this, key, handler)](./paramodel.modelbuilder.addaction.md) |  |
+|  [addEvent(this, key, type)](./paramodel.modelbuilder.addevent.md) |  |
+|  [addView(this, key, handler)](./paramodel.modelbuilder.addview.md) |  |
+|  [createModel(this)](./paramodel.modelbuilder.createmodel.md) |  |
+|  [use(setup)](./paramodel.modelbuilder.use.md) |  |
 

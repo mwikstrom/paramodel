@@ -3,6 +3,7 @@
  * @packageDocumentation
  */
 
+export * from "./action";
 export * from "./action-context";
 export * from "./action-handler";
 export * from "./change";
@@ -22,3 +23,4 @@ export * from "./queryable";
 export * from "./state-projection";
 export * from "./state-view";
 export * from "./store";
+export * from "./view";

@@ -7,13 +7,14 @@
 <b>Signature:</b>
 
 ```typescript
-addEvent<EventKey extends string, EventArg>(key: EventKey, type: Type<EventArg>): ModelBuilder<Events & ChangeModel<EventKey, EventArg>, Views, Actions, Scope>;
+addEvent<EventKey extends string, EventArg>(this: void, key: EventKey, type: Type<EventArg>): ModelBuilder<Events & ChangeModel<EventKey, EventArg>, Views, Actions, Scope>;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
+|  this | void |  |
 |  key | EventKey |  |
 |  type | Type&lt;EventArg&gt; |  |
 

@@ -224,13 +224,15 @@ export type IsOperator = "is" | "is-not";
 // @public (undocumented)
 export interface ModelBuilder<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Actions extends WriteModel = WriteModel, Scope = unknown> {
     // (undocumented)
-    addAction<ActionKey extends string, Handler extends ActionHandler>(key: ActionKey, handler: Handler): ModelBuilder<Events, Views, Actions & WriteModel<ActionKey, ActionHandler>, Scope>;
+    addAction<ActionKey extends string, Handler extends ActionHandler>(this: void, key: ActionKey, handler: Handler): ModelBuilder<Events, Views, Actions & WriteModel<ActionKey, ActionHandler>, Scope>;
     // (undocumented)
-    addEvent<EventKey extends string, EventArg>(key: EventKey, type: Type<EventArg>): ModelBuilder<Events & ChangeModel<EventKey, EventArg>, Views, Actions, Scope>;
+    addEvent<EventKey extends string, EventArg>(this: void, key: EventKey, type: Type<EventArg>): ModelBuilder<Events & ChangeModel<EventKey, EventArg>, Views, Actions, Scope>;
     // (undocumented)
-    addView<ViewKey extends string, Handler extends Projection>(key: ViewKey, handler: Handler): ModelBuilder<Events, Views & ReadModel<ViewKey, Handler>, Actions, Scope>;
+    addView<ViewKey extends string, Handler extends Projection>(this: void, key: ViewKey, handler: Handler): ModelBuilder<Events, Views & ReadModel<ViewKey, Handler>, Actions, Scope>;
     // (undocumented)
-    createModel(): DomainModel<Events, Views, Actions, Scope>;
+    createModel(this: void): DomainModel<Events, Views, Actions, Scope>;
+    // (undocumented)
+    use<T>(setup: (this: void, builder: this) => T): T;
 }
 
 // @public (undocumented)
@@ -297,6 +299,12 @@ export interface ReadonlyEntityCollection<T extends Record<string, unknown> = Re
     // (undocumented)
     get(id: number): Promise<Entity<T> | undefined>;
 }
+
+// @public (undocumented)
+export function setupDomain(): ModelBuilder<ChangeModel, ReadModel, WriteModel, void>;
+
+// @public (undocumented)
+export function setupDomain<Scope>(scope: Type<Scope>): ModelBuilder<ChangeModel, ReadModel, WriteModel, Scope>;
 
 // @public (undocumented)
 export type SortableProps<T> = {

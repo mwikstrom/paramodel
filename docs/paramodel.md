@@ -14,6 +14,8 @@ Run-time domain model for event-sourcing.
 |  [defineEntity(type, dependencies, on, auth)](./paramodel.defineentity.md) |  |
 |  [defineQuery(type, params, dependencies, exec)](./paramodel.definequery.md) |  |
 |  [defineState(type, initial, dependencies, on, auth)](./paramodel.definestate.md) |  |
+|  [setupDomain()](./paramodel.setupdomain.md) |  |
+|  [setupDomain(scope)](./paramodel.setupdomain_1.md) |  |
 
 ## Interfaces
 

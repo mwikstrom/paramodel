@@ -7,13 +7,14 @@
 <b>Signature:</b>
 
 ```typescript
-addAction<ActionKey extends string, Handler extends ActionHandler>(key: ActionKey, handler: Handler): ModelBuilder<Events, Views, Actions & WriteModel<ActionKey, ActionHandler>, Scope>;
+addAction<ActionKey extends string, Handler extends ActionHandler>(this: void, key: ActionKey, handler: Handler): ModelBuilder<Events, Views, Actions & WriteModel<ActionKey, ActionHandler>, Scope>;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
+|  this | void |  |
 |  key | ActionKey |  |
 |  handler | Handler |  |
 
