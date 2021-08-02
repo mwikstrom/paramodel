@@ -28,6 +28,7 @@ Run-time domain model for event-sourcing.
 |  [Change](./paramodel.change.md) |  |
 |  [DomainStore](./paramodel.domainstore.md) |  |
 |  [DomainStoreProvider](./paramodel.domainstoreprovider.md) |  |
+|  [DomainStoreStatus](./paramodel.domainstorestatus.md) |  |
 |  [EntityCollection](./paramodel.entitycollection.md) |  |
 |  [EntityProjection](./paramodel.entityprojection.md) |  |
 |  [EntityView](./paramodel.entityview.md) |  |
@@ -43,6 +44,7 @@ Run-time domain model for event-sourcing.
 |  [StateProjection](./paramodel.stateprojection.md) |  |
 |  [StateView](./paramodel.stateview.md) |  |
 |  [ViewOptions](./paramodel.viewoptions.md) |  |
+|  [ViewStatus](./paramodel.viewstatus.md) |  |
 
 ## Variables
 
@@ -81,7 +83,6 @@ Run-time domain model for event-sourcing.
 |  [StateApplyFunc](./paramodel.stateapplyfunc.md) |  |
 |  [StateAuthFunc](./paramodel.stateauthfunc.md) |  |
 |  [StringOperator](./paramodel.stringoperator.md) |  |
-|  [VersionAlignment](./paramodel.versionalignment.md) |  |
 |  [View](./paramodel.view.md) |  |
 |  [ViewOf](./paramodel.viewof.md) |  |
 |  [ViewSnapshotFunc](./paramodel.viewsnapshotfunc.md) |  |

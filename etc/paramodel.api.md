@@ -136,6 +136,10 @@ export interface DomainStore<Model extends DomainModel> {
     // (undocumented)
     do<K extends string & keyof Model["actions"]>(key: K, input: TypeOf<Model["actions"][K]["input"]>, options?: ActionOptions): Promise<ActionResultType<Model, K>>;
     // (undocumented)
+    stat(): Promise<DomainStoreStatus<string & keyof Model["views"]>>;
+    // (undocumented)
+    sync(): Promise<DomainStoreStatus<string & keyof Model["views"]>>;
+    // (undocumented)
     view<K extends string & keyof Model["views"]>(key: K, options?: ViewOptions): Promise<ViewOf<Model["views"][K]> | undefined>;
 }
 
@@ -143,6 +147,14 @@ export interface DomainStore<Model extends DomainModel> {
 export interface DomainStoreProvider {
     // (undocumented)
     get<Model extends DomainModel>(id: string, model: Model, scope: TypeOf<Model["scope"]>): DomainStore<Model>;
+}
+
+// @public (undocumented)
+export interface DomainStoreStatus<K extends string> {
+    // (undocumented)
+    readonly version: number;
+    // (undocumented)
+    readonly views: Readonly<Record<K, ViewStatus>>;
 }
 
 // @public (undocumented)
@@ -361,24 +373,25 @@ export interface StateView<T = unknown> {
 export type StringOperator = ("contains" | "contains-ignore-case" | "starts-with" | "starts-with-ignore-case" | "ends-with" | "ends-with-ignore-case");
 
 // @public (undocumented)
-export type VersionAlignment<T> = (T extends number ? ("exact" | "fresh-after" | "fresh-before") : ("latest" | "latest-fresh"));
-
-// @public (undocumented)
 export type View = StateView | QueryView | EntityView;
 
 // @public (undocumented)
 export type ViewOf<H extends Projection> = H extends StateProjection<infer T> ? StateView<T> : H extends QueryHandler<infer P, infer T> ? QueryView<P, T> : H extends EntityProjection<infer T> ? EntityView<T> : View;
 
 // @public (undocumented)
-export interface ViewOptions<T extends number | undefined = undefined> {
+export interface ViewOptions {
     // (undocumented)
-    readonly align?: VersionAlignment<T>;
-    // (undocumented)
-    readonly version?: T;
+    readonly sync: number;
 }
 
 // @public (undocumented)
 export type ViewSnapshotFunc<R extends ReadModel> = <K extends string & keyof R>(key: K) => Promise<ViewOf<R[K]>>;
+
+// @public (undocumented)
+export interface ViewStatus {
+    // (undocumented)
+    readonly sync: number;
+}
 
 // @public (undocumented)
 export type WriteModel<K extends string = string, T extends ActionHandler = ActionHandler> = Readonly<Record<K, T>>;

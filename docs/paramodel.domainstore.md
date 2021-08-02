@@ -21,5 +21,7 @@ export interface DomainStore<Model extends DomainModel>
 |  Method | Description |
 |  --- | --- |
 |  [do(key, input, options)](./paramodel.domainstore.do.md) |  |
+|  [stat()](./paramodel.domainstore.stat.md) |  |
+|  [sync()](./paramodel.domainstore.sync.md) |  |
 |  [view(key, options)](./paramodel.domainstore.view.md) |  |
 

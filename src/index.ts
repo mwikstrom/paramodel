@@ -23,4 +23,3 @@ export * from "./queryable";
 export * from "./state-projection";
 export * from "./state-view";
 export * from "./store";
-export * from "./view";

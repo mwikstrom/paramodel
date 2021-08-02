@@ -7,13 +7,12 @@
 <b>Signature:</b>
 
 ```typescript
-export interface ViewOptions<T extends number | undefined = undefined> 
+export interface ViewOptions 
 ```
 
 ## Properties
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [align?](./paramodel.viewoptions.align.md) | [VersionAlignment](./paramodel.versionalignment.md)<!-- -->&lt;T&gt; | <i>(Optional)</i> |
-|  [version?](./paramodel.viewoptions.version.md) | T | <i>(Optional)</i> |
+|  [sync](./paramodel.viewoptions.sync.md) | number |  |
 
