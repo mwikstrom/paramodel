@@ -106,19 +106,19 @@ export type Comparable = number | string | Date;
 export type ComparisonOperator = ">" | ">=" | "<" | "<=";
 
 // @public (undocumented)
-export function defineAction<Events extends ChangeModel, Views extends ReadModel, Scope, Input, Output, Dependencies extends (string & keyof Views)[]>(input: Type<Input>, output: Type<Output>, dependencies: Dependencies, exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>;
+export function defineAction<Input, Output, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(input: Type<Input>, output: Type<Output>, dependencies: Dependencies, exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>;
 
 // @public (undocumented)
-export function defineEntity<Events extends ChangeModel, Views extends ReadModel, Scope, Props extends Record<string, unknown>, Mutators extends string & keyof Events, Dependencies extends (string & keyof Views)[]>(type: Type<Props>, dependencies: Dependencies, on: {
-    [K in Mutators]: EntityProjectionFunc<ChangeModel<K, Events[K]>, Pick<Views, Dependencies[number]>, Props>;
+export function defineEntity<Props extends Record<string, unknown>, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(type: Type<Props>, dependencies: Dependencies, on: {
+    [K in Mutators[number]]: (EntityProjectionFunc<ChangeModel<K, Events[K]>, Pick<Views, Dependencies[number]>, Props>);
 }, auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number]>>): EntityProjection<Props, Events, Views, Scope>;
 
 // @public (undocumented)
-export function defineQuery<Views extends ReadModel, Scope, Dependencies extends (string & keyof Views)[], Params extends Record<string, unknown>, Result>(type: Type<Result>, params: Type<Params>, dependencies: Dependencies, exec: QueryFunc<Pick<Views, Dependencies[number]>, Params, Scope, Result>): QueryHandler<Params, Result, Pick<Views, Dependencies[number]>, Scope>;
+export function defineQuery<Params extends Record<string, unknown>, Result, Scope = unknown, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(type: Type<Result>, params: Type<Params>, dependencies: Dependencies, exec: QueryFunc<Pick<Views, Dependencies[number]>, Params, Scope, Result>): QueryHandler<Params, Result, Pick<Views, Dependencies[number]>, Scope>;
 
 // @public (undocumented)
-export function defineState<Events extends ChangeModel, Views extends ReadModel, Scope, State, Mutators extends string & keyof Events, Dependencies extends (string & keyof Views)[]>(type: Type<State>, initial: State, dependencies: Dependencies, on: {
-    [K in Mutators]: StateApplyFunc<ChangeModel<K, Events[K]>, Pick<Views, Dependencies[number]>, State>;
+export function defineState<State, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(type: Type<State>, initial: State, dependencies: Dependencies, on: {
+    [K in Mutators[number]]: StateApplyFunc<ChangeModel<K, Events[K]>, Pick<Views, Dependencies[number]>, State>;
 }, auth?: StateAuthFunc<Scope, State, Pick<Views, Dependencies[number]>>): StateProjection<State, Events, Views, Scope>;
 
 // @public (undocumented)

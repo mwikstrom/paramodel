@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare function defineAction<Events extends ChangeModel, Views extends ReadModel, Scope, Input, Output, Dependencies extends (string & keyof Views)[]>(input: Type<Input>, output: Type<Output>, dependencies: Dependencies, exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>;
+export declare function defineAction<Input, Output, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(input: Type<Input>, output: Type<Output>, dependencies: Dependencies, exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>;
 ```
 
 ## Parameters
