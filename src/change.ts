@@ -2,10 +2,10 @@ import { TypeOf } from "paratype";
 import { ChangeModel } from "./model";
 
 export type ChangeType<Model extends ChangeModel> = {
-    [K in keyof Model]: K extends string ? Change<K, TypeOf<Model[K]>> : never;
+    [K in keyof Model]: K extends string ? Change<TypeOf<Model[K]>, K> : never;
 }[keyof Model];
 
-export interface Change<K extends string = string, T = unknown> {
+export interface Change<T = unknown, K extends string = string> {
     readonly version: number;
     readonly offset: number;
     readonly timestamp: Date;

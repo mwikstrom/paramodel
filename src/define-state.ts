@@ -15,7 +15,7 @@ export function defineState<
     initial: State,
     dependencies: Dependencies,
     on: {
-        [K in Mutators[number]]: StateApplyFunc<Change<K, Events[K]>, Pick<Views, Dependencies[number]>, State>;
+        [K in Mutators[number]]: StateApplyFunc<Change<Events[K], K>, Pick<Views, Dependencies[number]>, State>;
     },
     auth?: StateAuthFunc<Scope, State, Pick<Views, Dependencies[number]>>,
 ): StateProjection<State, Events, Views, Scope> {

@@ -15,7 +15,7 @@ export function defineEntity<
     dependencies: Dependencies,
     on: {
         [K in Mutators[number]]: (
-            EntityProjectionFunc<Change<K, TypeOf<Events[K]>>, Pick<Views, Dependencies[number]>, Props>
+            EntityProjectionFunc<Change<TypeOf<Events[K]>, K>, Pick<Views, Dependencies[number]>, Props>
         );
     },
     auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number]>>,
