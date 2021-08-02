@@ -3,17 +3,19 @@ import { EntityProjectionFunc, EntityProjection, EntityAuthFunc } from "./entity
 import { ChangeModel, ReadModel } from "./model";
 
 export function defineEntity<
-    Events extends ChangeModel,
-    Views extends ReadModel,
-    Scope,
     Props extends Record<string, unknown>,
-    Mutators extends string & keyof Events,
-    Dependencies extends (string & keyof Views)[],
+    Scope = unknown,
+    Events extends ChangeModel = ChangeModel,
+    Views extends ReadModel = ReadModel,
+    Mutators extends (string & keyof Events)[] = [],
+    Dependencies extends (string & keyof Views)[] = [],
 >(
     type: Type<Props>,
     dependencies: Dependencies,
     on: {
-        [K in Mutators]: EntityProjectionFunc<ChangeModel<K, Events[K]>, Pick<Views, Dependencies[number]>, Props>;
+        [K in Mutators[number]]: (
+            EntityProjectionFunc<ChangeModel<K, Events[K]>, Pick<Views, Dependencies[number]>, Props>
+        );
     },
     auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number]>>,
 ): EntityProjection<Props, Events, Views, Scope> {
@@ -25,7 +27,7 @@ export function defineEntity<
     
     const apply: EntityProjectionFunc<Events, Views, Props> = async (change, ...rest) => {
         if (change.key in on) {
-            const func = on[change.key as Mutators];
+            const func = on[change.key as Mutators[number]];
             if (isFunc(func)) {
                 return await func(change, ...rest);
             }

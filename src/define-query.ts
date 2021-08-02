@@ -3,11 +3,11 @@ import { ReadModel } from "./model";
 import { QueryFunc, QueryHandler } from "./query-handler";
 
 export function defineQuery<
-    Views extends ReadModel,
-    Scope,
-    Dependencies extends (string & keyof Views)[],
     Params extends Record<string, unknown>,
     Result,
+    Scope = unknown,
+    Views extends ReadModel = ReadModel,
+    Dependencies extends (string & keyof Views)[] = [],
 >(
     type: Type<Result>,
     params: Type<Params>,

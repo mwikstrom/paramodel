@@ -3,18 +3,18 @@ import { ChangeModel, ReadModel } from "./model";
 import { StateApplyFunc, StateAuthFunc, StateProjection } from "./state-projection";
 
 export function defineState<
-    Events extends ChangeModel,
-    Views extends ReadModel,
-    Scope,
     State,
-    Mutators extends string & keyof Events,
-    Dependencies extends (string & keyof Views)[],
+    Scope = unknown,
+    Events extends ChangeModel = ChangeModel,
+    Views extends ReadModel = ReadModel,
+    Mutators extends (string & keyof Events)[] = [],
+    Dependencies extends (string & keyof Views)[] = [],
 >(
     type: Type<State>,
     initial: State,
     dependencies: Dependencies,
     on: {
-        [K in Mutators]: StateApplyFunc<ChangeModel<K, Events[K]>, Pick<Views, Dependencies[number]>, State>;
+        [K in Mutators[number]]: StateApplyFunc<ChangeModel<K, Events[K]>, Pick<Views, Dependencies[number]>, State>;
     },
     auth?: StateAuthFunc<Scope, State, Pick<Views, Dependencies[number]>>,
 ): StateProjection<State, Events, Views, Scope> {
@@ -26,7 +26,7 @@ export function defineState<
     
     const apply: StateApplyFunc<Events, Views, State> = async (change, before, ...rest) => {
         if (change.key in on) {
-            const func = on[change.key as Mutators];
+            const func = on[change.key as Mutators[number]];
             if (isFunc(func)) {
                 return await func(change, before, ...rest);
             }

@@ -3,12 +3,12 @@ import { ActionFunc, ActionHandler } from "./action-handler";
 import { ChangeModel, ReadModel } from "./model";
 
 export function defineAction<
-    Events extends ChangeModel,
-    Views extends ReadModel,
-    Scope,
     Input,
     Output,
-    Dependencies extends (string & keyof Views)[],
+    Scope = unknown,
+    Events extends ChangeModel = ChangeModel,
+    Views extends ReadModel = ReadModel,
+    Dependencies extends (string & keyof Views)[] = [],
 >(
     input: Type<Input>,
     output: Type<Output>,
