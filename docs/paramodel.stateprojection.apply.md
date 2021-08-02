@@ -7,5 +7,5 @@
 <b>Signature:</b>
 
 ```typescript
-readonly apply: StateApplyFunc<C, R, T>;
+readonly apply: StateApplyFunc<Change, R, T>;
 ```

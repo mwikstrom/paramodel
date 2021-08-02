@@ -1,4 +1,5 @@
 import { Type } from "paratype";
+import { Change } from "./change";
 import { ChangeModel, ReadModel } from "./model";
 import { StateApplyFunc, StateAuthFunc, StateProjection } from "./state-projection";
 
@@ -14,17 +15,17 @@ export function defineState<
     initial: State,
     dependencies: Dependencies,
     on: {
-        [K in Mutators[number]]: StateApplyFunc<ChangeModel<K, Events[K]>, Pick<Views, Dependencies[number]>, State>;
+        [K in Mutators[number]]: StateApplyFunc<Change<K, Events[K]>, Pick<Views, Dependencies[number]>, State>;
     },
     auth?: StateAuthFunc<Scope, State, Pick<Views, Dependencies[number]>>,
 ): StateProjection<State, Events, Views, Scope> {
     const mutators = Object.freeze(new Set(Object.keys(on)));
     
-    function isFunc(thing: unknown): thing is StateApplyFunc<Events, Views, State> {
+    function isFunc(thing: unknown): thing is StateApplyFunc<Change, Views, State> {
         return typeof thing === "function";
     }
     
-    const apply: StateApplyFunc<Events, Views, State> = async (change, before, ...rest) => {
+    const apply: StateApplyFunc<Change, Views, State> = async (change, before, ...rest) => {
         if (change.key in on) {
             const func = on[change.key as Mutators[number]];
             if (isFunc(func)) {

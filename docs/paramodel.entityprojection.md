@@ -14,7 +14,7 @@ export interface EntityProjection<T extends Record<string, unknown> = Record<str
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [apply](./paramodel.entityprojection.apply.md) | [EntityProjectionFunc](./paramodel.entityprojectionfunc.md)<!-- -->&lt;C, R, T&gt; |  |
+|  [apply](./paramodel.entityprojection.apply.md) | [EntityProjectionFunc](./paramodel.entityprojectionfunc.md)<!-- -->&lt;[Change](./paramodel.change.md)<!-- -->, R, T&gt; |  |
 |  [auth](./paramodel.entityprojection.auth.md) | [EntityAuthFunc](./paramodel.entityauthfunc.md)<!-- -->&lt;Scope, T, R&gt; \| undefined |  |
 |  [dependencies](./paramodel.entityprojection.dependencies.md) | ReadonlySet&lt;string &amp; keyof R&gt; |  |
 |  [kind](./paramodel.entityprojection.kind.md) | "entities" |  |

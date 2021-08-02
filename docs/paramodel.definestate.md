@@ -8,7 +8,7 @@
 
 ```typescript
 export declare function defineState<State, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(type: Type<State>, initial: State, dependencies: Dependencies, on: {
-    [K in Mutators[number]]: StateApplyFunc<ChangeModel<K, Events[K]>, Pick<Views, Dependencies[number]>, State>;
+    [K in Mutators[number]]: StateApplyFunc<Change<K, Events[K]>, Pick<Views, Dependencies[number]>, State>;
 }, auth?: StateAuthFunc<Scope, State, Pick<Views, Dependencies[number]>>): StateProjection<State, Events, Views, Scope>;
 ```
 
@@ -19,7 +19,7 @@ export declare function defineState<State, Scope = unknown, Events extends Chang
 |  type | Type&lt;State&gt; |  |
 |  initial | State |  |
 |  dependencies | Dependencies |  |
-|  on | { \[K in Mutators\[number\]\]: [StateApplyFunc](./paramodel.stateapplyfunc.md)<!-- -->&lt;[ChangeModel](./paramodel.changemodel.md)<!-- -->&lt;K, Events\[K\]&gt;, Pick&lt;Views, Dependencies\[number\]&gt;, State&gt;; } |  |
+|  on | { \[K in Mutators\[number\]\]: [StateApplyFunc](./paramodel.stateapplyfunc.md)<!-- -->&lt;[Change](./paramodel.change.md)<!-- -->&lt;K, Events\[K\]&gt;, Pick&lt;Views, Dependencies\[number\]&gt;, State&gt;; } |  |
 |  auth | [StateAuthFunc](./paramodel.stateauthfunc.md)<!-- -->&lt;Scope, State, Pick&lt;Views, Dependencies\[number\]&gt;&gt; |  |
 
 <b>Returns:</b>

@@ -7,5 +7,5 @@
 <b>Signature:</b>
 
 ```typescript
-readonly apply: EntityProjectionFunc<C, R, T>;
+readonly apply: EntityProjectionFunc<Change, R, T>;
 ```

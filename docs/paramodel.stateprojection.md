@@ -14,7 +14,7 @@ export interface StateProjection<T = unknown, C extends ChangeModel = ChangeMode
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [apply](./paramodel.stateprojection.apply.md) | [StateApplyFunc](./paramodel.stateapplyfunc.md)<!-- -->&lt;C, R, T&gt; |  |
+|  [apply](./paramodel.stateprojection.apply.md) | [StateApplyFunc](./paramodel.stateapplyfunc.md)<!-- -->&lt;[Change](./paramodel.change.md)<!-- -->, R, T&gt; |  |
 |  [auth](./paramodel.stateprojection.auth.md) | [StateAuthFunc](./paramodel.stateauthfunc.md)<!-- -->&lt;Scope, T, R&gt; \| undefined |  |
 |  [dependencies](./paramodel.stateprojection.dependencies.md) | ReadonlySet&lt;string &amp; keyof R&gt; |  |
 |  [initial](./paramodel.stateprojection.initial.md) | T |  |

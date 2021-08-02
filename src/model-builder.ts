@@ -1,10 +1,7 @@
 import { Type, voidType } from "paratype";
-import { ActionFunc, ActionHandler } from "./action-handler";
-import { EntityAuthFunc, EntityProjection, EntityProjectionFunc } from "./entity-projection";
+import { ActionHandler } from "./action-handler";
 import { ChangeModel, ReadModel, WriteModel, DomainModel } from "./model";
 import { Projection } from "./projection";
-import { QueryFunc, QueryHandler } from "./query-handler";
-import { StateApplyFunc, StateAuthFunc, StateProjection } from "./state-projection";
 
 export interface ModelBuilder<
     Scope = unknown,
@@ -12,111 +9,23 @@ export interface ModelBuilder<
     Views extends ReadModel = ReadModel,
     Actions extends WriteModel = WriteModel,
 > {
-    defineEvent<EventKey extends string, EventArg>(
+    addEvent<EventKey extends string, EventArg>(
         this: void,
-        definition: {
-            key: EventKey,
-            type: Type<EventArg>,
-        }
-    ): ModelBuilder<
-        Scope,
-        Events & Readonly<Record<EventKey, Type<EventArg>>>,
-        Views,
-        Actions
-    >;
+        key: EventKey, 
+        type: Type<EventArg>,
+    ): ModelBuilder<Scope, Events & ChangeModel<EventKey, EventArg>, Views, Actions>;
 
-    defineEntity<
-        ViewKey extends string,
-        Props extends Record<string, unknown>,
-        Mutators extends (string & keyof Events)[] = [],
-        Dependencies extends (string & keyof Views)[] = [],
-    >(
+    addView<ViewKey extends string, Handler extends Projection>(
         this: void,
-        definition: {
-            key: ViewKey,
-            type: Type<Props>,
-            on: {
-                [K in Mutators[number]]: (
-                    EntityProjectionFunc<Pick<Events, K>, Pick<Views, Dependencies[number]>, Props>
-                );
-            },
-            dependencies?: Dependencies,
-            auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number]>>,
-        }
-    ): ModelBuilder<
-        Scope,
-        Events,
-        Views & Readonly<Record<ViewKey, EntityProjection<Props, Events, Views, Scope>>>, 
-        Actions
-    >;
+        key: ViewKey,
+        handler: Handler,
+    ): ModelBuilder<Scope, Events, Views & ReadModel<ViewKey, Handler>, Actions>;
 
-    defineState<
-        ViewKey extends string,
-        State,
-        Mutators extends (string & keyof Events)[] = [],
-        Dependencies extends (string & keyof Views)[] = [],
-    >(
+    addAction<ActionKey extends string, Handler extends ActionHandler>(
         this: void,
-        definition: {
-            key: ViewKey,
-            type: Type<State>,
-            initial: State,
-            on: {
-                [K in Mutators[number]]: (
-                    StateApplyFunc<Pick<Events, K>, Pick<Views, Dependencies[number]>, State>
-                );
-            },
-            dependencies?: Dependencies,
-            auth?: StateAuthFunc<Scope, State, Pick<Views, Dependencies[number]>>,
-        }
-    ): ModelBuilder<
-        Scope,
-        Events,
-        Views & Readonly<Record<ViewKey, StateProjection<State, Events, Views, Scope>>>,
-        Actions
-    >;
-
-    defineQuery<
-        ViewKey extends string,
-        Params extends Record<string, unknown>,
-        Result,
-        Dependencies extends (string & keyof Views)[] = []
-    >(
-        this: void,
-        definition: {
-            key: ViewKey,
-            type: Type<Result>,
-            params: Type<Params>,
-            exec: QueryFunc<Pick<Views, Dependencies[number]>, Params, Scope, Result>,
-            dependencies?: Dependencies,
-        }
-    ): ModelBuilder<
-        Scope,
-        Events,
-        Views & Readonly<Record<ViewKey, QueryHandler<Params, Result, Views, Scope>>>,
-        Actions
-    >;
-    
-    defineAction<
-        ActionKey extends string,
-        Input,
-        Output,
-        Dependencies extends (string & keyof Views)[] = []
-    >(
-        this: void,
-        definition: {
-            key: ActionKey,
-            input: Type<Input>,
-            output: Type<Output>,
-            exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>,        
-            dependencies?: Dependencies,
-        }
-    ): ModelBuilder<
-        Scope,
-        Events,
-        Views,
-        Actions & Readonly<Record<ActionKey, ActionHandler<Events, Views, Scope, Input, Output>>>
-    >;
+        key: ActionKey,
+        handler: Handler,
+    ): ModelBuilder<Scope, Events, Views, Actions & WriteModel<ActionKey, ActionHandler>>;
 
     createModel(this: void): DomainModel<Scope, Events, Views, Actions>;
 
@@ -128,8 +37,6 @@ export function setupDomain<Scope>(scope: Type<Scope>): ModelBuilder<Scope, Chan
 export function setupDomain<Scope>(
     scope: Type<Scope | void> = voidType,
 ): ModelBuilder<Scope | void, ChangeModel, ReadModel, WriteModel> {
-    // TODO: THIS IMPLEMENTATION IS BROKEN!
-
     const events: Record<string, Type> = {};
     const views: Record<string, Projection> = {};
     const actions: Record<string, ActionHandler> = {};

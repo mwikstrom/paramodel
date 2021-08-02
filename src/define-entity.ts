@@ -1,4 +1,5 @@
 import { Type } from "paratype";
+import { Change } from "./change";
 import { EntityProjectionFunc, EntityProjection, EntityAuthFunc } from "./entity-projection";
 import { ChangeModel, ReadModel } from "./model";
 
@@ -14,18 +15,18 @@ export function defineEntity<
     dependencies: Dependencies,
     on: {
         [K in Mutators[number]]: (
-            EntityProjectionFunc<ChangeModel<K, Events[K]>, Pick<Views, Dependencies[number]>, Props>
+            EntityProjectionFunc<Change<K, Events[K]>, Pick<Views, Dependencies[number]>, Props>
         );
     },
     auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number]>>,
 ): EntityProjection<Props, Events, Views, Scope> {
     const mutators = Object.freeze(new Set(Object.keys(on)));
     
-    function isFunc(thing: unknown): thing is EntityProjectionFunc<Events, Views, Props> {
+    function isFunc(thing: unknown): thing is EntityProjectionFunc<Change, Views, Props> {
         return typeof thing === "function";
     }
     
-    const apply: EntityProjectionFunc<Events, Views, Props> = async (change, ...rest) => {
+    const apply: EntityProjectionFunc<Change, Views, Props> = async (change, ...rest) => {
         if (change.key in on) {
             const func = on[change.key as Mutators[number]];
             if (isFunc(func)) {

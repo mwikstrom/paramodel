@@ -1,5 +1,5 @@
 import { Type } from "paratype";
-import { ChangeType } from "./change";
+import { Change } from "./change";
 import { ReadonlyEntityCollection } from "./entity-view";
 import { ChangeModel, ReadModel, Forbidden } from "./model";
 import { ViewSnapshotFunc } from "./projection";
@@ -15,7 +15,7 @@ export interface EntityProjection<
     readonly type: Type<T>;
     readonly mutators: ReadonlySet<string & keyof C>;
     readonly dependencies: ReadonlySet<string & keyof R>;
-    readonly apply: EntityProjectionFunc<C, R, T>;
+    readonly apply: EntityProjectionFunc<Change, R, T>;
     readonly auth: EntityAuthFunc<Scope, T, R> | undefined;
 }
 
@@ -26,10 +26,10 @@ export type EntityAuthFunc<
 > = (query: Filterable<T>, scope: Scope, view: ViewSnapshotFunc<R>) => Promise<Filterable<T> | Forbidden>;
 
 export type EntityProjectionFunc<
-    C extends ChangeModel = ChangeModel,
+    C extends Change = Change,
     R extends ReadModel = ReadModel,
     T extends Record<string, unknown> = Record<string, unknown>,
-> = (change: ChangeType<C>, state: EntityCollection<T>, view: ViewSnapshotFunc<R>) => Promise<void>;
+> = (change: C, state: EntityCollection<T>, view: ViewSnapshotFunc<R>) => Promise<void>;
 
 export interface EntityCollection<
     T extends Record<string, unknown> = Record<string, unknown>,
