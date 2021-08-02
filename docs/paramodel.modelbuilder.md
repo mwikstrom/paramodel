@@ -14,9 +14,11 @@ export interface ModelBuilder<Scope = unknown, Events extends ChangeModel = Chan
 
 |  Method | Description |
 |  --- | --- |
-|  [addAction(this, key, handler)](./paramodel.modelbuilder.addaction.md) |  |
-|  [addEvent(this, key, type)](./paramodel.modelbuilder.addevent.md) |  |
-|  [addView(this, key, handler)](./paramodel.modelbuilder.addview.md) |  |
 |  [createModel(this)](./paramodel.modelbuilder.createmodel.md) |  |
+|  [defineAction(this, definition)](./paramodel.modelbuilder.defineaction.md) |  |
+|  [defineEntity(this, definition)](./paramodel.modelbuilder.defineentity.md) |  |
+|  [defineEvent(this, definition)](./paramodel.modelbuilder.defineevent.md) |  |
+|  [defineQuery(this, definition)](./paramodel.modelbuilder.definequery.md) |  |
+|  [defineState(this, definition)](./paramodel.modelbuilder.definestate.md) |  |
 |  [use(setup)](./paramodel.modelbuilder.use.md) |  |
 

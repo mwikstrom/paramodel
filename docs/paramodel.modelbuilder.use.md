@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-use<T>(setup: (this: void, builder: this) => T): T;
+use<T extends ModelBuilder>(setup: (this: void, builder: this) => T): T;
 ```
 
 ## Parameters
