@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-addView<ViewKey extends string, Handler extends Projection>(this: void, key: ViewKey, handler: Handler): ModelBuilder<Events, Views & ReadModel<ViewKey, Handler>, Actions, Scope>;
+addView<ViewKey extends string, Handler extends Projection>(this: void, key: ViewKey, handler: Handler): ModelBuilder<Scope, Events, Views & ReadModel<ViewKey, Handler>, Actions>;
 ```
 
 ## Parameters
@@ -20,5 +20,5 @@ addView<ViewKey extends string, Handler extends Projection>(this: void, key: Vie
 
 <b>Returns:</b>
 
-[ModelBuilder](./paramodel.modelbuilder.md)<!-- -->&lt;Events, Views &amp; [ReadModel](./paramodel.readmodel.md)<!-- -->&lt;ViewKey, Handler&gt;, Actions, Scope&gt;
+[ModelBuilder](./paramodel.modelbuilder.md)<!-- -->&lt;Scope, Events, Views &amp; [ReadModel](./paramodel.readmodel.md)<!-- -->&lt;ViewKey, Handler&gt;, Actions&gt;
 

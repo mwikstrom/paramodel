@@ -122,11 +122,11 @@ export function defineState<Events extends ChangeModel, Views extends ReadModel,
 }, auth?: StateAuthFunc<Scope, State, Pick<Views, Dependencies[number]>>): StateProjection<State, Events, Views, Scope>;
 
 // @public (undocumented)
-export type DomainModel<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Actions extends WriteModel = WriteModel, Scope = unknown> = {
+export type DomainModel<Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Actions extends WriteModel = WriteModel> = {
+    readonly scope: Type<Scope>;
     readonly events: Events;
     readonly views: Views;
     readonly actions: Actions;
-    readonly scope: Type<Scope>;
 };
 
 // @public (undocumented)
@@ -234,15 +234,15 @@ export type IsOperand<T> = ((T extends undefined ? "defined" : never) | (T exten
 export type IsOperator = "is" | "is-not";
 
 // @public (undocumented)
-export interface ModelBuilder<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Actions extends WriteModel = WriteModel, Scope = unknown> {
+export interface ModelBuilder<Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Actions extends WriteModel = WriteModel> {
     // (undocumented)
-    addAction<ActionKey extends string, Handler extends ActionHandler>(this: void, key: ActionKey, handler: Handler): ModelBuilder<Events, Views, Actions & WriteModel<ActionKey, ActionHandler>, Scope>;
+    addAction<ActionKey extends string, Handler extends ActionHandler>(this: void, key: ActionKey, handler: Handler): ModelBuilder<Scope, Events, Views, Actions & WriteModel<ActionKey, ActionHandler>>;
     // (undocumented)
-    addEvent<EventKey extends string, EventArg>(this: void, key: EventKey, type: Type<EventArg>): ModelBuilder<Events & ChangeModel<EventKey, EventArg>, Views, Actions, Scope>;
+    addEvent<EventKey extends string, EventArg>(this: void, key: EventKey, type: Type<EventArg>): ModelBuilder<Scope, Events & ChangeModel<EventKey, EventArg>, Views, Actions>;
     // (undocumented)
-    addView<ViewKey extends string, Handler extends Projection>(this: void, key: ViewKey, handler: Handler): ModelBuilder<Events, Views & ReadModel<ViewKey, Handler>, Actions, Scope>;
+    addView<ViewKey extends string, Handler extends Projection>(this: void, key: ViewKey, handler: Handler): ModelBuilder<Scope, Events, Views & ReadModel<ViewKey, Handler>, Actions>;
     // (undocumented)
-    createModel(this: void): DomainModel<Events, Views, Actions, Scope>;
+    createModel(this: void): DomainModel<Scope, Events, Views, Actions>;
     // (undocumented)
     use<T>(setup: (this: void, builder: this) => T): T;
 }
@@ -313,10 +313,10 @@ export interface ReadonlyEntityCollection<T extends Record<string, unknown> = Re
 }
 
 // @public (undocumented)
-export function setupDomain(): ModelBuilder<ChangeModel, ReadModel, WriteModel, void>;
+export function setupDomain(): ModelBuilder<void, ChangeModel, ReadModel, WriteModel>;
 
 // @public (undocumented)
-export function setupDomain<Scope>(scope: Type<Scope>): ModelBuilder<ChangeModel, ReadModel, WriteModel, Scope>;
+export function setupDomain<Scope>(scope: Type<Scope>): ModelBuilder<Scope, ChangeModel, ReadModel, WriteModel>;
 
 // @public (undocumented)
 export type SortableProps<T> = {

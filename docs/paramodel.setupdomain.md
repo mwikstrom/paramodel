@@ -7,9 +7,9 @@
 <b>Signature:</b>
 
 ```typescript
-export declare function setupDomain(): ModelBuilder<ChangeModel, ReadModel, WriteModel, void>;
+export declare function setupDomain(): ModelBuilder<void, ChangeModel, ReadModel, WriteModel>;
 ```
 <b>Returns:</b>
 
-[ModelBuilder](./paramodel.modelbuilder.md)<!-- -->&lt;[ChangeModel](./paramodel.changemodel.md)<!-- -->, [ReadModel](./paramodel.readmodel.md)<!-- -->, [WriteModel](./paramodel.writemodel.md)<!-- -->, void&gt;
+[ModelBuilder](./paramodel.modelbuilder.md)<!-- -->&lt;void, [ChangeModel](./paramodel.changemodel.md)<!-- -->, [ReadModel](./paramodel.readmodel.md)<!-- -->, [WriteModel](./paramodel.writemodel.md)<!-- -->&gt;
 

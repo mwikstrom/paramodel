@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-createModel(this: void): DomainModel<Events, Views, Actions, Scope>;
+createModel(this: void): DomainModel<Scope, Events, Views, Actions>;
 ```
 
 ## Parameters
@@ -18,5 +18,5 @@ createModel(this: void): DomainModel<Events, Views, Actions, Scope>;
 
 <b>Returns:</b>
 
-[DomainModel](./paramodel.domainmodel.md)<!-- -->&lt;Events, Views, Actions, Scope&gt;
+[DomainModel](./paramodel.domainmodel.md)<!-- -->&lt;Scope, Events, Views, Actions&gt;
 

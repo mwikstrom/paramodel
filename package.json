@@ -42,7 +42,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^7.31.0",
     "jest": "^27.0.6",
-    "paratype": "0.0.7",
+    "paratype": "0.0.10",
     "rimraf": "^3.0.2",
     "ts-jest": "^27.0.4",
     "ts-node": "^10.1.0",

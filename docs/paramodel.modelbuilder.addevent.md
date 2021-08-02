@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-addEvent<EventKey extends string, EventArg>(this: void, key: EventKey, type: Type<EventArg>): ModelBuilder<Events & ChangeModel<EventKey, EventArg>, Views, Actions, Scope>;
+addEvent<EventKey extends string, EventArg>(this: void, key: EventKey, type: Type<EventArg>): ModelBuilder<Scope, Events & ChangeModel<EventKey, EventArg>, Views, Actions>;
 ```
 
 ## Parameters
@@ -20,5 +20,5 @@ addEvent<EventKey extends string, EventArg>(this: void, key: EventKey, type: Typ
 
 <b>Returns:</b>
 
-[ModelBuilder](./paramodel.modelbuilder.md)<!-- -->&lt;Events &amp; [ChangeModel](./paramodel.changemodel.md)<!-- -->&lt;EventKey, EventArg&gt;, Views, Actions, Scope&gt;
+[ModelBuilder](./paramodel.modelbuilder.md)<!-- -->&lt;Scope, Events &amp; [ChangeModel](./paramodel.changemodel.md)<!-- -->&lt;EventKey, EventArg&gt;, Views, Actions&gt;
 

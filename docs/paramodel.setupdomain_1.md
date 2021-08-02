@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare function setupDomain<Scope>(scope: Type<Scope>): ModelBuilder<ChangeModel, ReadModel, WriteModel, Scope>;
+export declare function setupDomain<Scope>(scope: Type<Scope>): ModelBuilder<Scope, ChangeModel, ReadModel, WriteModel>;
 ```
 
 ## Parameters
@@ -18,5 +18,5 @@ export declare function setupDomain<Scope>(scope: Type<Scope>): ModelBuilder<Cha
 
 <b>Returns:</b>
 
-[ModelBuilder](./paramodel.modelbuilder.md)<!-- -->&lt;[ChangeModel](./paramodel.changemodel.md)<!-- -->, [ReadModel](./paramodel.readmodel.md)<!-- -->, [WriteModel](./paramodel.writemodel.md)<!-- -->, Scope&gt;
+[ModelBuilder](./paramodel.modelbuilder.md)<!-- -->&lt;Scope, [ChangeModel](./paramodel.changemodel.md)<!-- -->, [ReadModel](./paramodel.readmodel.md)<!-- -->, [WriteModel](./paramodel.writemodel.md)<!-- -->&gt;
 

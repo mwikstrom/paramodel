@@ -4,39 +4,39 @@ import { ChangeModel, ReadModel, WriteModel, DomainModel } from "./model";
 import { Projection } from "./projection";
 
 export interface ModelBuilder<
+    Scope = unknown,
     Events extends ChangeModel = ChangeModel,
     Views extends ReadModel = ReadModel,
     Actions extends WriteModel = WriteModel,
-    Scope = unknown,
 > {
     addEvent<EventKey extends string, EventArg>(
         this: void,
         key: EventKey, 
         type: Type<EventArg>,
-    ): ModelBuilder<Events & ChangeModel<EventKey, EventArg>, Views, Actions, Scope>;
+    ): ModelBuilder<Scope, Events & ChangeModel<EventKey, EventArg>, Views, Actions>;
 
     addView<ViewKey extends string, Handler extends Projection>(
         this: void,
         key: ViewKey,
         handler: Handler,
-    ): ModelBuilder<Events, Views & ReadModel<ViewKey, Handler>, Actions, Scope>;
+    ): ModelBuilder<Scope, Events, Views & ReadModel<ViewKey, Handler>, Actions>;
 
     addAction<ActionKey extends string, Handler extends ActionHandler>(
         this: void,
         key: ActionKey,
         handler: Handler,
-    ): ModelBuilder<Events, Views, Actions & WriteModel<ActionKey, ActionHandler>, Scope>;
+    ): ModelBuilder<Scope, Events, Views, Actions & WriteModel<ActionKey, ActionHandler>>;
 
-    createModel(this: void): DomainModel<Events, Views, Actions, Scope>;
+    createModel(this: void): DomainModel<Scope, Events, Views, Actions>;
 
     use<T>(setup: (this: void, builder: this) => T): T;
 }
 
-export function setupDomain(): ModelBuilder<ChangeModel, ReadModel, WriteModel, void>;
-export function setupDomain<Scope>(scope: Type<Scope>): ModelBuilder<ChangeModel, ReadModel, WriteModel, Scope>;
+export function setupDomain(): ModelBuilder<void, ChangeModel, ReadModel, WriteModel>;
+export function setupDomain<Scope>(scope: Type<Scope>): ModelBuilder<Scope, ChangeModel, ReadModel, WriteModel>;
 export function setupDomain<Scope>(
     scope: Type<Scope | void> = voidType,
-): ModelBuilder<ChangeModel, ReadModel, WriteModel, Scope | void> {
+): ModelBuilder<Scope | void, ChangeModel, ReadModel, WriteModel> {
     const events: Record<string, Type> = {};
     const views: Record<string, Projection> = {};
     const actions: Record<string, ActionHandler> = {};
