@@ -4,7 +4,7 @@ import { EntityProjectionFunc, EntityProjection, EntityAuthFunc } from "./entity
 import { ChangeModel, ReadModel } from "./model";
 
 export function defineEntity<
-    Props extends Record<string, unknown>,
+    Props,
     Scope = unknown,
     Events extends ChangeModel = ChangeModel,
     Views extends ReadModel = ReadModel,

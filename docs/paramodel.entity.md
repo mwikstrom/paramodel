@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type Entity<T extends Record<string, unknown> = Record<string, unknown>> = T & {
+export declare type Entity<T> = T & {
     id: number;
 };
 ```

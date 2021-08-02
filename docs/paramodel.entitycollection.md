@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface EntityCollection<T extends Record<string, unknown> = Record<string, unknown>> extends ReadonlyEntityCollection<T> 
+export interface EntityCollection<T> extends ReadonlyEntityCollection<T> 
 ```
 <b>Extends:</b> [ReadonlyEntityCollection](./paramodel.readonlyentitycollection.md)<!-- -->&lt;T&gt;
 

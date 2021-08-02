@@ -109,7 +109,7 @@ export type ComparisonOperator = ">" | ">=" | "<" | "<=";
 export function defineAction<Input, Output, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(input: Type<Input>, output: Type<Output>, dependencies: Dependencies, exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>;
 
 // @public (undocumented)
-export function defineEntity<Props extends Record<string, unknown>, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(type: Type<Props>, dependencies: Dependencies, on: {
+export function defineEntity<Props, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(type: Type<Props>, dependencies: Dependencies, on: {
     [K in Mutators[number]]: (EntityProjectionFunc<Change<K, Events[K]>, Pick<Views, Dependencies[number]>, Props>);
 }, auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number]>>): EntityProjection<Props, Events, Views, Scope>;
 
@@ -158,15 +158,15 @@ export interface DomainStoreStatus<K extends string> {
 }
 
 // @public (undocumented)
-export type Entity<T extends Record<string, unknown> = Record<string, unknown>> = T & {
+export type Entity<T> = T & {
     id: number;
 };
 
 // @public (undocumented)
-export type EntityAuthFunc<Scope, T extends Record<string, unknown> = Record<string, unknown>, R extends ReadModel = ReadModel> = (query: Filterable<T>, scope: Scope, view: ViewSnapshotFunc<R>) => Promise<Filterable<T> | Forbidden>;
+export type EntityAuthFunc<Scope, T, R extends ReadModel = ReadModel> = (query: Filterable<T>, scope: Scope, view: ViewSnapshotFunc<R>) => Promise<Filterable<T> | Forbidden>;
 
 // @public (undocumented)
-export interface EntityCollection<T extends Record<string, unknown> = Record<string, unknown>> extends ReadonlyEntityCollection<T> {
+export interface EntityCollection<T> extends ReadonlyEntityCollection<T> {
     // (undocumented)
     del(id: number): void;
     // (undocumented)
@@ -174,7 +174,7 @@ export interface EntityCollection<T extends Record<string, unknown> = Record<str
 }
 
 // @public (undocumented)
-export interface EntityProjection<T extends Record<string, unknown> = Record<string, unknown>, C extends ChangeModel = ChangeModel, R extends ReadModel = ReadModel, Scope = unknown> {
+export interface EntityProjection<T = unknown, C extends ChangeModel = ChangeModel, R extends ReadModel = ReadModel, Scope = unknown> {
     // (undocumented)
     readonly apply: EntityProjectionFunc<Change, R, T>;
     // (undocumented)
@@ -190,10 +190,10 @@ export interface EntityProjection<T extends Record<string, unknown> = Record<str
 }
 
 // @public (undocumented)
-export type EntityProjectionFunc<C extends Change = Change, R extends ReadModel = ReadModel, T extends Record<string, unknown> = Record<string, unknown>> = (change: C, state: EntityCollection<T>, view: ViewSnapshotFunc<R>) => Promise<void>;
+export type EntityProjectionFunc<C extends Change = Change, R extends ReadModel = ReadModel, T = unknown> = (change: C, state: EntityCollection<T>, view: ViewSnapshotFunc<R>) => Promise<void>;
 
 // @public (undocumented)
-export interface EntityView<T extends Record<string, unknown> = Record<string, unknown>> extends ReadonlyEntityCollection<T> {
+export interface EntityView<T = unknown> extends ReadonlyEntityCollection<T> {
     // (undocumented)
     readonly kind: "entities";
     // (undocumented)
@@ -307,7 +307,7 @@ export interface QueryView<P = unknown, T = unknown> {
 export type ReadModel<K extends string = string, T extends Projection = Projection> = Readonly<Record<K, T>>;
 
 // @public (undocumented)
-export interface ReadonlyEntityCollection<T extends Record<string, unknown> = Record<string, unknown>> extends Queryable<Entity<T>> {
+export interface ReadonlyEntityCollection<T> extends Queryable<Entity<T>> {
     // (undocumented)
     get(id: number): Promise<Entity<T> | undefined>;
 }

@@ -6,7 +6,7 @@ import { ViewSnapshotFunc } from "./projection";
 import { Filterable } from "./queryable";
 
 export interface EntityProjection<
-    T extends Record<string, unknown> = Record<string, unknown>,
+    T = unknown,
     C extends ChangeModel = ChangeModel,
     R extends ReadModel = ReadModel,
     Scope = unknown
@@ -21,19 +21,17 @@ export interface EntityProjection<
 
 export type EntityAuthFunc<
     Scope,
-    T extends Record<string, unknown> = Record<string, unknown>,
+    T,
     R extends ReadModel = ReadModel
 > = (query: Filterable<T>, scope: Scope, view: ViewSnapshotFunc<R>) => Promise<Filterable<T> | Forbidden>;
 
 export type EntityProjectionFunc<
     C extends Change = Change,
     R extends ReadModel = ReadModel,
-    T extends Record<string, unknown> = Record<string, unknown>,
+    T = unknown,
 > = (change: C, state: EntityCollection<T>, view: ViewSnapshotFunc<R>) => Promise<void>;
 
-export interface EntityCollection<
-    T extends Record<string, unknown> = Record<string, unknown>,
-> extends ReadonlyEntityCollection<T> {
+export interface EntityCollection<T> extends ReadonlyEntityCollection<T> {
     put(id: number, props: T): void;
     del(id: number): void;
 }

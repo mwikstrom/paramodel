@@ -1,5 +1,5 @@
 import { Type } from "paratype";
-import { Change, ChangeType } from "./change";
+import { Change } from "./change";
 import { ChangeModel, Forbidden, ReadModel } from "./model";
 import { ViewSnapshotFunc } from "./projection";
 
