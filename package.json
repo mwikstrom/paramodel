@@ -8,19 +8,18 @@
     "model",
     "run-time"
   ],
-  "main": "./lib/index.js",
-  "typings": "./lib/index.d.ts",
-  "type": "module",
+  "main": "./dist/paramodel.js",
+  "typings": "./lib/paramodel.d.ts",
   "files": [
-    "lib"
+    "dist"
   ],
   "scripts": {
-    "prebuild": "rimraf temp lib && npm run lint",
-    "build": "tsc",
+    "prebuild": "rimraf temp lib && npm run lint && tsc",
+    "build": "rollup -c",
     "postbuild": "npm test && api-extractor run --local && api-documenter markdown --input temp --output docs",
     "lint": "eslint src test",
     "lint:fix": "eslint src test --fix",
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
+    "test": "jest",
     "prepublishOnly": "npm run build"
   },
   "repository": {
@@ -34,18 +33,25 @@
   },
   "homepage": "https://github.com/mwikstrom/paramodel#readme",
   "devDependencies": {
+    "@babel/core": "^7.14.8",
+    "@babel/preset-env": "^7.14.9",
     "@microsoft/api-documenter": "^7.13.33",
     "@microsoft/api-extractor": "^7.18.4",
+    "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-commonjs": "^20.0.0",
+    "@rollup/plugin-node-resolve": "^13.0.4",
+    "@rollup/plugin-typescript": "^8.2.5",
     "@types/jest": "^26.0.24",
     "@typescript-eslint/eslint-plugin": "^4.28.5",
     "@typescript-eslint/parser": "^4.28.5",
-    "cross-env": "^7.0.3",
     "eslint": "^7.31.0",
     "jest": "^27.0.6",
-    "paratype": "0.0.10",
+    "paratype": "0.0.11",
     "rimraf": "^3.0.2",
+    "rollup": "^2.55.1",
     "ts-jest": "^27.0.4",
     "ts-node": "^10.1.0",
+    "tslib": "^2.3.0",
     "typescript": "^4.3.5"
   },
   "peerDependencies": {

@@ -110,7 +110,7 @@ export function defineAction<Input, Output, Scope = unknown, Events extends Chan
 
 // @public (undocumented)
 export function defineEntity<Props, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(type: Type<Props>, dependencies: Dependencies, on: {
-    [K in Mutators[number]]: (EntityProjectionFunc<Change<K, Events[K]>, Pick<Views, Dependencies[number]>, Props>);
+    [K in Mutators[number]]: (EntityProjectionFunc<Change<K, TypeOf<Events[K]>>, Pick<Views, Dependencies[number]>, Props>);
 }, auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number]>>): EntityProjection<Props, Events, Views, Scope>;
 
 // @public (undocumented)

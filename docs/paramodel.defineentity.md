@@ -8,7 +8,7 @@
 
 ```typescript
 export declare function defineEntity<Props, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(type: Type<Props>, dependencies: Dependencies, on: {
-    [K in Mutators[number]]: (EntityProjectionFunc<Change<K, Events[K]>, Pick<Views, Dependencies[number]>, Props>);
+    [K in Mutators[number]]: (EntityProjectionFunc<Change<K, TypeOf<Events[K]>>, Pick<Views, Dependencies[number]>, Props>);
 }, auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number]>>): EntityProjection<Props, Events, Views, Scope>;
 ```
 
@@ -18,7 +18,7 @@ export declare function defineEntity<Props, Scope = unknown, Events extends Chan
 |  --- | --- | --- |
 |  type | Type&lt;Props&gt; |  |
 |  dependencies | Dependencies |  |
-|  on | { \[K in Mutators\[number\]\]: ([EntityProjectionFunc](./paramodel.entityprojectionfunc.md)<!-- -->&lt;[Change](./paramodel.change.md)<!-- -->&lt;K, Events\[K\]&gt;, Pick&lt;Views, Dependencies\[number\]&gt;, Props&gt;); } |  |
+|  on | { \[K in Mutators\[number\]\]: ([EntityProjectionFunc](./paramodel.entityprojectionfunc.md)<!-- -->&lt;[Change](./paramodel.change.md)<!-- -->&lt;K, TypeOf&lt;Events\[K\]&gt;&gt;, Pick&lt;Views, Dependencies\[number\]&gt;, Props&gt;); } |  |
 |  auth | [EntityAuthFunc](./paramodel.entityauthfunc.md)<!-- -->&lt;Scope, Props, Pick&lt;Views, Dependencies\[number\]&gt;&gt; |  |
 
 <b>Returns:</b>

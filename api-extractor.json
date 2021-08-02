@@ -6,7 +6,7 @@
   },
   "dtsRollup": {
     "enabled": true,
-    "untrimmedFilePath": "<projectFolder>/lib/index.d.ts"
+    "untrimmedFilePath": "<projectFolder>/dist/paramodel.d.ts"
   },
   "docModel": {
     "enabled": true

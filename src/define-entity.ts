@@ -1,4 +1,4 @@
-import { Type } from "paratype";
+import { Type, TypeOf } from "paratype";
 import { Change } from "./change";
 import { EntityProjectionFunc, EntityProjection, EntityAuthFunc } from "./entity-projection";
 import { ChangeModel, ReadModel } from "./model";
@@ -15,7 +15,7 @@ export function defineEntity<
     dependencies: Dependencies,
     on: {
         [K in Mutators[number]]: (
-            EntityProjectionFunc<Change<K, Events[K]>, Pick<Views, Dependencies[number]>, Props>
+            EntityProjectionFunc<Change<K, TypeOf<Events[K]>>, Pick<Views, Dependencies[number]>, Props>
         );
     },
     auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number]>>,
