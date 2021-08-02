@@ -125,6 +125,7 @@ export type ArrayAnyOperator = (
  * @public
  */
 export type StringOperator = (
+    "equals-ignore-case" |
     "contains" |
     "contains-ignore-case" |
     "starts-with" |
