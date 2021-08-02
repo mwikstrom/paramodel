@@ -370,7 +370,7 @@ export interface StateView<T = unknown> {
 }
 
 // @public (undocumented)
-export type StringOperator = ("contains" | "contains-ignore-case" | "starts-with" | "starts-with-ignore-case" | "ends-with" | "ends-with-ignore-case");
+export type StringOperator = ("equals-ignore-case" | "contains" | "contains-ignore-case" | "starts-with" | "starts-with-ignore-case" | "ends-with" | "ends-with-ignore-case");
 
 // @public (undocumented)
 export type View = StateView | QueryView | EntityView;
