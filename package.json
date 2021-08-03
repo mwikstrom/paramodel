@@ -9,7 +9,7 @@
     "run-time"
   ],
   "main": "./dist/paramodel.js",
-  "typings": "./lib/paramodel.d.ts",
+  "typings": "./dist/paramodel.d.ts",
   "files": [
     "dist"
   ],
