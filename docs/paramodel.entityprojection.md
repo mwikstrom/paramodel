@@ -14,7 +14,7 @@ export interface EntityProjection<T = unknown, C extends ChangeModel = ChangeMod
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [apply](./paramodel.entityprojection.apply.md) | [EntityProjectionFunc](./paramodel.entityprojectionfunc.md)<!-- -->&lt;[Change](./paramodel.change.md)<!-- -->, R, T&gt; |  |
+|  [apply](./paramodel.entityprojection.apply.md) | [EntityProjectionFunc](./paramodel.entityprojectionfunc.md)<!-- -->&lt;[Change](./paramodel.change.md)<!-- -->, T, R&gt; |  |
 |  [auth](./paramodel.entityprojection.auth.md) | [EntityAuthFunc](./paramodel.entityauthfunc.md)<!-- -->&lt;Scope, T, R&gt; \| undefined |  |
 |  [dependencies](./paramodel.entityprojection.dependencies.md) | ReadonlySet&lt;string &amp; keyof R&gt; |  |
 |  [kind](./paramodel.entityprojection.kind.md) | "entities" |  |

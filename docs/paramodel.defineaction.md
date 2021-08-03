@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare function defineAction<Input, Output, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(input: Type<Input>, output: Type<Output>, dependencies: Dependencies, exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>;
+export declare function defineAction<Input, Output, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(input: Type<Input>, exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>, dependencies?: Dependencies, output?: Type<Output>): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>;
 ```
 
 ## Parameters
@@ -15,9 +15,9 @@ export declare function defineAction<Input, Output, Scope = unknown, Events exte
 |  Parameter | Type | Description |
 |  --- | --- | --- |
 |  input | Type&lt;Input&gt; |  |
-|  output | Type&lt;Output&gt; |  |
-|  dependencies | Dependencies |  |
 |  exec | [ActionFunc](./paramodel.actionfunc.md)<!-- -->&lt;Events, Pick&lt;Views, Dependencies\[number\]&gt;, Scope, Input, Output&gt; |  |
+|  dependencies | Dependencies |  |
+|  output | Type&lt;Output&gt; |  |
 
 <b>Returns:</b>
 

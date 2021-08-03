@@ -10,12 +10,10 @@ Run-time domain model for event-sourcing.
 
 |  Function | Description |
 |  --- | --- |
-|  [defineAction(input, output, dependencies, exec)](./paramodel.defineaction.md) |  |
-|  [defineEntity(type, dependencies, on, auth)](./paramodel.defineentity.md) |  |
+|  [defineAction(input, exec, dependencies, output)](./paramodel.defineaction.md) |  |
+|  [defineEntity(type, on, auth, dependencies)](./paramodel.defineentity.md) |  |
 |  [defineQuery(type, params, dependencies, exec)](./paramodel.definequery.md) |  |
-|  [defineState(type, initial, dependencies, on, auth)](./paramodel.definestate.md) |  |
-|  [setupDomain()](./paramodel.setupdomain.md) |  |
-|  [setupDomain(scope)](./paramodel.setupdomain_1.md) |  |
+|  [defineState(type, initial, on, dependencies, auth)](./paramodel.definestate.md) |  |
 
 ## Interfaces
 
@@ -33,7 +31,6 @@ Run-time domain model for event-sourcing.
 |  [EntityProjection](./paramodel.entityprojection.md) |  |
 |  [EntityView](./paramodel.entityview.md) |  |
 |  [Filterable](./paramodel.filterable.md) |  |
-|  [ModelBuilder](./paramodel.modelbuilder.md) |  |
 |  [Page](./paramodel.page.md) |  |
 |  [PageOptions](./paramodel.pageoptions.md) |  |
 |  [Queryable](./paramodel.queryable.md) |  |
@@ -67,6 +64,7 @@ Run-time domain model for event-sourcing.
 |  [DomainModel](./paramodel.domainmodel.md) |  |
 |  [Entity](./paramodel.entity.md) |  |
 |  [EntityAuthFunc](./paramodel.entityauthfunc.md) |  |
+|  [EntityChangeHandlers](./paramodel.entitychangehandlers.md) |  |
 |  [EntityProjectionFunc](./paramodel.entityprojectionfunc.md) |  |
 |  [EqualityOperator](./paramodel.equalityoperator.md) |  |
 |  [Equatable](./paramodel.equatable.md) |  |
@@ -82,6 +80,7 @@ Run-time domain model for event-sourcing.
 |  [SortableProps](./paramodel.sortableprops.md) |  |
 |  [StateApplyFunc](./paramodel.stateapplyfunc.md) |  |
 |  [StateAuthFunc](./paramodel.stateauthfunc.md) |  |
+|  [StateChangeHandlers](./paramodel.statechangehandlers.md) |  |
 |  [StringOperator](./paramodel.stringoperator.md) |  |
 |  [View](./paramodel.view.md) |  |
 |  [ViewOf](./paramodel.viewof.md) |  |

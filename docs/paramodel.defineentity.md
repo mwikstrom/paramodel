@@ -7,9 +7,9 @@
 <b>Signature:</b>
 
 ```typescript
-export declare function defineEntity<Props, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(type: Type<Props>, dependencies: Dependencies, on: {
-    [K in Mutators[number]]: (EntityProjectionFunc<Change<K, TypeOf<Events[K]>>, Pick<Views, Dependencies[number]>, Props>);
-}, auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number]>>): EntityProjection<Props, Events, Views, Scope>;
+export declare function defineEntity<Props, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(type: Type<Props>, on: {
+    [K in Mutators[number]]: (EntityProjectionFunc<Change<TypeOf<Events[K]>, K>, Props, Pick<Views, Dependencies[number]>>);
+}, auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number]>>, dependencies?: Dependencies): EntityProjection<Props, Events, Views, Scope>;
 ```
 
 ## Parameters
@@ -17,9 +17,9 @@ export declare function defineEntity<Props, Scope = unknown, Events extends Chan
 |  Parameter | Type | Description |
 |  --- | --- | --- |
 |  type | Type&lt;Props&gt; |  |
-|  dependencies | Dependencies |  |
-|  on | { \[K in Mutators\[number\]\]: ([EntityProjectionFunc](./paramodel.entityprojectionfunc.md)<!-- -->&lt;[Change](./paramodel.change.md)<!-- -->&lt;K, TypeOf&lt;Events\[K\]&gt;&gt;, Pick&lt;Views, Dependencies\[number\]&gt;, Props&gt;); } |  |
+|  on | { \[K in Mutators\[number\]\]: ([EntityProjectionFunc](./paramodel.entityprojectionfunc.md)<!-- -->&lt;[Change](./paramodel.change.md)<!-- -->&lt;TypeOf&lt;Events\[K\]&gt;, K&gt;, Props, Pick&lt;Views, Dependencies\[number\]&gt;&gt;); } |  |
 |  auth | [EntityAuthFunc](./paramodel.entityauthfunc.md)<!-- -->&lt;Scope, Props, Pick&lt;Views, Dependencies\[number\]&gt;&gt; |  |
+|  dependencies | Dependencies |  |
 
 <b>Returns:</b>
 

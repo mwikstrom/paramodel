@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface Change<K extends string = string, T = unknown> 
+export interface Change<T = unknown, K extends string = string> 
 ```
 
 ## Properties

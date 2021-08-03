@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type Projection = StateProjection | QueryHandler | EntityProjection;
+export declare type Projection = {
+    kind: "state" | "query" | "entities";
+};
 ```
-<b>References:</b> [StateProjection](./paramodel.stateprojection.md)<!-- -->, [QueryHandler](./paramodel.queryhandler.md)<!-- -->, [EntityProjection](./paramodel.entityprojection.md)
-

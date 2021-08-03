@@ -12,13 +12,13 @@ export function defineAction<
 >(
     input: Type<Input>,
     exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>,
-    dependencies: Dependencies = [] as any,
-    output: Type<Output> = voidType as any,
+    dependencies?: Dependencies,
+    output?: Type<Output>,
 ): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output> {
     return Object.freeze({
         input,
-        output,
-        dependencies: Object.freeze(new Set(dependencies)),
+        output: (output || voidType) as Type<Output>,
+        dependencies: Object.freeze(new Set(dependencies || [])),
         exec,
     });
 }

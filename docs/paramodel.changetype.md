@@ -8,7 +8,7 @@
 
 ```typescript
 export declare type ChangeType<Model extends ChangeModel> = {
-    [K in keyof Model]: K extends string ? Change<K, TypeOf<Model[K]>> : never;
+    [K in keyof Model]: K extends string ? Change<TypeOf<Model[K]>, K> : never;
 }[keyof Model];
 ```
 <b>References:</b> [ChangeModel](./paramodel.changemodel.md)<!-- -->, [Change](./paramodel.change.md)

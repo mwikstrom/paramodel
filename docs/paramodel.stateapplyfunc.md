@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type StateApplyFunc<C extends Change = Change, R extends ReadModel = ReadModel, T = unknown> = (this: void, change: C, before: T, view: ViewSnapshotFunc<R>) => Promise<T>;
+export declare type StateApplyFunc<C extends Change = Change, T = unknown, R extends ReadModel = ReadModel> = (this: void, change: C, before: T, view: ViewSnapshotFunc<R>) => Promise<T>;
 ```
 <b>References:</b> [Change](./paramodel.change.md)<!-- -->, [ReadModel](./paramodel.readmodel.md)<!-- -->, [ViewSnapshotFunc](./paramodel.viewsnapshotfunc.md)
 

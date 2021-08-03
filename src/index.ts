@@ -13,7 +13,6 @@ export * from "./define-query";
 export * from "./define-state";
 export * from "./entity-projection";
 export * from "./entity-view";
-export * from "./model-builder";
 export * from "./model";
 export * from "./projection";
 export * from "./provider";

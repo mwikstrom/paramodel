@@ -11,8 +11,11 @@ export type Projection = {
 };
 
 export type ViewOf<H extends Projection> =
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     H extends StateProjection<infer T, any, any, any> ? StateView<T> :
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     H extends QueryHandler<infer P, infer T, any, any> ? QueryView<P, T> :
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     H extends EntityProjection<infer T, any, any, any> ? EntityView<T> :
     View;
 
