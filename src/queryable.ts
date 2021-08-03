@@ -23,13 +23,14 @@ export interface Filterable<T> {
         property: P,
         operator: O,
         operand: FilterOperand<T[P], O>,
-    ): Filtered<T>;
+    ): Filtered<this>;
 }
 
 export type Filtered<T> =
     T extends Queryable<T> ? Queryable<T> :
     T extends SortedQueryable<T> ? SortedQueryable<T> :
-    Filterable<T>;
+    T extends Filterable<T> ? Filterable<T> :
+    never;
 
 /**
  * @public
