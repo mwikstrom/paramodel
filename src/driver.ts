@@ -40,26 +40,22 @@ export interface DomainDriver {
 }
 
 export interface QuerySpec {
-    where: FilterSpec[];
-    continuation?: string;
-    by?: SortSpec;
-    size?: number;
-}
-
-export interface SortSpec {
-    property: string;
-    direction: SortDirection;
+    readonly where: readonly FilterSpec[];
+    readonly direction: SortDirection;
+    readonly continuation?: string;
+    readonly by?: string;
+    readonly size?: number;
 }
 
 export interface FilterSpec {
-    property: string;
-    operator: FilterOperator<JsonValue>;
-    operand: JsonValue;
+    readonly property: string;
+    readonly operator: FilterOperator<JsonValue>;
+    readonly operand: JsonValue;
 }
 
 export interface DataRecord {
-    value: JsonValue;
-    token: string;
+    readonly value: JsonValue;
+    readonly token: string;
 }
 
 export function createMemoryDriver(): DomainDriver {

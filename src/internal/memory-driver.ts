@@ -4,8 +4,8 @@ import { Page } from "../queryable";
 
 /** @internal */
 export class _MemoryDriver implements DomainDriver {
-    #data = new Map<string, Map<string, Map<string, DataRecord>>>();
-    #get = (store: string, partition: string): Map<string, DataRecord> => {
+    readonly #data = new Map<string, Map<string, Map<string, DataRecord>>>();
+    readonly #get = (store: string, partition: string): Map<string, DataRecord> => {
         let partitions = this.#data.get(store);
         if (!partitions) {
             this.#data.set(store, partitions = new Map());

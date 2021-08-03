@@ -9,10 +9,10 @@ import { DomainStore, DomainStoreStatus, ViewOptions } from "../store";
 
 /** @internal */
 export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model> {
-    #driver: DomainDriver;
-    #id: string;
-    #model: Model;
-    #scope: TypeOf<Model["scope"]>;
+    readonly #driver: DomainDriver;
+    readonly #id: string;
+    readonly #model: Model;
+    readonly #scope: TypeOf<Model["scope"]>;
 
     constructor(driver: DomainDriver, id: string, model: Model, scope: TypeOf<Model["scope"]>) {
         this.#driver = driver;

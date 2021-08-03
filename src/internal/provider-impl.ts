@@ -7,8 +7,8 @@ import { _StoreImpl } from "./store-impl";
 
 /** @internal */
 export class _ProviderImpl implements DomainProvider {
-    #driver: DomainDriver;
-    #init = new Map<string, Promise<void> | typeof INIT_DONE>();
+    readonly #driver: DomainDriver;
+    readonly #init = new Map<string, Promise<void> | typeof INIT_DONE>();
 
     constructor(driver: DomainDriver) {
         this.#driver = driver;

@@ -2,7 +2,8 @@
  * @public
  */
 export interface Queryable<T> extends SortedQueryable<T> {
-    by<P extends keyof SortableProps<T>>(
+    by<P extends string & keyof SortableProps<T>>(
+        this: void,
         property: P, 
         direction?: SortDirection,
     ): SortedQueryable<T>;
@@ -13,37 +14,30 @@ export type SortDirection = "ascending" | "descending";
 /**
  * @public
  */
-export interface SortedQueryable<T> extends Filterable<T>, AsyncIterable<T> {
-    any(): Promise<boolean>;
-    count(): Promise<number>;
-    first(): Promise<T | undefined>;
-    last(): Promise<T | undefined>;
-    page(options?: PageOptions): Promise<Page<T>>;
-}
-
-export interface Filterable<T> {
+export interface SortedQueryable<T> {
+    all(this: void): AsyncIterable<T>;
+    any(this: void): Promise<boolean>;
+    count(this: void): Promise<number>;
+    first(this: void): Promise<T | undefined>;
+    last(this: void): Promise<T | undefined>;
+    page(this: void, options?: PageOptions): Promise<Page<T>>;
+    reverse(this: void): SortedQueryable<T>;
     where<
         P extends string & keyof T,
         O extends FilterOperator<T[P]>,
     >(
+        this: void,
         property: P,
         operator: O,
         operand: FilterOperand<T[P], O>,
-    ): Filtered<this>;
+    ): SortedQueryable<T>;
 }
-
-export type Filtered<T> =
-    T extends Queryable<T> ? Queryable<T> :
-    T extends SortedQueryable<T> ? SortedQueryable<T> :
-    T extends Filterable<T> ? Filterable<T> :
-    never;
 
 /**
  * @public
  */
 export interface PageOptions {
     size?: number;
-    fill?: boolean;
     continuation?: string;
 }
 
@@ -53,7 +47,6 @@ export interface PageOptions {
 export interface Page<T> {
     readonly items: readonly T[];
     readonly continuation?: string;
-    readonly final?: boolean;
 }
 
 /**
