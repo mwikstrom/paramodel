@@ -22,13 +22,17 @@ export interface DomainStore<Model extends DomainModel> {
 
 export interface DomainStoreStatus<K extends string> {
     readonly version: number;
+    readonly position: number;
+    readonly timestamp: Date;
     readonly views: Readonly<Record<K, ViewStatus>>;
 }
 
 export interface ViewStatus {
-    readonly sync: number;
+    readonly version: number;
+    readonly position: number;
+    readonly timestamp: Date;
 }
 
 export interface ViewOptions {
-    readonly sync: number;
+    readonly version: number;
 }

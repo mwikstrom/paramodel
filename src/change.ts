@@ -7,7 +7,7 @@ export type ChangeType<Model extends ChangeModel> = {
 
 export interface Change<T = unknown, K extends string = string> {
     readonly version: number;
-    readonly offset: number;
+    readonly position: number;
     readonly timestamp: Date;
     readonly key: K;
     readonly arg: T;
