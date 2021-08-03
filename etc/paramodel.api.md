@@ -211,11 +211,11 @@ export type Equatable = null | boolean | Comparable;
 // @public (undocumented)
 export interface Filterable<T> {
     // (undocumented)
-    where<P extends string & keyof T, O extends FilterOperator<T[P]>>(property: P, operator: O, operand: FilterOperand<T[P], O>): Filtered<T>;
+    where<P extends string & keyof T, O extends FilterOperator<T[P]>>(property: P, operator: O, operand: FilterOperand<T[P], O>): Filtered<this>;
 }
 
 // @public (undocumented)
-export type Filtered<T> = T extends Queryable<T> ? Queryable<T> : T extends SortedQueryable<T> ? SortedQueryable<T> : Filterable<T>;
+export type Filtered<T> = T extends Queryable<T> ? Queryable<T> : T extends SortedQueryable<T> ? SortedQueryable<T> : T extends Filterable<T> ? Filterable<T> : never;
 
 // @public (undocumented)
 export type FilterOperand<T, O> = (O extends IsOperator ? IsOperand<T> : O extends EqualityOperator ? T : O extends ComparisonOperator ? T : O extends ArrayAnyOperator ? T : O extends ArrayOperator ? T extends unknown[infer E] ? E : never : O extends StringOperator ? string : never);

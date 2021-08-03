@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-where<P extends string & keyof T, O extends FilterOperator<T[P]>>(property: P, operator: O, operand: FilterOperand<T[P], O>): Filtered<T>;
+where<P extends string & keyof T, O extends FilterOperator<T[P]>>(property: P, operator: O, operand: FilterOperand<T[P], O>): Filtered<this>;
 ```
 
 ## Parameters
@@ -20,5 +20,5 @@ where<P extends string & keyof T, O extends FilterOperator<T[P]>>(property: P, o
 
 <b>Returns:</b>
 
-[Filtered](./paramodel.filtered.md)<!-- -->&lt;T&gt;
+[Filtered](./paramodel.filtered.md)<!-- -->&lt;this&gt;
 

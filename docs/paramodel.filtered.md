@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type Filtered<T> = T extends Queryable<T> ? Queryable<T> : T extends SortedQueryable<T> ? SortedQueryable<T> : Filterable<T>;
+export declare type Filtered<T> = T extends Queryable<T> ? Queryable<T> : T extends SortedQueryable<T> ? SortedQueryable<T> : T extends Filterable<T> ? Filterable<T> : never;
 ```
 <b>References:</b> [Queryable](./paramodel.queryable.md)<!-- -->, [SortedQueryable](./paramodel.sortedqueryable.md)<!-- -->, [Filterable](./paramodel.filterable.md)
 
