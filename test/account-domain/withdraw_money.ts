@@ -20,7 +20,7 @@ const exec: AccountAction<"accounts", WithdrawMoney> = async ({
     emit,
     view,
 }) => {
-    const found = await (await view("accounts")).get(account_id);
+    const found = await (await view("accounts")).get({ account_id });
     if (!found || found.owner_id !== user_id) {
         forbidden();
     }
