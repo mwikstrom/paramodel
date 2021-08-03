@@ -31,6 +31,8 @@ export interface ViewStatus {
     readonly version: number;
     readonly position: number;
     readonly timestamp: Date;
+    readonly clean: boolean;
+    readonly failed: boolean;
 }
 
 export interface ViewOptions {

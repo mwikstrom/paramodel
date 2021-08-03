@@ -1,39 +1,40 @@
 import { JsonValue } from "paratype";
+import { _MemoryDriver } from "./internal/memory-driver";
 import { FilterOperator, Page, SortDirection } from "./queryable";
 
 export interface DomainDriver {
     init(
-        this: this,
+        this: void,
         store: string,
     ): Promise<void>;
 
     count(
-        this: this, 
+        this: void, 
         store: string, 
         partition: string, 
         where?: FilterSpec[],
     ): Promise<number>;
 
     page(
-        this: this,
+        this: void,
         store: string,
         partition: string,
         query?: QuerySpec,
-    ): Page<DataRecord>;
+    ): Promise<Page<DataRecord>>;
 
     read(
-        this: this,
+        this: void,
         store: string,
         partition: string, 
         key: string,
     ): Promise<DataRecord | undefined>;
 
     write(
-        this: this,
+        this: void,
         store: string,
         partition: string,
         key: string,
-        value: JsonValue,
+        value: JsonValue | undefined,
         token: string | null,
     ): Promise<string | undefined>;
 }
@@ -59,4 +60,8 @@ export interface FilterSpec {
 export interface DataRecord {
     value: JsonValue;
     token: string;
+}
+
+export function createMemoryDriver(): DomainDriver {
+    return new _MemoryDriver();
 }
