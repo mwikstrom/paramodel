@@ -14,7 +14,6 @@ export * from "./define-state";
 export * from "./driver";
 export * from "./entity-projection";
 export * from "./entity-view";
-export * from "./make-provider";
 export * from "./model";
 export * from "./projection";
 export * from "./provider";

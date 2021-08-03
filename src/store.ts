@@ -6,15 +6,17 @@ import { ViewOf } from "./projection";
 import { SortedQueryable } from "./queryable";
 
 export interface DomainStore<Model extends DomainModel> {
-    readonly changes: SortedQueryable<ChangeType<Model["events"]>>;
     do<K extends string & keyof Model["actions"]>(
+        this: void,
         key: K,
         input: TypeOf<Model["actions"][K]["input"]>,
         options?: ActionOptions,
     ): Promise<ActionResultType<Model, K>>;
-    stat(): Promise<DomainStoreStatus<string & keyof Model["views"]>>;
-    sync(): Promise<DomainStoreStatus<string & keyof Model["views"]>>;
+    read(this: void): SortedQueryable<ChangeType<Model["events"]>>;
+    stat(this: void): Promise<DomainStoreStatus<string & keyof Model["views"]>>;
+    sync(this: void): Promise<DomainStoreStatus<string & keyof Model["views"]>>;
     view<K extends string & keyof Model["views"]>(
+        this: void,
         key: K,
         options?: ViewOptions
     ): Promise<ViewOf<Model["views"][K]> | undefined>;
