@@ -7,14 +7,14 @@
 <b>Signature:</b>
 
 ```typescript
-del(id: number): void;
+del(key: Pick<T, K>): void;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  id | number |  |
+|  key | Pick&lt;T, K&gt; |  |
 
 <b>Returns:</b>
 

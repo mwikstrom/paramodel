@@ -16,9 +16,9 @@ export type ViewOf<H extends Projection> =
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     H extends QueryHandler<infer P, infer T, any, any> ? QueryView<P, T> :
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    H extends EntityProjection<infer T, any, any, any> ? EntityView<T> :
+    H extends EntityProjection<infer T, infer K, any, any, any> ? EntityView<T, K> :
     View;
 
-export type View = StateView | QueryView | EntityView;
+export type View = StateView | QueryView | EntityView<unknown, keyof unknown>;
 
 export type ViewSnapshotFunc<R extends ReadModel> = <K extends string & keyof R>(key: K) => Promise<ViewOf<R[K]>>;

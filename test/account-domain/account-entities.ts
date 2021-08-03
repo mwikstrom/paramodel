@@ -1,4 +1,4 @@
-import { numberType, recordType, stringType, Type } from "paratype";
+import { numberType, positiveIntegerType, recordType, stringType, Type } from "paratype";
 import { Change, defineEntity, EntityAuthFunc, EntityChangeHandlers, EntityProjectionFunc } from "../../src";
 import { AccessScope } from "./access-scope";
 import { 
@@ -11,63 +11,65 @@ import {
 } from "./change-model";
 
 type AccountProps = {
+    account_id: number;
     owner_id: string;
     balance: number;
 };
 
 const accountPropsType: Type<AccountProps> = recordType({
+    account_id: positiveIntegerType,
     owner_id: stringType,
     balance: numberType,
 });
 
-const account_registered: EntityProjectionFunc<Change<AccountRegistered>, AccountProps> = async (
+const account_registered: EntityProjectionFunc<AccountProps, "account_id", Change<AccountRegistered>> = async (
     { arg: { account_id, owner_id } },
     { get, put },
 ) => {
-    const found = await get(account_id);
+    const found = await get({ account_id });
     if (!found) {
-        put(account_id, { owner_id, balance: 0 });
+        put({ account_id, owner_id, balance: 0 });
     }
 };
 
-const account_deleted: EntityProjectionFunc<Change<AccountDeleted>, AccountProps> = async (
+const account_deleted: EntityProjectionFunc<AccountProps, "account_id", Change<AccountDeleted>> = async (
     { arg: { account_id } },
     { del },
-) => del(account_id);
+) => del({ account_id });
 
-const money_deposited: EntityProjectionFunc<Change<MoneyDeposited>, AccountProps> = async (
+const money_deposited: EntityProjectionFunc<AccountProps, "account_id", Change<MoneyDeposited>> = async (
     { arg: { account_id, amount } },
     { get, put },
 ) => {
-    const found = await get(account_id);
+    const found = await get({ account_id });
     if (found) {
-        put(account_id, { ...found, balance: found.balance + amount});
+        put({ ...found, balance: found.balance + amount});
     }
 };
 
-const money_withdrawn: EntityProjectionFunc<Change<MoneyWithdrawn>, AccountProps> = async (
+const money_withdrawn: EntityProjectionFunc<AccountProps, "account_id", Change<MoneyWithdrawn>> = async (
     { arg: { account_id, amount } },
     { get, put },
 ) => {
-    const found = await get(account_id);
+    const found = await get({ account_id });
     if (found) {
-        put(account_id, { ...found, balance: found.balance - amount});
+        put({ ...found, balance: found.balance - amount});
     }
 };
 
-const money_transferred: EntityProjectionFunc<Change<MoneyTransferred>, AccountProps> = async (
+const money_transferred: EntityProjectionFunc<AccountProps, "account_id", Change<MoneyTransferred>> = async (
     { arg: { from_account_id, to_account_id, amount } },
     { get, put },
 ) => {
-    const from = await get(from_account_id);    
-    const to = await get(to_account_id);    
+    const from = await get({ account_id: from_account_id });    
+    const to = await get({ account_id: to_account_id });    
     if (from && to) {
-        put(from_account_id, { ...from, balance: from.balance - amount});
-        put(to_account_id, { ...to, balance: to.balance + amount});
+        put({ ...from, balance: from.balance - amount});
+        put({ ...to, balance: to.balance + amount});
     }
 };
 
-const on: EntityChangeHandlers<AccountChanges, AccountProps> = {
+const on: EntityChangeHandlers<AccountChanges, AccountProps, "account_id"> = {
     account_registered,
     account_deleted,
     money_deposited,
@@ -82,6 +84,7 @@ const auth: EntityAuthFunc<AccessScope, AccountProps> = async (
 
 export const accounts = defineEntity(
     accountPropsType,
+    "account_id",
     on,
     auth,
 );

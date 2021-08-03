@@ -11,7 +11,7 @@ Run-time domain model for event-sourcing.
 |  Function | Description |
 |  --- | --- |
 |  [defineAction(input, exec, dependencies, output)](./paramodel.defineaction.md) |  |
-|  [defineEntity(type, on, auth, dependencies)](./paramodel.defineentity.md) |  |
+|  [defineEntity(type, key, on, auth, dependencies)](./paramodel.defineentity.md) |  |
 |  [defineQuery(type, params, dependencies, exec)](./paramodel.definequery.md) |  |
 |  [defineState(type, initial, on, dependencies, auth)](./paramodel.definestate.md) |  |
 
@@ -62,7 +62,6 @@ Run-time domain model for event-sourcing.
 |  [Comparable](./paramodel.comparable.md) |  |
 |  [ComparisonOperator](./paramodel.comparisonoperator.md) |  |
 |  [DomainModel](./paramodel.domainmodel.md) |  |
-|  [Entity](./paramodel.entity.md) |  |
 |  [EntityAuthFunc](./paramodel.entityauthfunc.md) |  |
 |  [EntityChangeHandlers](./paramodel.entitychangehandlers.md) |  |
 |  [EntityProjectionFunc](./paramodel.entityprojectionfunc.md) |  |

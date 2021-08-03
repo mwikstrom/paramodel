@@ -6,16 +6,18 @@ import { ViewSnapshotFunc } from "./projection";
 import { Filterable } from "./queryable";
 
 export interface EntityProjection<
-    T = unknown,
+    T,
+    K extends keyof T,
     C extends ChangeModel = ChangeModel,
     R extends ReadModel = ReadModel,
     Scope = unknown
 > {
     readonly kind: "entities";
     readonly type: Type<T>;
+    readonly key: K;
     readonly mutators: ReadonlySet<string & keyof C>;
     readonly dependencies: ReadonlySet<string & keyof R>;
-    readonly apply: EntityProjectionFunc<Change, T, R>;
+    readonly apply: EntityProjectionFunc<T, K, Change, R>;
     readonly auth: EntityAuthFunc<Scope, T, R> | undefined;
 }
 
@@ -26,16 +28,22 @@ export type EntityAuthFunc<
 > = (query: Filterable<T>, scope: Scope, view: ViewSnapshotFunc<R>) => Promise<Filterable<T> | Forbidden>;
 
 export type EntityProjectionFunc<
+    T,
+    K extends keyof T,
     C extends Change = Change,
-    T = unknown,
     R extends ReadModel = ReadModel,
-> = (change: C, state: EntityCollection<T>, view: ViewSnapshotFunc<R>) => Promise<void>;
+> = (change: C, state: EntityCollection<T, K>, view: ViewSnapshotFunc<R>) => Promise<void>;
 
-export interface EntityCollection<T> extends ReadonlyEntityCollection<T> {
-    put(id: number, props: T): void;
-    del(id: number): void;
+export interface EntityCollection<T, K extends keyof T> extends ReadonlyEntityCollection<T, K> {
+    put(props: T): void;
+    del(key: Pick<T, K>): void;
 }
 
-export type EntityChangeHandlers<C extends ChangeModel, T, R extends ReadModel = ReadModel> = Partial<{
-    [K in keyof C]: EntityProjectionFunc<Change<TypeOf<C[K]>>, T, R>;
+export type EntityChangeHandlers<
+    C extends ChangeModel, 
+    T, 
+    K extends keyof T, 
+    R extends ReadModel = ReadModel
+> = Partial<{
+    [E in keyof C]: EntityProjectionFunc<T, K, Change<TypeOf<C[E]>>, R>;
 }>;

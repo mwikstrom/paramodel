@@ -7,14 +7,14 @@
 <b>Signature:</b>
 
 ```typescript
-export interface EntityCollection<T> extends ReadonlyEntityCollection<T> 
+export interface EntityCollection<T, K extends keyof T> extends ReadonlyEntityCollection<T, K> 
 ```
-<b>Extends:</b> [ReadonlyEntityCollection](./paramodel.readonlyentitycollection.md)<!-- -->&lt;T&gt;
+<b>Extends:</b> [ReadonlyEntityCollection](./paramodel.readonlyentitycollection.md)<!-- -->&lt;T, K&gt;
 
 ## Methods
 
 |  Method | Description |
 |  --- | --- |
-|  [del(id)](./paramodel.entitycollection.del.md) |  |
-|  [put(id, props)](./paramodel.entitycollection.put.md) |  |
+|  [del(key)](./paramodel.entitycollection.del.md) |  |
+|  [put(props)](./paramodel.entitycollection.put.md) |  |
 

@@ -7,13 +7,13 @@
 <b>Signature:</b>
 
 ```typescript
-export interface ReadonlyEntityCollection<T> extends Queryable<Entity<T>> 
+export interface ReadonlyEntityCollection<T, K extends keyof T> extends Queryable<T> 
 ```
-<b>Extends:</b> [Queryable](./paramodel.queryable.md)<!-- -->&lt;[Entity](./paramodel.entity.md)<!-- -->&lt;T&gt;&gt;
+<b>Extends:</b> [Queryable](./paramodel.queryable.md)<!-- -->&lt;T&gt;
 
 ## Methods
 
 |  Method | Description |
 |  --- | --- |
-|  [get(id)](./paramodel.readonlyentitycollection.get.md) |  |
+|  [get(key)](./paramodel.readonlyentitycollection.get.md) |  |
 

@@ -1,12 +1,11 @@
 import { Queryable } from "./queryable";
 
-export interface EntityView<T = unknown> extends ReadonlyEntityCollection<T> {
-    readonly kind: "entities";    
+export interface EntityView<T, K extends keyof T> extends ReadonlyEntityCollection<T, K> {
+    readonly kind: "entities";
     readonly version: number;
 }
 
-export interface ReadonlyEntityCollection<T> extends Queryable<Entity<T>> {
-    get(id: number): Promise<Entity<T> | undefined>;
+export interface ReadonlyEntityCollection<T, K extends keyof T> extends Queryable<T> {
+    get(key: Pick<T, K>): Promise<T | undefined>;
 }
 
-export type Entity<T> = T & { id: number };

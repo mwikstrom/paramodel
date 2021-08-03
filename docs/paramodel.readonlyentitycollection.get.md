@@ -7,16 +7,16 @@
 <b>Signature:</b>
 
 ```typescript
-get(id: number): Promise<Entity<T> | undefined>;
+get(key: Pick<T, K>): Promise<T | undefined>;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  id | number |  |
+|  key | Pick&lt;T, K&gt; |  |
 
 <b>Returns:</b>
 
-Promise&lt;[Entity](./paramodel.entity.md)<!-- -->&lt;T&gt; \| undefined&gt;
+Promise&lt;T \| undefined&gt;
 

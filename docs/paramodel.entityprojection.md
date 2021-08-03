@@ -7,16 +7,17 @@
 <b>Signature:</b>
 
 ```typescript
-export interface EntityProjection<T = unknown, C extends ChangeModel = ChangeModel, R extends ReadModel = ReadModel, Scope = unknown> 
+export interface EntityProjection<T, K extends keyof T, C extends ChangeModel = ChangeModel, R extends ReadModel = ReadModel, Scope = unknown> 
 ```
 
 ## Properties
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [apply](./paramodel.entityprojection.apply.md) | [EntityProjectionFunc](./paramodel.entityprojectionfunc.md)<!-- -->&lt;[Change](./paramodel.change.md)<!-- -->, T, R&gt; |  |
+|  [apply](./paramodel.entityprojection.apply.md) | [EntityProjectionFunc](./paramodel.entityprojectionfunc.md)<!-- -->&lt;T, K, [Change](./paramodel.change.md)<!-- -->, R&gt; |  |
 |  [auth](./paramodel.entityprojection.auth.md) | [EntityAuthFunc](./paramodel.entityauthfunc.md)<!-- -->&lt;Scope, T, R&gt; \| undefined |  |
 |  [dependencies](./paramodel.entityprojection.dependencies.md) | ReadonlySet&lt;string &amp; keyof R&gt; |  |
+|  [key](./paramodel.entityprojection.key.md) | K |  |
 |  [kind](./paramodel.entityprojection.kind.md) | "entities" |  |
 |  [mutators](./paramodel.entityprojection.mutators.md) | ReadonlySet&lt;string &amp; keyof C&gt; |  |
 |  [type](./paramodel.entityprojection.type.md) | Type&lt;T&gt; |  |
