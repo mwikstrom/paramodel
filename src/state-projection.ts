@@ -1,8 +1,9 @@
-import { Type } from "paratype";
+import { Type, TypeOf } from "paratype";
 import { Change } from "./change";
 import { ChangeModel, Forbidden, ReadModel } from "./model";
 import { ViewSnapshotFunc } from "./projection";
 
+// TODO: Rename to StateDefinition
 export interface StateProjection<
     T = unknown,
     C extends ChangeModel = ChangeModel,
@@ -14,7 +15,7 @@ export interface StateProjection<
     readonly mutators: ReadonlySet<string & keyof C>;
     readonly dependencies: ReadonlySet<string & keyof R>;
     readonly initial: T;
-    readonly apply: StateApplyFunc<Change, R, T>;
+    readonly apply: StateApplyFunc<Change, T, R>;
     readonly auth: StateAuthFunc<Scope, T, R> | undefined;
 }
 
@@ -26,6 +27,10 @@ export type StateAuthFunc<
 
 export type StateApplyFunc<
     C extends Change = Change,
-    R extends ReadModel = ReadModel,
     T = unknown,
+    R extends ReadModel = ReadModel,
 > = (this: void, change: C, before: T, view: ViewSnapshotFunc<R>) => Promise<T>;
+
+export type StateChangeHandlers<C extends ChangeModel, T, R extends ReadModel = ReadModel> = Partial<{
+    [K in keyof C]: StateApplyFunc<Change<TypeOf<C[K]>>, T, R>;
+}>;

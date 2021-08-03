@@ -12,21 +12,21 @@ export function defineEntity<
     Dependencies extends (string & keyof Views)[] = [],
 >(
     type: Type<Props>,
-    dependencies: Dependencies,
     on: {
         [K in Mutators[number]]: (
-            EntityProjectionFunc<Change<TypeOf<Events[K]>, K>, Pick<Views, Dependencies[number]>, Props>
+            EntityProjectionFunc<Change<TypeOf<Events[K]>, K>, Props, Pick<Views, Dependencies[number]>>
         );
     },
     auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number]>>,
+    dependencies?: Dependencies,
 ): EntityProjection<Props, Events, Views, Scope> {
     const mutators = Object.freeze(new Set(Object.keys(on)));
     
-    function isFunc(thing: unknown): thing is EntityProjectionFunc<Change, Views, Props> {
+    function isFunc(thing: unknown): thing is EntityProjectionFunc<Change, Props, Views> {
         return typeof thing === "function";
     }
     
-    const apply: EntityProjectionFunc<Change, Views, Props> = async (change, ...rest) => {
+    const apply: EntityProjectionFunc<Change, Props, Views> = async (change, ...rest) => {
         if (change.key in on) {
             const func = on[change.key as Mutators[number]];
             if (isFunc(func)) {

@@ -1,4 +1,4 @@
-import { Type } from "paratype";
+import { Type, TypeOf } from "paratype";
 import { Change } from "./change";
 import { ReadonlyEntityCollection } from "./entity-view";
 import { ChangeModel, ReadModel, Forbidden } from "./model";
@@ -15,7 +15,7 @@ export interface EntityProjection<
     readonly type: Type<T>;
     readonly mutators: ReadonlySet<string & keyof C>;
     readonly dependencies: ReadonlySet<string & keyof R>;
-    readonly apply: EntityProjectionFunc<Change, R, T>;
+    readonly apply: EntityProjectionFunc<Change, T, R>;
     readonly auth: EntityAuthFunc<Scope, T, R> | undefined;
 }
 
@@ -27,11 +27,15 @@ export type EntityAuthFunc<
 
 export type EntityProjectionFunc<
     C extends Change = Change,
-    R extends ReadModel = ReadModel,
     T = unknown,
+    R extends ReadModel = ReadModel,
 > = (change: C, state: EntityCollection<T>, view: ViewSnapshotFunc<R>) => Promise<void>;
 
 export interface EntityCollection<T> extends ReadonlyEntityCollection<T> {
     put(id: number, props: T): void;
     del(id: number): void;
 }
+
+export type EntityChangeHandlers<C extends ChangeModel, T, R extends ReadModel = ReadModel> = Partial<{
+    [K in keyof C]: EntityProjectionFunc<Change<TypeOf<C[K]>>, T, R>;
+}>;

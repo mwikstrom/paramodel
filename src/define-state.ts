@@ -5,27 +5,27 @@ import { StateApplyFunc, StateAuthFunc, StateProjection } from "./state-projecti
 
 export function defineState<
     State,
-    Scope = unknown,
     Events extends ChangeModel = ChangeModel,
+    Scope = unknown,
     Views extends ReadModel = ReadModel,
     Mutators extends (string & keyof Events)[] = [],
     Dependencies extends (string & keyof Views)[] = [],
 >(
     type: Type<State>,
     initial: State,
-    dependencies: Dependencies,
     on: {
-        [K in Mutators[number]]: StateApplyFunc<Change<Events[K], K>, Pick<Views, Dependencies[number]>, State>;
+        [K in Mutators[number]]: StateApplyFunc<Change<Events[K], K>, State, Pick<Views, Dependencies[number]>>;
     },
+    dependencies?: Dependencies,
     auth?: StateAuthFunc<Scope, State, Pick<Views, Dependencies[number]>>,
 ): StateProjection<State, Events, Views, Scope> {
     const mutators = Object.freeze(new Set(Object.keys(on)));
     
-    function isFunc(thing: unknown): thing is StateApplyFunc<Change, Views, State> {
+    function isFunc(thing: unknown): thing is StateApplyFunc<Change, State, Views> {
         return typeof thing === "function";
     }
     
-    const apply: StateApplyFunc<Change, Views, State> = async (change, before, ...rest) => {
+    const apply: StateApplyFunc<Change, State, Views> = async (change, before, ...rest) => {
         if (change.key in on) {
             const func = on[change.key as Mutators[number]];
             if (isFunc(func)) {

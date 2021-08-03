@@ -1,4 +1,4 @@
-import { Type } from "paratype";
+import { Type, voidType } from "paratype";
 import { ActionFunc, ActionHandler } from "./action-handler";
 import { ChangeModel, ReadModel } from "./model";
 
@@ -11,9 +11,9 @@ export function defineAction<
     Dependencies extends (string & keyof Views)[] = [],
 >(
     input: Type<Input>,
-    output: Type<Output>,
-    dependencies: Dependencies,
     exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>,
+    dependencies: Dependencies = [] as any,
+    output: Type<Output> = voidType as any,
 ): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output> {
     return Object.freeze({
         input,

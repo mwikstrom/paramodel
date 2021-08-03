@@ -8,12 +8,7 @@ export type ReadModel<K extends string = string, T extends Projection = Projecti
 
 export type WriteModel<K extends string = string, T extends ActionHandler = ActionHandler> = Readonly<Record<K, T>>;
 
-export type DomainModel<
-    Scope = unknown,
-    Events extends ChangeModel = ChangeModel,
-    Views extends ReadModel = ReadModel,
-    Actions extends WriteModel = WriteModel,
-> = {
+export type DomainModel<Scope = unknown, Events = unknown, Views = unknown, Actions = unknown> = {
     readonly scope: Type<Scope>;
     readonly events: Events;
     readonly views: Views;
