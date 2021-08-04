@@ -1,4 +1,5 @@
 import { JsonValue, Predicate } from "paratype";
+import { _isOperator } from "./is-operator";
 
 /** @internal */
 export const _compileOperator = (
@@ -11,24 +12,16 @@ export const _compileOperator = (
         operator = operator.replace(INVERTED_OPERATOR_PATTERN, "");
     }
 
-    if (typeof operator !== "string" || !(operator in operatorFactories)) {
+    if (typeof operator !== "string" || !(operator in factory)) {
         return matchNone;
     }
 
-    const compiled = operatorFactories[operator](operand);
+    const compiled = factory[operator](operand);
     return inverted ? value => !compiled(value) : compiled;
 };
 
 const INVERTED_OPERATOR_PATTERN = /(^not-)|(-not)$/;
 const matchNone = () => false;
-
-const isOperator = (operand: JsonValue): Predicate<JsonValue | undefined> => {
-    if (typeof operand === "string" && operand in isOperatorsByOperand) {
-        return isOperatorsByOperand[operand];
-    } else {
-        return matchNone;
-    }
-};
 
 const inOperator = (operand: JsonValue): Predicate<JsonValue | undefined> => {
     if (Array.isArray(operand)) {
@@ -38,7 +31,20 @@ const inOperator = (operand: JsonValue): Predicate<JsonValue | undefined> => {
     }
 };
 
-const operatorFactories: Record<string, (operand: JsonValue) => Predicate<JsonValue | undefined>> = {
+const includesOperator = (operand: JsonValue): Predicate<JsonValue | undefined> => value => (
+    Array.isArray(value) &&
+    value.includes(operand)
+);
+
+const includesAnyOperator = (operand: JsonValue): Predicate<JsonValue | undefined> => {
+    if (Array.isArray(operand)) {
+        return value => Array.isArray(value) && operand.some(item => value.includes(item));
+    } else {
+        return matchNone;
+    }
+};
+
+const factory: Record<string, (operand: JsonValue) => Predicate<JsonValue | undefined>> = {
     // TODO: ==
     // TODO: !=
     // TODO: >=
@@ -46,9 +52,9 @@ const operatorFactories: Record<string, (operand: JsonValue) => Predicate<JsonVa
     // TODO: >
     // TODO: <
     in: inOperator,
-    // TODO: includes
-    // TODO: includes-any
-    is: isOperator,
+    includes: includesOperator,
+    "includes-any": includesAnyOperator,
+    is: _isOperator,
     // TODO: equals-ignore-case
     // TODO: contains
     // TODO: contains-ignore-case
@@ -57,19 +63,3 @@ const operatorFactories: Record<string, (operand: JsonValue) => Predicate<JsonVa
     // TODO: ends-with
     // TODO: ends-with-ignore-case
 };
-
-const isOperatorsByOperand: Record<string, Predicate<JsonValue | undefined>> = {
-    defined: value => value !== void(0),
-    null: value => value === null,
-    boolean: value => typeof value === "boolean",
-    number: value => typeof value === "number",
-    string: value => typeof value === "string",
-    scalar: value => isScalar(value),
-    array: value => Array.isArray(value),
-    object: value => value !== null && !Array.isArray(value) && typeof value === "object",
-};
-
-const isScalar = (value: unknown): boolean => (
-    value === null ||
-    ["boolean", "number", "string"].includes(typeof value)
-);
