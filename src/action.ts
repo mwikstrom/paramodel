@@ -3,7 +3,8 @@ import { ChangeType } from "./change";
 import { ChangeModel, DomainModel } from "./model";
 
 export interface ActionOptions {
-    dry?: boolean;
+    readonly dry: boolean;
+    readonly signal: AbortSignal;
 }
 
 export type ActionResultType<

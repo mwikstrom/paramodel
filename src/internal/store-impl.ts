@@ -4,7 +4,7 @@ import { ChangeType } from "../change";
 import { DomainDriver } from "../driver";
 import { DomainModel } from "../model";
 import { ViewOf } from "../projection";
-import { DomainStore, DomainStoreStatus, ReadOptions, ViewOptions } from "../store";
+import { DomainStore, DomainStoreStatus, ReadOptions, SyncOptions, ViewOptions } from "../store";
 
 /** @internal */
 export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model> {
@@ -23,7 +23,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     do = <K extends string & keyof Model["actions"]>(
         key: K, 
         input: TypeOf<Model["actions"][K]["input"]>, 
-        options?: ActionOptions
+        options?: Partial<ActionOptions>
     ): Promise<ActionResultType<Model, K>> => {
         throw new Error("TODO: Method not implemented.");
     }
@@ -38,14 +38,23 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         throw new Error("TODO: Method not implemented.");
     }
 
-    sync = (options: Partial<ViewOptions> = {}): Promise<number> => {
+    sync = (options: Partial<SyncOptions> = {}): Promise<number> => {
         throw new Error("TODO: Method not implemented.");
     }
 
-    view = <K extends string & keyof Model["views"]>(
+    view = async <K extends string & keyof Model["views"]>(
         key: K, 
-        options?: Partial<ViewOptions>
+        options: Partial<ViewOptions> = {}
     ): Promise<ViewOf<Model["views"][K]> | undefined> => {
+        const { sync, signal } = options;
+
+        if (typeof sync === "number") {
+            const done = await this.sync({ view: key, target: sync, signal });
+            if (done < sync) {
+                return void(0);
+            }
+        }
+
         throw new Error("TODO: Method not implemented.");
     }
 }

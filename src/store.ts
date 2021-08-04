@@ -9,7 +9,7 @@ export interface DomainStore<Model extends DomainModel> {
         this: void,
         key: K,
         input: TypeOf<Model["actions"][K]["input"]>,
-        options?: ActionOptions,
+        options?: Partial<ActionOptions>,
     ): Promise<ActionResultType<Model, K>>;
     read(
         this: void, 
