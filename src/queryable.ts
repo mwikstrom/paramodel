@@ -19,9 +19,7 @@ export interface SortedQueryable<T> {
     any(this: void): Promise<boolean>;
     count(this: void): Promise<number>;
     first(this: void): Promise<T | undefined>;
-    last(this: void): Promise<T | undefined>;
     page(this: void, options?: PageOptions): Promise<Page<T>>;
-    reverse(this: void): SortedQueryable<T>;
     where<
         P extends string & keyof T,
         O extends FilterOperator<T[P]>,

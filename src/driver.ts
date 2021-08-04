@@ -39,14 +39,18 @@ export interface DomainDriver {
 
 export interface QuerySpec {
     readonly where: readonly FilterSpec[];
-    readonly direction: SortDirection;
+    readonly by?: SortSpec;
     readonly continuation?: string;
-    readonly by?: string;
     readonly size?: number;
 }
 
+export interface SortSpec {
+    readonly path: readonly string[];
+    readonly direction: SortDirection;
+}
+
 export interface FilterSpec {
-    readonly property: string;
+    readonly path: readonly string[];
     readonly operator: FilterOperator<JsonValue>;
     readonly operand: JsonValue;
 }

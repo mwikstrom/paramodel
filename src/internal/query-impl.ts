@@ -1,4 +1,4 @@
-import { FilterSpec, QuerySpec } from "../driver";
+import { FilterSpec, QuerySpec, SortSpec } from "../driver";
 import { 
     FilterOperand, 
     FilterOperator, 
@@ -13,14 +13,19 @@ import { _QuerySource } from "./query-source";
 /** @internal */
 export class _QueryImpl<T> implements Queryable<T> {
     readonly #source: _QuerySource<T>;
+    readonly #path: readonly string[];
     readonly #where: readonly FilterSpec[];
-    readonly #reverse: boolean;
-    readonly #by?: string;
+    readonly #by?: SortSpec;
 
-    constructor(source: _QuerySource<T>, where: readonly FilterSpec[] = [], reverse = false, by?: string) {
+    constructor(
+        source: _QuerySource<T>,
+        path: readonly string[],
+        where: readonly FilterSpec[] = [],
+        by?: SortSpec,
+    ) {
         this.#source = source;
+        this.#path = path;
         this.#where = where;
-        this.#reverse = reverse;
         this.#by = by;
     }
 
@@ -50,9 +55,9 @@ export class _QueryImpl<T> implements Queryable<T> {
         direction: SortDirection = "ascending",
     ): SortedQueryable<T> => new _QueryImpl<T>(
         this.#source,
+        this.#path,
         this.#where,
-        direction === "descending",
-        property,
+        { path: [...this.#path, property ], direction }        
     );
 
     count = (): Promise<number> => this.#source.count(this.#where);
@@ -68,26 +73,16 @@ export class _QueryImpl<T> implements Queryable<T> {
         } while (continuation !== void(0));
     }
     
-    last = (): Promise<T | undefined> => this.reverse().first();
-
     page = (options: PageOptions = {}): Promise<Page<T>> => {
         const { continuation, size } = options;
         const spec: QuerySpec = {
             where: this.#where,
-            direction: this.#reverse ? "descending" : "ascending",
-            continuation,
             by: this.#by,
+            continuation,
             size,
         };
         return this.#source.page(spec);
     }
-
-    reverse = (): Queryable<T> => new _QueryImpl<T>(
-        this.#source,
-        this.#where,
-        !this.#reverse,
-        this.#by,
-    );
 
     where = <P extends string & keyof T, O extends FilterOperator<T[P]>>(
         property: P,
@@ -95,8 +90,8 @@ export class _QueryImpl<T> implements Queryable<T> {
         operand: FilterOperand<T[P], O>
     ): SortedQueryable<T> => new _QueryImpl<T>(
         this.#source,
-        [...this.#where, { property, operator, operand }],
-        this.#reverse,
+        this.#path,
+        [...this.#where, { path: [...this.#path, property], operator, operand }],
         this.#by,
     );
 }
