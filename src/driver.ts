@@ -12,7 +12,7 @@ export interface DomainDriver {
         this: void, 
         store: string, 
         partition: string, 
-        where?: FilterSpec[],
+        where?: readonly FilterSpec[],
     ): Promise<number>;
 
     page(
