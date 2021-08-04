@@ -1,6 +1,6 @@
 import { TypeOf } from "paratype";
-import { ChangeType } from "./change";
-import { ChangeModel, DomainModel } from "./model";
+import { Change, ChangeType } from "./change";
+import { DomainModel } from "./model";
 
 export interface ActionOptions {
     readonly dry: boolean;
@@ -11,14 +11,14 @@ export type ActionResultType<
     Model extends Pick<DomainModel, "actions" | "events">,
     Action extends string & keyof Model["actions"],
 > = (
-    ActionResult<Model["events"], TypeOf<Model["actions"][Action]["output"]>>
+    ActionResult<ChangeType<Model["events"]>, TypeOf<Model["actions"][Action]["output"]>>
 );
 
-export interface ActionResult<Events extends ChangeModel, Output> {
+export interface ActionResult<ChangeType = Change, Output = unknown> {
     readonly timestamp: Date;
     readonly base: number;
     readonly status: "success" | "conflict" | "forbidden";
-    readonly changes: readonly ChangeType<Events>[];
+    readonly changes: readonly ChangeType[];
     readonly committed?: number;
     readonly message?: string;
     readonly output?: Output;
