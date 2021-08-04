@@ -1,5 +1,6 @@
 import { JsonValue } from "paratype";
 import { _MemoryDriver } from "./internal/memory-driver";
+import { _defaultTimeSource } from "./internal/time-source";
 import { FilterOperator, Page, SortDirection } from "./queryable";
 
 export interface DomainDriver {
@@ -71,5 +72,5 @@ export interface OutputRecord {
 }
 
 export function createMemoryDriver(): DomainDriver {
-    return new _MemoryDriver();
+    return new _MemoryDriver(_defaultTimeSource);
 }
