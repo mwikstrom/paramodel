@@ -1,11 +1,10 @@
-import { JsonValue } from "paratype";
-import { DataRecord, DomainDriver, FilterSpec, QuerySpec } from "../driver";
+import { DomainDriver, FilterSpec, InputRecord, OutputRecord, QuerySpec } from "../driver";
 import { Page } from "../queryable";
 
 /** @internal */
 export class _MemoryDriver implements DomainDriver {
-    readonly #data = new Map<string, Map<string, Map<string, DataRecord>>>();
-    readonly #get = (store: string, partition: string): Map<string, DataRecord> => {
+    readonly #data = new Map<string, Map<string, Map<string, OutputRecord>>>();
+    readonly #get = (store: string, partition: string): Map<string, OutputRecord> => {
         let partitions = this.#data.get(store);
         if (!partitions) {
             this.#data.set(store, partitions = new Map());
@@ -25,21 +24,19 @@ export class _MemoryDriver implements DomainDriver {
         throw new Error("TODO: Method not implemented.");
     }
 
-    page = async (store: string, partition: string, query?: QuerySpec): Promise<Page<DataRecord>> => {
+    page = async (store: string, partition: string, query?: QuerySpec): Promise<Page<OutputRecord>> => {
         throw new Error("TODO: Method not implemented.");
     }
     
-    read = async (store: string, partition: string, key: string): Promise<DataRecord | undefined> => {
+    read = async (store: string, partition: string, key: string): Promise<OutputRecord | undefined> => {
         throw new Error("TODO: Method not implemented.");
     }
 
     write = async (
         store: string, 
         partition: string, 
-        key: string, 
-        value: JsonValue | undefined, 
-        token: string | null
-    ): Promise<string | undefined> => {
+        input: InputRecord,
+    ): Promise<boolean> => {
         throw new Error("TODO: Method not implemented.");
     }
 }

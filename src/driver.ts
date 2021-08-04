@@ -20,23 +20,21 @@ export interface DomainDriver {
         store: string,
         partition: string,
         query?: QuerySpec,
-    ): Promise<Page<DataRecord>>;
+    ): Promise<Page<OutputRecord>>;
 
     read(
         this: void,
         store: string,
         partition: string, 
         key: string,
-    ): Promise<DataRecord | undefined>;
+    ): Promise<OutputRecord | undefined>;
 
     write(
         this: void,
         store: string,
         partition: string,
-        key: string,
-        value: JsonValue | undefined,
-        token: string | null,
-    ): Promise<string | undefined>;
+        input: InputRecord,
+    ): Promise<boolean>;
 }
 
 export interface QuerySpec {
@@ -53,9 +51,19 @@ export interface FilterSpec {
     readonly operand: JsonValue;
 }
 
-export interface DataRecord {
+export interface InputRecord {
+    readonly key: string;
+    readonly value: JsonValue;
+    readonly replace: string | null;
+    readonly ttl: number;
+}
+
+export interface OutputRecord {
+    readonly key: string;
     readonly value: JsonValue;
     readonly token: string;
+    readonly ttl: number;
+    readonly timestamp: Date;
 }
 
 export function createMemoryDriver(): DomainDriver {
