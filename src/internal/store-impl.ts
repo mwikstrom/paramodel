@@ -47,25 +47,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         new _QueryImpl(this.#commitSource, ["value"]).by("version", "descending").first()
     )
 
-    #tryCommit = (commit: _Commit): Promise<boolean> => {
-        const key = commit.version.toString(10).padStart(16, "0");
-        const value = _commitType.toJsonValue(commit);
-
-        if (value === void(0)) {
-            throw new Error("Failed to serialize commit");
-        }
-
-        const input: InputRecord = {
-            key,
-            value,
-            replace: null,
-            ttl: -1,
-        };
-
-        return this.#driver.write(this.#id, _partitionKeys.commits, input);
-    };
-
-    #tryRunAction = async <K extends string & keyof Model["actions"]>(
+    #tryAction = async <K extends string & keyof Model["actions"]>(
         latest: _Commit | undefined,
         minBase: number,
         actionKey: K, 
@@ -159,6 +141,24 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return result;
     }
 
+    #tryCommit = (commit: _Commit): Promise<boolean> => {
+        const key = commit.version.toString(10).padStart(16, "0");
+        const value = _commitType.toJsonValue(commit);
+
+        if (value === void(0)) {
+            throw new Error("Failed to serialize commit");
+        }
+
+        const input: InputRecord = {
+            key,
+            value,
+            replace: null,
+            ttl: -1,
+        };
+
+        return this.#driver.write(this.#id, _partitionKeys.commits, input);
+    };
+
     do = async <K extends string & keyof Model["actions"]>(
         key: K, 
         input: TypeOf<Model["actions"][K]["input"]>, 
@@ -168,7 +168,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
         for (;;) {
             const latest = await this.#getLatestCommit();            
-            const result = await this.#tryRunAction(latest, minBase, key, input, options);
+            const result = await this.#tryAction(latest, minBase, key, input, options);
 
             if (result !== void(0)) {
                 return result;
