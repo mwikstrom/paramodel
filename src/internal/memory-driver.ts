@@ -1,6 +1,7 @@
 import { DomainDriver, FilterSpec, InputRecord, OutputRecord, QuerySpec } from "../driver";
 import { Page } from "../queryable";
 import { _MemoryPartition } from "./memory-partition";
+import { _compilePredicate, _compileComparer } from "./memory-query";
 import { _TimeSource } from "./time-source";
 
 /** @internal */
@@ -27,12 +28,37 @@ export class _MemoryDriver implements DomainDriver {
         // no-op
     }
 
-    count = async (store: string, partition: string, where?: FilterSpec[]): Promise<number> => {
-        throw new Error("TODO: Method not implemented.");
+    count = async (store: string, partition: string, where: FilterSpec[] = []): Promise<number> => {
+        const predicate = _compilePredicate(where);
+        return this.#items(store, partition).all().filter(predicate).length;
     }
 
-    page = async (store: string, partition: string, query?: QuerySpec): Promise<Page<OutputRecord>> => {
-        throw new Error("TODO: Method not implemented.");
+    page = async (store: string, partition: string, query: QuerySpec = {}): Promise<Page<OutputRecord>> => {
+        const { where, by, size, continuation } = query;
+        const predicate = _compilePredicate(where || []);
+        let items = this.#items(store, partition).all().filter(predicate);
+
+        if (by) {
+            items.sort(_compileComparer(by));
+        }
+
+        let skip = 0;
+
+        if (typeof continuation === "string") {
+            skip = parseInt(continuation, 10);
+
+            if (!Number.isSafeInteger(skip) || skip > items.length) {
+                throw new RangeError("Invalid continuation token");
+            }
+
+            items = items.slice(skip);
+        }
+
+        if (typeof size !== "number") {
+            return { items };
+        }
+
+        return { items: items.slice(0, size), continuation: (skip + size).toString(10) };
     }
     
     read = async (

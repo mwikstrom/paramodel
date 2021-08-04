@@ -39,7 +39,7 @@ export interface DomainDriver {
 }
 
 export interface QuerySpec {
-    readonly where: readonly FilterSpec[];
+    readonly where?: readonly FilterSpec[];
     readonly by?: SortSpec;
     readonly continuation?: string;
     readonly size?: number;
