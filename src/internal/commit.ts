@@ -14,8 +14,9 @@ import { Change } from "../change";
 export type _Commit = {
     version: number;
     timestamp: Date;
+    position: number;
     changes: readonly string[];
-    events: readonly Omit<Change<JsonValue>, "version" | "timestamp">[];
+    events: readonly Omit<Change<JsonValue>, "version" | "timestamp" | "position">[];
 }
 
 /** @internal */

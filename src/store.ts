@@ -54,6 +54,6 @@ export interface ViewOptions {
 
 export interface SyncOptions<K extends string = string> {
     readonly target: number;
-    readonly view: K;
+    readonly views: readonly K[];
     readonly signal: AbortSignal;
 }

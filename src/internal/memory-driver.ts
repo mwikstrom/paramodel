@@ -68,6 +68,8 @@ export class _MemoryDriver implements DomainDriver {
         key: string,
     ): Promise<OutputRecord | undefined> => this.#items(store, partition).read(key);
 
+    timestamp = (): Date => new Date(this.#time.now());
+
     write = async (
         store: string, 
         partition: string, 

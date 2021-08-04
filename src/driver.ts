@@ -30,6 +30,8 @@ export interface DomainDriver {
         key: string,
     ): Promise<OutputRecord | undefined>;
 
+    timestamp(this: void): Date;
+
     write(
         this: void,
         store: string,
