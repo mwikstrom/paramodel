@@ -118,16 +118,26 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             forbidden: fail("forbidden"),
             conflict: fail("conflict"),
             output: result => {
-                if (!active || !handler.output) {
+                if (!active) {
+                    return;
+                }
+                
+                if (!handler.output) {
                     throw new Error("Output cannot be assigned");
                 }
+
                 const typeError = handler.output.error(result);
                 if (typeError !== void(0)) {
                     throw new Error(`Invalid action output: ${typeError}`);
                 }
+                
                 output = result as typeof output;
             },
             emit: (changeKey, arg) => {
+                if (!active) {
+                    return;
+                }
+
                 if (!(changeKey in this.#model.events)) {
                     throw new Error(`Cannot emit unknown event: ${changeKey}`);
                 }

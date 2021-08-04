@@ -21,4 +21,7 @@ export type ViewOf<H extends Projection> =
 
 export type View = StateView | QueryView | EntityView<unknown, keyof unknown>;
 
-export type ViewSnapshotFunc<R extends ReadModel> = <K extends string & keyof R>(key: K) => Promise<ViewOf<R[K]>>;
+export type ViewSnapshotFunc<R extends ReadModel> = <K extends string & keyof R>(
+    this: void,
+    key: K,
+) => Promise<ViewOf<R[K]>>;
