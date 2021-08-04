@@ -38,7 +38,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         throw new Error("TODO: Method not implemented.");
     }
 
-    sync = (key?: string): Promise<boolean> => {
+    sync = (options: Partial<ViewOptions> = {}): Promise<number> => {
         throw new Error("TODO: Method not implemented.");
     }
 
