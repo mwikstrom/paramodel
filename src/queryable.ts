@@ -54,7 +54,7 @@ export type FilterOperator<T> = (
     (IsOperand<T> extends never ? never : IsOperator) |
     (T extends Equatable ? EqualityOperator : never) |
     (T extends Comparable ? ComparisonOperator : never) |
-    (T extends unknown[] ? ArrayOperator : never) |
+    (T extends readonly unknown[] ? ArrayOperator : never) |
     (T extends string ? StringOperator : never)
 );
 
