@@ -57,5 +57,8 @@
   },
   "peerDependencies": {
     "paratype": "0.x"
+  },
+  "dependencies": {
+    "escape-string-regexp": "^5.0.0"
   }
 }

@@ -1,4 +1,6 @@
+import escapeRegex from "escape-string-regexp";
 import { JsonValue, Predicate } from "paratype";
+import { _compareJson } from "./compare-json";
 import { _isOperator } from "./is-operator";
 
 /** @internal */
@@ -12,18 +14,18 @@ export const _compileOperator = (
         operator = operator.replace(INVERTED_OPERATOR_PATTERN, "");
     }
 
-    if (typeof operator !== "string" || !(operator in factory)) {
+    if (typeof operator !== "string" || !(operator in factories)) {
         return matchNone;
     }
 
-    const compiled = factory[operator](operand);
-    return inverted ? value => !compiled(value) : compiled;
+    const compiled = factories[operator](operand);
+    return inverted ? invertOperator(compiled) : compiled;
 };
 
 const INVERTED_OPERATOR_PATTERN = /(^not-)|(-not)$/;
 const matchNone = () => false;
 
-const inOperator = (operand: JsonValue): Predicate<JsonValue | undefined> => {
+const _in: OpFactory = operand => {
     if (Array.isArray(operand)) {
         return value => value !== void(0) && operand.includes(value);
     } else {
@@ -31,12 +33,12 @@ const inOperator = (operand: JsonValue): Predicate<JsonValue | undefined> => {
     }
 };
 
-const includesOperator = (operand: JsonValue): Predicate<JsonValue | undefined> => value => (
+const includes: OpFactory = operand => value => (
     Array.isArray(value) &&
     value.includes(operand)
 );
 
-const includesAnyOperator = (operand: JsonValue): Predicate<JsonValue | undefined> => {
+const includesAny: OpFactory = operand => {
     if (Array.isArray(operand)) {
         return value => Array.isArray(value) && operand.some(item => value.includes(item));
     } else {
@@ -44,22 +46,51 @@ const includesAnyOperator = (operand: JsonValue): Predicate<JsonValue | undefine
     }
 };
 
-const factory: Record<string, (operand: JsonValue) => Predicate<JsonValue | undefined>> = {
-    // TODO: ==
-    // TODO: !=
-    // TODO: >=
-    // TODO: <=
-    // TODO: >
-    // TODO: <
-    in: inOperator,
-    includes: includesOperator,
-    "includes-any": includesAnyOperator,
-    is: _isOperator,
-    // TODO: equals-ignore-case
-    // TODO: contains
-    // TODO: contains-ignore-case
-    // TODO: starts-with
-    // TODO: starts-with-ignore-case
-    // TODO: ends-with
-    // TODO: ends-with-ignore-case
+const eq: OpFactory = operand => value => value === operand;
+const gt: OpFactory = operand => value => _compareJson(value, operand) > 0;
+const lt: OpFactory = operand => value => _compareJson(value, operand) < 0;
+
+const regexOperator = (pattern: RegExp): Predicate<JsonValue | undefined> => value => (
+    typeof value === "string" && 
+    pattern.test(value)
+);
+
+const regexOperatorFactory = (format: (operand: string) => string, flags?: string): OpFactory => operand => (
+    typeof operand === "string" ? regexOperator(new RegExp(format(escapeRegex(operand)), flags)) : matchNone
+);
+
+const equalsIgnoreCase: OpFactory = regexOperatorFactory(operand => `^${operand}$`, "i");
+const contains: OpFactory = regexOperatorFactory(operand => operand);
+const containsIgnoreCase: OpFactory = regexOperatorFactory(operand => operand, "i");
+const startsWith: OpFactory = regexOperatorFactory(operand => `^${operand}`);
+const startsWithIgnoreCase: OpFactory = regexOperatorFactory(operand => `^${operand}`, "i");
+const endsWith: OpFactory = regexOperatorFactory(operand => `${operand}$`);
+const endsWithIgnoreCase: OpFactory = regexOperatorFactory(operand => `${operand}$`, "i");
+
+const invertOperator = (
+    inner: Predicate<JsonValue | undefined>
+): Predicate<JsonValue | undefined> => value => !inner(value);
+
+const invertFactory = (inner: OpFactory): OpFactory => operand => invertOperator(inner(operand));
+
+type OpFactory = (operand: JsonValue) => Predicate<JsonValue | undefined>;
+
+const factories: Record<string, OpFactory> = {
+    "==": eq,
+    "!=": invertFactory(eq),
+    ">=": invertFactory(lt),
+    "<=": invertFactory(gt),
+    ">": gt,
+    "<": lt,
+    "in": _in,
+    "includes": includes,
+    "includes-any": includesAny,
+    "is": _isOperator,
+    "equals-ignore-case": equalsIgnoreCase,
+    "contains": contains,
+    "contains-ignore-case": containsIgnoreCase,
+    "starts-with": startsWith,
+    "starts-with-ignore-case": startsWithIgnoreCase,
+    "ends-with": endsWith,
+    "ends-with-ignore-case": endsWithIgnoreCase,
 };
