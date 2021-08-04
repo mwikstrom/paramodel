@@ -1,11 +1,11 @@
 import { JsonValue, TypeOf } from "paratype";
-import { ActionOptions, ActionResult, ActionResultType } from "../action";
-import { ActionContext } from "../action-context";
+import { ActionOptions, ActionResultType } from "../action";
 import { Change, ChangeType } from "../change";
 import { DomainDriver } from "../driver";
 import { DomainModel } from "../model";
 import { ViewOf } from "../projection";
 import { DomainStore, DomainStoreStatus, ReadOptions, SyncOptions, ViewOptions } from "../store";
+import { _ActionContextImpl } from "./action-context-impl";
 import { _Commit, _commitType } from "./commit";
 import { _QueryImpl } from "./query-impl";
 import { _DriverQuerySource, _QuerySource } from "./query-source";
@@ -60,31 +60,26 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         const { dry = false, signal } = options;
         const base = latest?.version || 0;
         const timestamp = this.#driver.timestamp();
-        const emittedEvents: Omit<Change<JsonValue>, "version" | "timestamp" | "position">[] = [];
-        const emittedChanges = new Set<string>();
-        let message: ActionResult["message"];
-        let status: ActionResult["status"] | undefined;
-        let output: ActionResultType<Model, K>["output"];
                 
         if (base < minBase) {
-            status = "aborted";
-            message = "Optimistic concurrency inconsistency";
-            return { timestamp, base, status, message, output };
+            const status = "aborted";
+            const message = "Optimistic concurrency inconsistency";
+            return { timestamp, base, status, message };
         }
 
         if (!(actionKey in this.#model.actions)) {
-            status = "rejected";
-            message = `Unknown action: ${actionKey}`;
-            return { timestamp, base, status, message, output };
+            const status = "rejected";
+            const message = `Unknown action: ${actionKey}`;
+            return { timestamp, base, status, message };
         }
         
         const handler = this.#model.actions[actionKey];
         const inputError = handler.input.error(input);
         
         if (inputError !== void(0)) {
-            status = "rejected";
-            message = `Invalid action input: ${inputError}`;
-            return { timestamp, base, status, message, output };
+            const status = "rejected";
+            const message = `Invalid action input: ${inputError}`;
+            return { timestamp, base, status, message };
         }
 
         if (handler.dependencies.size > 0) {
@@ -100,116 +95,53 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
 
         const version = base + 1;
-        let active = true;
-        
-        const fail = (kind: typeof status) => (msg: string) => {
-            if (active) {
-                status = kind;
-                message = msg;
-            }
-            throw new Error(msg || kind);
-        };
-
-        const context: ActionContext = {
+        const fromContext = await new _ActionContextImpl(
             version,
             timestamp,
             input,
-            scope: this.#scope,
-            forbidden: fail("forbidden"),
-            conflict: fail("conflict"),
-            output: result => {
-                if (!active) {
-                    return;
-                }
-                
-                if (!handler.output) {
-                    throw new Error("Output cannot be assigned");
-                }
+            this.#scope,
+            this.#model.events,
+            handler,
+        )._run();
 
-                const typeError = handler.output.error(result);
-                if (typeError !== void(0)) {
-                    throw new Error(`Invalid action output: ${typeError}`);
-                }
-                
-                output = result as typeof output;
-            },
-            emit: (changeKey, arg) => {
-                if (!active) {
-                    return;
-                }
-
-                if (!(changeKey in this.#model.events)) {
-                    throw new Error(`Cannot emit unknown event: ${changeKey}`);
-                }
-
-                const eventType = this.#model.events[changeKey];
-                const typeError = eventType.error(arg);
-                if (typeError !== void(0)) {
-                    throw new Error(`Invalid argument for event '${changeKey}': ${typeError}`);
-                }
-
-                const jsonArg = eventType.toJsonValue(arg);
-                if (jsonArg == void(0)) {
-                    throw new Error(`Argument for event '${changeKey}' could not be converted to json`);
-                }
-
-                emittedChanges.add(changeKey);
-                emittedEvents.push({
-                    key: changeKey,
-                    arg: jsonArg,
-                });
-            },
-            view: viewKey => {
-                if (!handler.dependencies.has(viewKey)) {
-                    throw new Error(
-                        `Cannot access view '${viewKey}' because it is ` + 
-                        `not a dependency of action '${actionKey}'`
-                    );
-                }
-
-                throw new Error("TODO: GET VIEW SNAPSHOT");
-            }
-        };
-
-        try {
-            await handler.exec(context);
-            status = "success"; 
-            active = false;
-        } catch (e) {
-            if (status === void(0) || status === "success") {
-                status = "failed";
-                message = e instanceof Error ? e.message : void(0);
-            }
-        }
-
-        if (status !== "success") {
-            return { timestamp, base, status, message, output };
+        if (fromContext.status !== "success") {
+            const { status, message } = fromContext;
+            return { timestamp, base, status, message };
         }
 
         if (signal?.aborted) {
-            status = "aborted";
-            message = "Signal aborted";
-            return { timestamp, base, status, message, output };
-        }
-        
-        if (dry) {
-            return { timestamp, base, status, message, output, changes: emittedEvents.length };
+            const status = "aborted";
+            const message = "Signal aborted";
+            return { timestamp, base, status, message };
         }
 
-        const position = latest ? latest.position + latest.events.length : 1;
-        const commit: _Commit = {
-            version,
-            position,
+        if (!dry) {
+            const position = latest ? latest.position + latest.events.length : 1;
+            const { changes, events } = fromContext;
+            const commit: _Commit = {
+                version,
+                position,
+                timestamp,
+                changes,
+                events,
+            };
+
+            if (!await this.#tryCommit(commit)) {
+                return void(0);
+            }
+        }
+
+        const result: ActionResultType<Model, K> = {
             timestamp,
-            changes: Array.from(emittedChanges),
-            events: emittedEvents,
+            base,
+            status: fromContext.status,
+            message: fromContext.message,
+            output: fromContext.output as TypeOf<Model["actions"][K]["output"]>,
+            committed: dry ? void(0) : version,
+            changes: fromContext.events.length,
         };
-
-        if (!await this.#tryCommit(commit)) {
-            return void(0);
-        }
-
-        return { timestamp, base, status, message, output, committed: version, changes: emittedEvents.length };
+        
+        return result;
     }
 
     do = async <K extends string & keyof Model["actions"]>(
