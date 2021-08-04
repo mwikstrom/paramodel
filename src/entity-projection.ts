@@ -3,7 +3,7 @@ import { Change } from "./change";
 import { ReadonlyEntityCollection } from "./entity-view";
 import { ChangeModel, ReadModel, Forbidden } from "./model";
 import { ViewSnapshotFunc } from "./projection";
-import { Filterable } from "./queryable";
+import { Queryable } from "./queryable";
 
 export interface EntityProjection<
     T,
@@ -25,7 +25,7 @@ export type EntityAuthFunc<
     Scope,
     T,
     R extends ReadModel = ReadModel
-> = (query: Filterable<T>, scope: Scope, view: ViewSnapshotFunc<R>) => Promise<Filterable<T> | Forbidden>;
+> = (query: Queryable<T>, scope: Scope, view: ViewSnapshotFunc<R>) => Promise<Queryable<T> | Forbidden>;
 
 export type EntityProjectionFunc<
     T,

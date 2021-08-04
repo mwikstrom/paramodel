@@ -4,8 +4,7 @@ import { ChangeType } from "../change";
 import { DomainDriver } from "../driver";
 import { DomainModel } from "../model";
 import { ViewOf } from "../projection";
-import { SortedQueryable } from "../queryable";
-import { DomainStore, DomainStoreStatus, ViewOptions } from "../store";
+import { DomainStore, DomainStoreStatus, ReadOptions, ViewOptions } from "../store";
 
 /** @internal */
 export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model> {
@@ -29,7 +28,9 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         throw new Error("TODO: Method not implemented.");
     }
 
-    read = (): SortedQueryable<ChangeType<Model["events"]>> => {
+    read = (
+        options?: Partial<ReadOptions<string & keyof Model["events"]>>
+    ): AsyncIterable<ChangeType<Model["events"]>> => {
         throw new Error("TODO: Method not implemented.");
     }
 
@@ -43,7 +44,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
     view = <K extends string & keyof Model["views"]>(
         key: K, 
-        options?: ViewOptions
+        options?: Partial<ViewOptions>
     ): Promise<ViewOf<Model["views"][K]> | undefined> => {
         throw new Error("TODO: Method not implemented.");
     }

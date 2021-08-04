@@ -3,7 +3,6 @@ import { ActionOptions, ActionResultType } from "./action";
 import { ChangeType } from "./change";
 import { DomainModel } from "./model";
 import { ViewOf } from "./projection";
-import { SortedQueryable } from "./queryable";
 
 export interface DomainStore<Model extends DomainModel> {
     do<K extends string & keyof Model["actions"]>(
@@ -12,14 +11,23 @@ export interface DomainStore<Model extends DomainModel> {
         input: TypeOf<Model["actions"][K]["input"]>,
         options?: ActionOptions,
     ): Promise<ActionResultType<Model, K>>;
-    read(this: void): SortedQueryable<ChangeType<Model["events"]>>;
+    read(
+        this: void, 
+        options?: Partial<ReadOptions<string & keyof Model["events"]>>,
+    ): AsyncIterable<ChangeType<Model["events"]>>;
     stat(this: void): Promise<DomainStoreStatus<string & keyof Model["views"]>>;
     sync(this: void): Promise<DomainStoreStatus<string & keyof Model["views"]>>;
     view<K extends string & keyof Model["views"]>(
         this: void,
         key: K,
-        options?: ViewOptions
+        options?: Partial<ViewOptions>,
     ): Promise<ViewOf<Model["views"][K]> | undefined>;
+}
+
+export interface ReadOptions<K extends string> {
+    readonly start: number;
+    readonly end: number;
+    readonly changes: readonly K[];
 }
 
 export interface DomainStoreStatus<K extends string> {
