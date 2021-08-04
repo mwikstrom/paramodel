@@ -260,7 +260,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 let { position } = commit;
 
                 if (version < minVersion || position < minPosition) {
-                    throw new Error("Detected inconsistent commit history sequence");
+                    throw new Error("Detected inconsistent commit history");
                 }
 
                 for (const entry of commit.events) {
