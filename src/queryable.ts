@@ -1,22 +1,14 @@
 /**
  * @public
  */
-export interface Queryable<T> extends SortedQueryable<T> {
+export interface Queryable<T> {
+    all(this: void): AsyncIterable<T>;
+    any(this: void): Promise<boolean>;
     by<P extends string & keyof SortableProps<T>>(
         this: void,
         property: P, 
         direction?: SortDirection,
-    ): SortedQueryable<T>;
-}
-
-export type SortDirection = "ascending" | "descending";
-
-/**
- * @public
- */
-export interface SortedQueryable<T> {
-    all(this: void): AsyncIterable<T>;
-    any(this: void): Promise<boolean>;
+    ): Queryable<T>;
     count(this: void): Promise<number>;
     first(this: void): Promise<T | undefined>;
     page(this: void, options?: PageOptions): Promise<Page<T>>;
@@ -28,8 +20,10 @@ export interface SortedQueryable<T> {
         property: P,
         operator: O,
         operand: FilterOperand<T[P], O>,
-    ): SortedQueryable<T>;
+    ): Queryable<T>;
 }
+
+export type SortDirection = "ascending" | "descending";
 
 /**
  * @public

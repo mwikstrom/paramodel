@@ -6,7 +6,6 @@ import {
     PageOptions, 
     Queryable, 
     SortDirection, 
-    SortedQueryable 
 } from "../queryable";
 import { _QuerySource } from "./query-source";
 
@@ -53,7 +52,7 @@ export class _QueryImpl<T> implements Queryable<T> {
     by = <P extends string & keyof T>(
         property: P,
         direction: SortDirection = "ascending",
-    ): SortedQueryable<T> => new _QueryImpl<T>(
+    ): Queryable<T> => new _QueryImpl<T>(
         this.#source,
         this.#path,
         this.#where,
@@ -106,7 +105,7 @@ export class _QueryImpl<T> implements Queryable<T> {
         property: P,
         operator: O,
         operand: FilterOperand<T[P], O>
-    ): SortedQueryable<T> => new _QueryImpl<T>(
+    ): Queryable<T> => new _QueryImpl<T>(
         this.#source,
         this.#path,
         [...this.#where, { path: [...this.#path, property], operator, operand }],
