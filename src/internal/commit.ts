@@ -13,8 +13,8 @@ import { Change } from "../change";
 /** @internal */
 export type _Commit = {
     version: number;
-    timestamp: Date;
     position: number;
+    timestamp: Date;
     changes: readonly string[];
     events: readonly Omit<Change<JsonValue>, "version" | "timestamp" | "position">[];
 }
@@ -22,6 +22,7 @@ export type _Commit = {
 /** @internal */
 export const _commitType: Type<_Commit> = recordType({
     version: positiveIntegerType,
+    position: positiveIntegerType,
     timestamp: timestampType,
     changes: arrayType(stringType),
     events: arrayType(recordType({

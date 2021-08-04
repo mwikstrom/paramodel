@@ -46,7 +46,11 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         new _QueryImpl(this.#commitSource, ["value"]).by("version", "descending").first()
     )
 
-    #try = async <K extends string & keyof Model["actions"]>(
+    #tryCommit = async(commit: _Commit): Promise<boolean> => {
+        throw new Error("TODO");
+    }
+
+    #tryRunAction = async <K extends string & keyof Model["actions"]>(
         latest: _Commit | undefined,
         minBase: number,
         actionKey: K, 
@@ -56,7 +60,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         const { dry = false, signal } = options;
         const base = latest?.version || 0;
         const timestamp = this.#driver.timestamp();
-        const emittedEvents: _Commit["events"][] = [];
+        const emittedEvents: Omit<Change<JsonValue>, "version" | "timestamp" | "position">[] = [];
         const emittedChanges = new Set<string>();
         let message: ActionResult["message"];
         let status: ActionResult["status"] | undefined;
@@ -182,7 +186,19 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             return { timestamp, base, status, message, output, changes: emittedEvents.length };
         }
 
-        // TODO: Try commit emitted changes
+        const position = latest ? latest.position + latest.events.length : 1;
+        const commit: _Commit = {
+            version,
+            position,
+            timestamp,
+            changes: Array.from(emittedChanges),
+            events: emittedEvents,
+        };
+
+        if (!await this.#tryCommit(commit)) {
+            return void(0);
+        }
+
         return { timestamp, base, status, message, output, committed: version, changes: emittedEvents.length };
     }
 
@@ -195,7 +211,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
         for (;;) {
             const latest = await this.#getLatestCommit();            
-            const result = await this.#try(latest, minBase, key, input, options);
+            const result = await this.#tryRunAction(latest, minBase, key, input, options);
 
             if (result !== void(0)) {
                 return result;
