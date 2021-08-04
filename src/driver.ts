@@ -63,12 +63,12 @@ export interface InputRecord {
     readonly ttl: number;
 }
 
-export interface OutputRecord {
+export type OutputRecord = {
     readonly key: string;
     readonly value: JsonValue;
     readonly token: string;
     readonly ttl: number;
-    readonly timestamp: Date;
+    readonly timestamp: number;
 }
 
 export function createMemoryDriver(): DomainDriver {

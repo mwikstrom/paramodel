@@ -14,7 +14,7 @@ export class _MemoryPartition {
     #hasExpired = (record: StoredRecord): boolean => {
         const { timestamp, ttl } = record;
         const now = this.#time.now();
-        return ttl >= 0 && now >= timestamp.valueOf() + ttl * 1000;
+        return ttl >= 0 && now >= timestamp + ttl * 1000;
     }
 
     all = (): readonly OutputRecord[] => {
@@ -60,7 +60,7 @@ export class _MemoryPartition {
         }
 
         const token = (++this.#tokenCounter).toString(10);
-        const timestamp = new Date(this.#time.now());
+        const timestamp = this.#time.now();
         const stored: StoredRecord = Object.freeze({ value, token, ttl, timestamp });
         this.#records.set(key, stored);
         return true;

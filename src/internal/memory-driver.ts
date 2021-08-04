@@ -1,7 +1,8 @@
 import { DomainDriver, FilterSpec, InputRecord, OutputRecord, QuerySpec } from "../driver";
 import { Page } from "../queryable";
+import { _compileComparison } from "./compile-comparison";
+import { _compilePredicate } from "./compile-predicate";
 import { _MemoryPartition } from "./memory-partition";
-import { _compilePredicate, _compileComparer } from "./memory-query";
 import { _TimeSource } from "./time-source";
 
 /** @internal */
@@ -39,7 +40,7 @@ export class _MemoryDriver implements DomainDriver {
         let items = this.#items(store, partition).all().filter(predicate);
 
         if (by) {
-            items.sort(_compileComparer(by));
+            items.sort(_compileComparison(by));
         }
 
         let skip = 0;

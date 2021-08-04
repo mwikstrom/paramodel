@@ -129,7 +129,14 @@ export type StringOperator = (
     "starts-with" |
     "starts-with-ignore-case" |
     "ends-with" |
-    "ends-with-ignore-case"
+    "ends-with-ignore-case" |
+    "not-equals-ignore-case" |
+    "not-contains" |
+    "not-contains-ignore-case" |
+    "not-starts-with" |
+    "not-starts-with-ignore-case" |
+    "not-ends-with" |
+    "not-ends-with-ignore-case"
 );
 
 /**

@@ -67,13 +67,13 @@ export class _QueryImpl<T> implements Queryable<T> {
 
         // having a sort spec means that items that does not have the
         // property path that is being sorted by will be filtered out
-        
+
         const where: FilterSpec[] = [
             ...this.#where,
             {
                 path: this.#by.path,
                 operator: "is",
-                operand: "defined",
+                operand: "scalar",
             }
         ];
 
