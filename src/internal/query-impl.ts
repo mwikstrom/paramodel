@@ -60,7 +60,25 @@ export class _QueryImpl<T> implements Queryable<T> {
         { path: [...this.#path, property ], direction }        
     );
 
-    count = (): Promise<number> => this.#source.count(this.#where);
+    count = (): Promise<number> => {       
+        if (!this.#by) {
+            return this.#source.count(this.#where);
+        }
+
+        // having a sort spec means that items that does not have the
+        // property path that is being sorted by will be filtered out
+        
+        const where: FilterSpec[] = [
+            ...this.#where,
+            {
+                path: this.#by.path,
+                operator: "is",
+                operand: "defined",
+            }
+        ];
+
+        return this.#source.count(where);
+    }
     
     first = async (): Promise<T | undefined> => {
         let continuation: string | undefined;
