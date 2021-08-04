@@ -1,12 +1,13 @@
 import { JsonValue, TypeOf } from "paratype";
 import { ActionOptions, ActionResultType } from "../action";
 import { Change, ChangeType } from "../change";
-import { DomainDriver } from "../driver";
+import { DomainDriver, InputRecord } from "../driver";
 import { DomainModel } from "../model";
 import { ViewOf } from "../projection";
 import { DomainStore, DomainStoreStatus, ReadOptions, SyncOptions, ViewOptions } from "../store";
 import { _ActionContextImpl } from "./action-context-impl";
 import { _Commit, _commitType } from "./commit";
+import { _partitionKeys } from "./partition-keys";
 import { _QueryImpl } from "./query-impl";
 import { _DriverQuerySource, _QuerySource } from "./query-source";
 
@@ -26,7 +27,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         this.#commitSource = new _DriverQuerySource(
             this.#driver,
             this.#id,
-            "commits",
+            _partitionKeys.commits,
             record => _commitType.fromJsonValue(record.value)
         );
     }
@@ -46,9 +47,23 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         new _QueryImpl(this.#commitSource, ["value"]).by("version", "descending").first()
     )
 
-    #tryCommit = async(commit: _Commit): Promise<boolean> => {
-        throw new Error("TODO");
-    }
+    #tryCommit = (commit: _Commit): Promise<boolean> => {
+        const key = commit.version.toString(10).padStart(16, "0");
+        const value = _commitType.toJsonValue(commit);
+
+        if (value === void(0)) {
+            throw new Error("Failed to serialize commit");
+        }
+
+        const input: InputRecord = {
+            key,
+            value,
+            replace: null,
+            ttl: -1,
+        };
+
+        return this.#driver.write(this.#id, _partitionKeys.commits, input);
+    };
 
     #tryRunAction = async <K extends string & keyof Model["actions"]>(
         latest: _Commit | undefined,
