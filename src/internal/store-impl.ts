@@ -38,7 +38,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         throw new Error("TODO: Method not implemented.");
     }
 
-    sync(): Promise<DomainStoreStatus<string & keyof Model["views"]>> {
+    sync = (key?: string): Promise<boolean> => {
         throw new Error("TODO: Method not implemented.");
     }
 

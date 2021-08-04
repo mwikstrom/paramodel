@@ -16,7 +16,8 @@ export interface DomainStore<Model extends DomainModel> {
         options?: Partial<ReadOptions<string & keyof Model["events"]>>,
     ): AsyncIterable<ChangeType<Model["events"]>>;
     stat(this: void): Promise<DomainStoreStatus<string & keyof Model["views"]>>;
-    sync(this: void): Promise<DomainStoreStatus<string & keyof Model["views"]>>;
+    sync(this: void): Promise<boolean>;
+    sync<K extends string & keyof Model["views"]>(this: void, key: K): Promise<boolean>;
     view<K extends string & keyof Model["views"]>(
         this: void,
         key: K,
