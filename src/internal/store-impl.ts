@@ -5,7 +5,7 @@ import { DomainDriver, FilterSpec, InputRecord, OutputRecord } from "../driver";
 import { EntityProjection } from "../entity-projection";
 import { EntityView } from "../entity-view";
 import { DomainModel, Forbidden } from "../model";
-import { ViewOf, ViewSnapshotFunc } from "../projection";
+import { AnyProjection, View, ViewOf, ViewSnapshotFunc } from "../projection";
 import { QueryHandler } from "../query-handler";
 import { QueryView } from "../query-view";
 import { Queryable } from "../queryable";
@@ -164,12 +164,78 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return view;
     }
 
+    #createView = async (
+        viewKey: string,
+        version: number,
+        circular: readonly string[],
+        authError?: ErrorFactory,
+    ): Promise<View> => {
+        const definition = this.#model.views[viewKey];
+        
+        if (!definition) {
+            throw new Error(`Cannot access unknown view: ${viewKey}`);
+        }
+
+        const view = await this.#createViewFromDefinition(definition, viewKey, version, circular, authError);
+        if (!view) {
+            throw new Error(`Unable to create view accessor: ${viewKey}`);
+        }   
+        
+        return view;
+    }
+
+    #createViewFromDefinition = async <Definition extends AnyProjection>(
+        definition: Definition,
+        viewKey: string,
+        version: number,
+        circular: readonly string[],
+        authError?: ErrorFactory,
+    ): Promise<ViewOf<Definition> | undefined> => {
+        switch (definition.kind) {
+            case "entities":
+                return await this.#createEntityView(
+                    viewKey, 
+                    definition, 
+                    version, 
+                    circular,
+                    authError,
+                ) as ViewOf<Definition>;
+            case "state":
+                return this.#createStateView(
+                    viewKey, 
+                    definition, 
+                    version, 
+                    circular,
+                    authError,
+                ) as ViewOf<Definition>;
+            case "query":
+                return this.#createQueryView(
+                    definition,
+                    version,
+                    circular,
+                    authError,
+                ) as ViewOf<Definition>;
+            default:
+                return void(0);
+        }
+    }
+
     #createViewSnapshotFunc = (
         version: number,
         dependencies: ReadonlySet<string>,
         circular: readonly string[],
-    ): ViewSnapshotFunc<Model["views"]> => async key => {
-        throw new Error("TODO: create view snapshot func");
+    ): ViewSnapshotFunc<Model["views"]> => async (key, options = {}) => {
+        if (!dependencies.has(key)) {
+            throw new Error(`Cannot access view '${key}' because it is not a registered dependency`);
+        }
+
+        if (circular.includes(key)) {
+            throw new Error(`Detected circular view dependency: ${circular.map(item => `'${item}'`).join(" -> ")}`);
+        }
+
+        const authError = authErrorFromOptions(options);
+        const view = await this.#createView(key, version, [...circular, key], authError);
+        return view as ViewOf<Model["views"][typeof key]>;
     }
 
     #deserializeChangeArg = (
@@ -396,7 +462,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         key: K, 
         options: Partial<ViewOptions> = {}
     ): Promise<ViewOf<Model["views"][K]> | undefined> => {
-        const { sync = 0, signal, auth } = options;
+        const { sync = 0, signal } = options;
         const definition = this.#model.views[key];
         if (!definition) {
             return void(0);
@@ -416,37 +482,9 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             }
         }
 
-        const authError: ErrorFactory | undefined = (
-            typeof auth === "function" ? auth : auth === true ? defaultAuthError : void(0)
-        );
-
-        switch (definition.kind) {
-            case "entities":
-                return await this.#createEntityView(
-                    key, 
-                    definition, 
-                    version, 
-                    [key],
-                    authError,
-                ) as ViewOf<Model["views"][K]>;
-            case "state":
-                return this.#createStateView(
-                    key, 
-                    definition, 
-                    version, 
-                    [key],
-                    authError,
-                ) as ViewOf<Model["views"][K]>;
-            case "query":
-                return this.#createQueryView(
-                    definition,
-                    version,
-                    [key],
-                    authError,
-                ) as ViewOf<Model["views"][K]>;
-            default:
-                return void(0);
-        }
+        const authError = authErrorFromOptions(options);
+        const view = await this.#createViewFromDefinition(definition, key, version, [key], authError);
+        return view as ViewOf<Model["views"][K]>;
     }
 }
 
@@ -463,3 +501,14 @@ const entityEnvelopeType = <T>(valueType: Type<T>): Type<EntityEnvelope<T>> => r
 });
 
 const defaultAuthError: ErrorFactory = () => new Error("Forbidden");
+
+const authErrorFromOptions = (options: Partial<Pick<ViewOptions, "auth">>): ErrorFactory | undefined => {
+    const auth = options;
+    if (typeof auth === "function") {
+        return auth;
+    } else if (auth === true) {
+        return defaultAuthError;
+    } else {
+        return void(0);
+    }
+};
