@@ -15,10 +15,6 @@ export class _QueryViewImpl<P extends Record<string, unknown>, T> implements Que
         this.version = version;
     }
 
-    auth = (params: P): Promise<boolean> => {
-        throw new Error("TODO: Method not implemented.");
-    }
-
     query = (params: P): Promise<T> => {
         throw new Error("TODO: Method not implemented.");
     }

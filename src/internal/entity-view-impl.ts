@@ -50,8 +50,8 @@ export class _EntityViewImpl<
         this.version = version;
     }
 
-    _restrict = async (rule: (query: Queryable<T>) => Promise<Queryable<T>>): Promise<void> => {
-        this.#query = await rule(this.#query);
+    _auth = async (func: (query: Queryable<T>) => Promise<Queryable<T>>): Promise<void> => {
+        this.#query = await func(this.#query);
     }
 
     get = (key: T[K]): Promise<T | undefined> => this.#query.where(this.#keyProp, "==", key).first();

@@ -9,6 +9,7 @@ export class _StateViewImpl<T> implements StateView<T> {
     readonly #type: Type<T>
     readonly #partitionKey: string;
     readonly #rowKey: string;
+    readonly #auth: (state: T) => Promise<T>;
 
     public readonly kind = "state";
     public readonly version: number;
@@ -20,6 +21,7 @@ export class _StateViewImpl<T> implements StateView<T> {
         partitionKey: string,
         rowKey: string,
         version: number,
+        auth: (state: T) => Promise<T>,
     ) {
         this.#driver = driver;
         this.#storeId = storeId;
@@ -27,10 +29,7 @@ export class _StateViewImpl<T> implements StateView<T> {
         this.#partitionKey = partitionKey;
         this.#rowKey = rowKey;
         this.version = version;
-    }
-
-    auth = (): Promise<boolean> => {
-        throw new Error("TODO: Method not implemented.");
+        this.#auth = auth;
     }
 
     read = async (): Promise<T> => {
@@ -40,6 +39,8 @@ export class _StateViewImpl<T> implements StateView<T> {
             throw new Error(`State not found: ${this.#storeId}/${this.#partitionKey}/${this.#rowKey}`);
         }
 
-        return this.#type.fromJsonValue(data.value);
+        const mapped = this.#type.fromJsonValue(data.value);
+        const authed = await this.#auth(mapped);
+        return authed;
     }
 }
