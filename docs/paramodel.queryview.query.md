@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-query(params: P): T;
+query(params: P): Promise<T | Forbidden>;
 ```
 
 ## Parameters
@@ -18,5 +18,5 @@ query(params: P): T;
 
 <b>Returns:</b>
 
-T
+Promise&lt;T \| [Forbidden](./paramodel.forbidden.md)<!-- -->&gt;
 

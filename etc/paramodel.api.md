@@ -370,7 +370,7 @@ export interface QueryView<P = unknown, T = unknown> {
     // (undocumented)
     readonly kind: "query";
     // (undocumented)
-    query(params: P): T;
+    query(params: P): Promise<T | Forbidden>;
     // (undocumented)
     readonly version: number;
 }
