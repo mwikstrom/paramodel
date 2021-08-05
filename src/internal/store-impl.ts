@@ -1,7 +1,7 @@
 import { JsonValue, TypeOf } from "paratype";
 import { ActionOptions, ActionResultType } from "../action";
 import { Change, ChangeType } from "../change";
-import { DomainDriver, InputRecord } from "../driver";
+import { DomainDriver, InputRecord, OutputRecord } from "../driver";
 import { DomainModel } from "../model";
 import { ViewOf } from "../projection";
 import { DomainStore, DomainStoreStatus, ReadOptions, SyncOptions, ViewOptions } from "../store";
@@ -10,6 +10,7 @@ import { _Commit, _commitType } from "./commit";
 import { _partitionKeys, _rowKeys } from "./data-keys";
 import { _QueryImpl } from "./query-impl";
 import { _DriverQuerySource, _QuerySource } from "./query-source";
+import { _viewHeader, _ViewHeader } from "./view-header";
 
 /** @internal */
 export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model> {
@@ -46,6 +47,17 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     #getLatestCommit = (): Promise<_Commit | undefined> => (
         new _QueryImpl(this.#commitSource, ["value"]).by("version", "descending").first()
     )
+
+    #getViewHeaderRecord = (key: string): Promise<OutputRecord | undefined> => {
+        const partition = _partitionKeys.view(key);
+        const row = _rowKeys.viewHeader;
+        return this.#driver.read(this.#id, partition, row);
+    }
+
+    #getViewHeader = async (key: string): Promise<_ViewHeader | undefined> => {
+        const record = await this.#getViewHeaderRecord(key);
+        return record && _viewHeader.fromJsonValue(record.value);
+    }
 
     #tryAction = async <K extends string & keyof Model["actions"]>(
         latest: _Commit | undefined,
@@ -231,7 +243,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }};
     }
 
-    stat = (): Promise<DomainStoreStatus<string & keyof Model["views"]>> => {
+    stat = async (): Promise<DomainStoreStatus<string & keyof Model["views"]>> => {
         throw new Error("TODO: Method not implemented.");
     }
 
