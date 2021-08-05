@@ -1,5 +1,6 @@
 import { positiveIntegerType, recordType, Type } from "paratype";
 import { DomainDriver, FilterSpec, OutputRecord } from "../driver";
+import { EntityAuthFunc } from "../entity-projection";
 import { EntityView, PossibleKeysOf } from "../entity-view";
 import { FilterOperand, FilterOperator, Page, PageOptions, Queryable, SortDirection } from "../queryable";
 import { _QueryImpl } from "./query-impl";
@@ -12,7 +13,7 @@ export class _EntityViewImpl<
 > implements EntityView<T, K> {
     #query: Queryable<T & {[P in K]: string | number}>;
     #keyProp: K;
-    #authed: undefined | boolean;
+    #authResult: undefined | boolean;
     public readonly kind = "entities";
     public readonly version: number;    
 
@@ -52,11 +53,11 @@ export class _EntityViewImpl<
     }
 
     auth = async (): Promise<boolean> => {
-        if (this.#authed === void(0)) {
+        if (this.#authResult === void(0)) {
             throw new Error("TODO: Method not implemented.");
         }
         
-        return this.#authed;
+        return this.#authResult;
     }
 
     get = (key: T[K]): Promise<T | undefined> => this.#query.where(this.#keyProp, "==", key).first();
