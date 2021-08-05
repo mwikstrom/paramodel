@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type ViewSnapshotFunc<R extends ReadModel> = <K extends string & keyof R>(key: K) => Promise<ViewOf<R[K]>>;
+export declare type ViewSnapshotFunc<R extends ReadModel> = <K extends string & keyof R>(this: void, key: K) => Promise<ViewOf<R[K]>>;
 ```
 <b>References:</b> [ReadModel](./paramodel.readmodel.md)<!-- -->, [ViewOf](./paramodel.viewof.md)
 

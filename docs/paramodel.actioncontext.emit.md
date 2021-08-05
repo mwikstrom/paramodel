@@ -7,13 +7,14 @@
 <b>Signature:</b>
 
 ```typescript
-emit<K extends string & keyof Events>(key: K, arg: TypeOf<Events[K]>): void;
+emit<K extends string & keyof Events>(this: void, key: K, arg: TypeOf<Events[K]>): void;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
+|  this | void |  |
 |  key | K |  |
 |  arg | TypeOf&lt;Events\[K\]&gt; |  |
 

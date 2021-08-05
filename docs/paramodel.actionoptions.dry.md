@@ -7,5 +7,5 @@
 <b>Signature:</b>
 
 ```typescript
-dry?: boolean;
+readonly dry: boolean;
 ```

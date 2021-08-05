@@ -7,5 +7,5 @@
 <b>Signature:</b>
 
 ```typescript
-readonly status: "success" | "conflict" | "forbidden";
+readonly status: "success" | "conflict" | "forbidden" | "aborted" | "rejected" | "failed";
 ```

@@ -14,5 +14,6 @@ export interface ActionOptions
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [dry?](./paramodel.actionoptions.dry.md) | boolean | <i>(Optional)</i> |
+|  [dry](./paramodel.actionoptions.dry.md) | boolean |  |
+|  [signal](./paramodel.actionoptions.signal.md) | AbortSignal |  |
 

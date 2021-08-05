@@ -7,16 +7,18 @@
 <b>Signature:</b>
 
 ```typescript
-by<P extends keyof SortableProps<T>>(property: P): SortedQueryable<T>;
+by<P extends string & keyof SortableProps<T>>(this: void, property: P, direction?: SortDirection): Queryable<T>;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
+|  this | void |  |
 |  property | P |  |
+|  direction | [SortDirection](./paramodel.sortdirection.md) |  |
 
 <b>Returns:</b>
 
-[SortedQueryable](./paramodel.sortedqueryable.md)<!-- -->&lt;T&gt;
+[Queryable](./paramodel.queryable.md)<!-- -->&lt;T&gt;
 

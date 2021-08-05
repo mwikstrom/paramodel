@@ -8,7 +8,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type FilterOperator<T> = ((IsOperand<T> extends never ? never : IsOperator) | (T extends Equatable ? EqualityOperator : never) | (T extends Comparable ? ComparisonOperator : never) | (T extends unknown[] ? ArrayOperator : never) | (T extends string ? StringOperator : never));
+export declare type FilterOperator<T> = ((IsOperand<T> extends never ? never : IsOperator) | (T extends Equatable ? EqualityOperator : never) | (T extends Comparable ? ComparisonOperator : never) | (T extends readonly unknown[] ? ArrayOperator : never) | (T extends string ? StringOperator : never));
 ```
 <b>References:</b> [IsOperand](./paramodel.isoperand.md)<!-- -->, [IsOperator](./paramodel.isoperator.md)<!-- -->, [Equatable](./paramodel.equatable.md)<!-- -->, [EqualityOperator](./paramodel.equalityoperator.md)<!-- -->, [Comparable](./paramodel.comparable.md)<!-- -->, [ComparisonOperator](./paramodel.comparisonoperator.md)<!-- -->, [ArrayOperator](./paramodel.arrayoperator.md)<!-- -->, [StringOperator](./paramodel.stringoperator.md)
 

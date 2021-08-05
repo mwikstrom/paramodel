@@ -8,5 +8,5 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type StringOperator = ("equals-ignore-case" | "contains" | "contains-ignore-case" | "starts-with" | "starts-with-ignore-case" | "ends-with" | "ends-with-ignore-case");
+export declare type StringOperator = ("equals-ignore-case" | "contains" | "contains-ignore-case" | "starts-with" | "starts-with-ignore-case" | "ends-with" | "ends-with-ignore-case" | "not-equals-ignore-case" | "not-contains" | "not-contains-ignore-case" | "not-starts-with" | "not-starts-with-ignore-case" | "not-ends-with" | "not-ends-with-ignore-case");
 ```

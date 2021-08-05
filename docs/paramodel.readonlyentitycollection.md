@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface ReadonlyEntityCollection<T, K extends keyof T> extends Queryable<T> 
+export interface ReadonlyEntityCollection<T, K extends PossibleKeysOf<T>> extends Queryable<T> 
 ```
 <b>Extends:</b> [Queryable](./paramodel.queryable.md)<!-- -->&lt;T&gt;
 
@@ -15,5 +15,5 @@ export interface ReadonlyEntityCollection<T, K extends keyof T> extends Queryabl
 
 |  Method | Description |
 |  --- | --- |
-|  [get(key)](./paramodel.readonlyentitycollection.get.md) |  |
+|  [get(this, key)](./paramodel.readonlyentitycollection.get.md) |  |
 

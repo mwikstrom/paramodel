@@ -7,9 +7,9 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type EntityChangeHandlers<C extends ChangeModel, T, K extends keyof T, R extends ReadModel = ReadModel> = Partial<{
+export declare type EntityChangeHandlers<C extends ChangeModel, T, K extends PossibleKeysOf<T>, R extends ReadModel = ReadModel> = Partial<{
     [E in keyof C]: EntityProjectionFunc<T, K, Change<TypeOf<C[E]>>, R>;
 }>;
 ```
-<b>References:</b> [ChangeModel](./paramodel.changemodel.md)<!-- -->, [ReadModel](./paramodel.readmodel.md)<!-- -->, [EntityProjectionFunc](./paramodel.entityprojectionfunc.md)<!-- -->, [Change](./paramodel.change.md)
+<b>References:</b> [ChangeModel](./paramodel.changemodel.md)<!-- -->, [PossibleKeysOf](./paramodel.possiblekeysof.md)<!-- -->, [ReadModel](./paramodel.readmodel.md)<!-- -->, [EntityProjectionFunc](./paramodel.entityprojectionfunc.md)<!-- -->, [Change](./paramodel.change.md)
 

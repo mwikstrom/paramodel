@@ -23,13 +23,13 @@ const exec: AccountAction<"accounts", TransferMoney> = async ({
     view,
 }) => {
     const accounts = await view("accounts");
-    const from = await accounts.get({ account_id: from_account_id });
-    const to = await accounts.get({ account_id: to_account_id });
+    const from = await accounts.get(from_account_id);
+    const to = await accounts.get(to_account_id);
     if (!from || from.owner_id !== user_id) {
-        forbidden();
+        return forbidden();
     }
     if (!to || from.balance < amount) {
-        conflict();
+        return conflict();
     }
     if (from_account_id !== to_account_id) {
         emit("money_transferred", { from_account_id, to_account_id, amount });

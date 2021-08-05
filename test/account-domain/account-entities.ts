@@ -26,7 +26,7 @@ const account_registered: EntityProjectionFunc<AccountProps, "account_id", Chang
     { arg: { account_id, owner_id } },
     { get, put },
 ) => {
-    const found = await get({ account_id });
+    const found = await get(account_id);
     if (!found) {
         put({ account_id, owner_id, balance: 0 });
     }
@@ -35,13 +35,13 @@ const account_registered: EntityProjectionFunc<AccountProps, "account_id", Chang
 const account_deleted: EntityProjectionFunc<AccountProps, "account_id", Change<AccountDeleted>> = async (
     { arg: { account_id } },
     { del },
-) => del({ account_id });
+) => del(account_id);
 
 const money_deposited: EntityProjectionFunc<AccountProps, "account_id", Change<MoneyDeposited>> = async (
     { arg: { account_id, amount } },
     { get, put },
 ) => {
-    const found = await get({ account_id });
+    const found = await get(account_id);
     if (found) {
         put({ ...found, balance: found.balance + amount});
     }
@@ -51,7 +51,7 @@ const money_withdrawn: EntityProjectionFunc<AccountProps, "account_id", Change<M
     { arg: { account_id, amount } },
     { get, put },
 ) => {
-    const found = await get({ account_id });
+    const found = await get(account_id);
     if (found) {
         put({ ...found, balance: found.balance - amount});
     }
@@ -61,8 +61,8 @@ const money_transferred: EntityProjectionFunc<AccountProps, "account_id", Change
     { arg: { from_account_id, to_account_id, amount } },
     { get, put },
 ) => {
-    const from = await get({ account_id: from_account_id });    
-    const to = await get({ account_id: to_account_id });    
+    const from = await get(from_account_id);
+    const to = await get(to_account_id);
     if (from && to) {
         put({ ...from, balance: from.balance - amount});
         put({ ...to, balance: to.balance + amount});

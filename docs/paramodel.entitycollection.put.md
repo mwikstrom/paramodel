@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-put(props: T): void;
+put(props: T): Promise<void>;
 ```
 
 ## Parameters
@@ -18,5 +18,5 @@ put(props: T): void;
 
 <b>Returns:</b>
 
-void
+Promise&lt;void&gt;
 

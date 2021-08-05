@@ -7,16 +7,16 @@
 <b>Signature:</b>
 
 ```typescript
-del(key: Pick<T, K>): void;
+del(key: T[K]): Promise<void>;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  key | Pick&lt;T, K&gt; |  |
+|  key | T\[K\] |  |
 
 <b>Returns:</b>
 
-void
+Promise&lt;void&gt;
 

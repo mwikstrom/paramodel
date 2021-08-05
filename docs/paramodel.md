@@ -10,6 +10,8 @@ Run-time domain model for event-sourcing.
 
 |  Function | Description |
 |  --- | --- |
+|  [createDomainProvider(driver)](./paramodel.createdomainprovider.md) |  |
+|  [createMemoryDriver()](./paramodel.creatememorydriver.md) |  |
 |  [defineAction(input, exec, dependencies, output)](./paramodel.defineaction.md) |  |
 |  [defineEntity(type, key, on, auth, dependencies)](./paramodel.defineentity.md) |  |
 |  [defineQuery(type, params, dependencies, exec)](./paramodel.definequery.md) |  |
@@ -24,22 +26,27 @@ Run-time domain model for event-sourcing.
 |  [ActionOptions](./paramodel.actionoptions.md) |  |
 |  [ActionResult](./paramodel.actionresult.md) |  |
 |  [Change](./paramodel.change.md) |  |
+|  [DomainDriver](./paramodel.domaindriver.md) |  |
+|  [DomainProvider](./paramodel.domainprovider.md) |  |
 |  [DomainStore](./paramodel.domainstore.md) |  |
-|  [DomainStoreProvider](./paramodel.domainstoreprovider.md) |  |
 |  [DomainStoreStatus](./paramodel.domainstorestatus.md) |  |
 |  [EntityCollection](./paramodel.entitycollection.md) |  |
 |  [EntityProjection](./paramodel.entityprojection.md) |  |
 |  [EntityView](./paramodel.entityview.md) |  |
-|  [Filterable](./paramodel.filterable.md) |  |
+|  [FilterSpec](./paramodel.filterspec.md) |  |
+|  [InputRecord](./paramodel.inputrecord.md) |  |
 |  [Page](./paramodel.page.md) |  |
 |  [PageOptions](./paramodel.pageoptions.md) |  |
 |  [Queryable](./paramodel.queryable.md) |  |
 |  [QueryHandler](./paramodel.queryhandler.md) |  |
+|  [QuerySpec](./paramodel.queryspec.md) |  |
 |  [QueryView](./paramodel.queryview.md) |  |
 |  [ReadonlyEntityCollection](./paramodel.readonlyentitycollection.md) |  |
-|  [SortedQueryable](./paramodel.sortedqueryable.md) |  |
+|  [ReadOptions](./paramodel.readoptions.md) |  |
+|  [SortSpec](./paramodel.sortspec.md) |  |
 |  [StateProjection](./paramodel.stateprojection.md) |  |
 |  [StateView](./paramodel.stateview.md) |  |
+|  [SyncOptions](./paramodel.syncoptions.md) |  |
 |  [ViewOptions](./paramodel.viewoptions.md) |  |
 |  [ViewStatus](./paramodel.viewstatus.md) |  |
 
@@ -67,16 +74,18 @@ Run-time domain model for event-sourcing.
 |  [EntityProjectionFunc](./paramodel.entityprojectionfunc.md) |  |
 |  [EqualityOperator](./paramodel.equalityoperator.md) |  |
 |  [Equatable](./paramodel.equatable.md) |  |
-|  [Filtered](./paramodel.filtered.md) |  |
 |  [FilterOperand](./paramodel.filteroperand.md) |  |
 |  [FilterOperator](./paramodel.filteroperator.md) |  |
 |  [Forbidden](./paramodel.forbidden.md) |  |
 |  [IsOperand](./paramodel.isoperand.md) |  |
 |  [IsOperator](./paramodel.isoperator.md) |  |
+|  [OutputRecord](./paramodel.outputrecord.md) |  |
+|  [PossibleKeysOf](./paramodel.possiblekeysof.md) |  |
 |  [Projection](./paramodel.projection.md) |  |
 |  [QueryFunc](./paramodel.queryfunc.md) |  |
 |  [ReadModel](./paramodel.readmodel.md) |  |
 |  [SortableProps](./paramodel.sortableprops.md) |  |
+|  [SortDirection](./paramodel.sortdirection.md) |  |
 |  [StateApplyFunc](./paramodel.stateapplyfunc.md) |  |
 |  [StateAuthFunc](./paramodel.stateauthfunc.md) |  |
 |  [StateChangeHandlers](./paramodel.statechangehandlers.md) |  |

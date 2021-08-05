@@ -14,7 +14,7 @@
     "dist"
   ],
   "scripts": {
-    "prebuild": "rimraf temp lib && npm run lint && tsc",
+    "prebuild": "rimraf temp lib dist && npm run lint && tsc",
     "check": "tsc && npm run lint",
     "build": "rollup -c",
     "postbuild": "npm test && api-extractor run --local && api-documenter markdown --input temp --output docs",

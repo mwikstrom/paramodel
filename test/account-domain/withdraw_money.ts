@@ -20,12 +20,12 @@ const exec: AccountAction<"accounts", WithdrawMoney> = async ({
     emit,
     view,
 }) => {
-    const found = await (await view("accounts")).get({ account_id });
+    const found = await (await view("accounts")).get(account_id);
     if (!found || found.owner_id !== user_id) {
-        forbidden();
+        return forbidden();
     }
     if (found.balance < amount) {
-        conflict();
+        return conflict();
     }
     emit("money_withdrawn", { account_id, amount });
 };

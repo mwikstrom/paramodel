@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type EntityAuthFunc<Scope, T, R extends ReadModel = ReadModel> = (query: Filterable<T>, scope: Scope, view: ViewSnapshotFunc<R>) => Promise<Filterable<T> | Forbidden>;
+export declare type EntityAuthFunc<Scope, T, R extends ReadModel = ReadModel> = (query: Queryable<T>, scope: Scope, view: ViewSnapshotFunc<R>) => Promise<Queryable<T> | Forbidden>;
 ```
-<b>References:</b> [ReadModel](./paramodel.readmodel.md)<!-- -->, [Filterable](./paramodel.filterable.md)<!-- -->, [ViewSnapshotFunc](./paramodel.viewsnapshotfunc.md)<!-- -->, [Forbidden](./paramodel.forbidden.md)
+<b>References:</b> [ReadModel](./paramodel.readmodel.md)<!-- -->, [Queryable](./paramodel.queryable.md)<!-- -->, [ViewSnapshotFunc](./paramodel.viewsnapshotfunc.md)<!-- -->, [Forbidden](./paramodel.forbidden.md)
 

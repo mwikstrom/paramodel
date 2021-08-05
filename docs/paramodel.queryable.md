@@ -8,13 +8,18 @@
 <b>Signature:</b>
 
 ```typescript
-export interface Queryable<T> extends SortedQueryable<T> 
+export interface Queryable<T> 
 ```
-<b>Extends:</b> [SortedQueryable](./paramodel.sortedqueryable.md)<!-- -->&lt;T&gt;
 
 ## Methods
 
 |  Method | Description |
 |  --- | --- |
-|  [by(property)](./paramodel.queryable.by.md) |  |
+|  [all(this)](./paramodel.queryable.all.md) |  |
+|  [any(this)](./paramodel.queryable.any.md) |  |
+|  [by(this, property, direction)](./paramodel.queryable.by.md) |  |
+|  [count(this)](./paramodel.queryable.count.md) |  |
+|  [first(this)](./paramodel.queryable.first.md) |  |
+|  [page(this, options)](./paramodel.queryable.page.md) |  |
+|  [where(this, property, operator, operand)](./paramodel.queryable.where.md) |  |
 

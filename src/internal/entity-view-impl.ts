@@ -1,12 +1,13 @@
 import { positiveIntegerType, recordType, Type } from "paratype";
 import { DomainDriver, FilterSpec, OutputRecord } from "../driver";
-import { EntityView } from "../entity-view";
+import { EntityView, PossibleKeysOf } from "../entity-view";
 import { Queryable } from "../queryable";
 import { _QueryImpl } from "./query-impl";
 import { _DriverQuerySource } from "./query-source";
 
 /** @internal */
-export class _EntityViewImpl<T, K extends keyof T> extends _QueryImpl<T> implements EntityView<T, K> {
+export class _EntityViewImpl<T, K extends PossibleKeysOf<T>> extends _QueryImpl<T> implements EntityView<T, K> {
+    #keyProp: K;
     public readonly kind = "entities";
     public readonly version: number;
 
@@ -15,6 +16,7 @@ export class _EntityViewImpl<T, K extends keyof T> extends _QueryImpl<T> impleme
         storeId: string,
         type: Type<T>, 
         partitionKey: string,
+        keyProp: K,
         version: number,
     ) {
         const envelope = envelopeType(type);
@@ -39,21 +41,16 @@ export class _EntityViewImpl<T, K extends keyof T> extends _QueryImpl<T> impleme
             }
         ]);
 
-        super(source, ["value", "entity"], where);        
+        super(source, ["value", "entity"], where);
+        this.#keyProp = keyProp;
         this.version = version;
     }
 
-    get = (key: Pick<T, K>): Promise<T | undefined> => {
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        let q = this as Queryable<any>;
-
-        for (const [prop, value] of Object.entries(key)) {
-            q = q.where(prop, "==", value);
-        }
-
-        return q.first();
-    }
+    get = (key: T[K]): Promise<T | undefined> => (
+        (this as Queryable<T & {[P in K]: string | number}>)
+            .where(this.#keyProp, "==", key)
+            .first()
+    );
 }
 
 type Envelope<T> = {

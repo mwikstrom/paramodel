@@ -7,13 +7,14 @@
 <b>Signature:</b>
 
 ```typescript
-output(result: Output): void;
+output(this: void, result: Output): void;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
+|  this | void |  |
 |  result | Output |  |
 
 <b>Returns:</b>

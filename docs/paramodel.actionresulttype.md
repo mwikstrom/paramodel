@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type ActionResultType<Model extends Pick<DomainModel, "actions" | "events">, Action extends string & keyof Model["actions"]> = (ActionResult<Model["events"], TypeOf<Model["actions"][Action]["output"]>>);
+export declare type ActionResultType<Model extends Pick<DomainModel, "actions" | "events">, Action extends string & keyof Model["actions"]> = (ActionResult<TypeOf<Model["actions"][Action]["output"]>>);
 ```
 <b>References:</b> [DomainModel](./paramodel.domainmodel.md)<!-- -->, [ActionResult](./paramodel.actionresult.md)
 

@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface ActionResult<Events extends ChangeModel, Output> 
+export interface ActionResult<Output = unknown> 
 ```
 
 ## Properties
@@ -15,10 +15,10 @@ export interface ActionResult<Events extends ChangeModel, Output>
 |  Property | Type | Description |
 |  --- | --- | --- |
 |  [base](./paramodel.actionresult.base.md) | number |  |
-|  [changes](./paramodel.actionresult.changes.md) | readonly [ChangeType](./paramodel.changetype.md)<!-- -->&lt;Events&gt;\[\] |  |
+|  [changes?](./paramodel.actionresult.changes.md) | number | <i>(Optional)</i> |
 |  [committed?](./paramodel.actionresult.committed.md) | number | <i>(Optional)</i> |
 |  [message?](./paramodel.actionresult.message.md) | string | <i>(Optional)</i> |
 |  [output?](./paramodel.actionresult.output.md) | Output | <i>(Optional)</i> |
-|  [status](./paramodel.actionresult.status.md) | "success" \| "conflict" \| "forbidden" |  |
+|  [status](./paramodel.actionresult.status.md) | "success" \| "conflict" \| "forbidden" \| "aborted" \| "rejected" \| "failed" |  |
 |  [timestamp](./paramodel.actionresult.timestamp.md) | Date |  |
 

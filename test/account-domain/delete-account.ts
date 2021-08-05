@@ -20,10 +20,10 @@ const exec: AccountAction<"accounts", DeleteAccount> = async ({
 }) => {
     const found = await (await view("accounts")).get(account_id);
     if (!found || found.owner_id !== user_id) {
-        forbidden();
+        return forbidden();
     }
     if (found.balance !== 0) {
-        conflict();
+        return conflict();
     }
     emit("account_deleted", { account_id });
 };

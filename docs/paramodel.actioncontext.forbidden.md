@@ -7,13 +7,14 @@
 <b>Signature:</b>
 
 ```typescript
-forbidden(message?: string): never;
+forbidden(this: void, message?: string): never;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
+|  this | void |  |
 |  message | string |  |
 
 <b>Returns:</b>

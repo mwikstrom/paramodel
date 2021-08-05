@@ -7,8 +7,15 @@
 <b>Signature:</b>
 
 ```typescript
-read(): Promise<T>;
+read(this: void): Promise<T>;
 ```
+
+## Parameters
+
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  this | void |  |
+
 <b>Returns:</b>
 
 Promise&lt;T&gt;

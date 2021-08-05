@@ -7,15 +7,16 @@
 <b>Signature:</b>
 
 ```typescript
-view<K extends string & keyof Model["views"]>(key: K, options?: ViewOptions): Promise<ViewOf<Model["views"][K]> | undefined>;
+view<K extends string & keyof Model["views"]>(this: void, key: K, options?: Partial<ViewOptions>): Promise<ViewOf<Model["views"][K]> | undefined>;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
+|  this | void |  |
 |  key | K |  |
-|  options | [ViewOptions](./paramodel.viewoptions.md) |  |
+|  options | Partial&lt;[ViewOptions](./paramodel.viewoptions.md)<!-- -->&gt; |  |
 
 <b>Returns:</b>
 

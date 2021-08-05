@@ -1,11 +1,12 @@
 import { Type, TypeOf } from "paratype";
 import { Change } from "./change";
 import { EntityProjectionFunc, EntityProjection, EntityAuthFunc } from "./entity-projection";
+import { PossibleKeysOf } from "./entity-view";
 import { ChangeModel, ReadModel } from "./model";
 
 export function defineEntity<
     Props,
-    Key extends keyof Props,
+    Key extends PossibleKeysOf<Props>,
     Scope = unknown,
     Events extends ChangeModel = ChangeModel,
     Views extends ReadModel = ReadModel,

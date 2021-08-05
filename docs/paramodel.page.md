@@ -16,6 +16,5 @@ export interface Page<T>
 |  Property | Type | Description |
 |  --- | --- | --- |
 |  [continuation?](./paramodel.page.continuation.md) | string | <i>(Optional)</i> |
-|  [final?](./paramodel.page.final.md) | boolean | <i>(Optional)</i> |
 |  [items](./paramodel.page.items.md) | readonly T\[\] |  |
 

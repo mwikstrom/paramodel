@@ -7,5 +7,5 @@
 <b>Signature:</b>
 
 ```typescript
-readonly changes: readonly ChangeType<Events>[];
+readonly changes?: number;
 ```

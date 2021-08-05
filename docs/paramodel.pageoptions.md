@@ -16,6 +16,5 @@ export interface PageOptions
 |  Property | Type | Description |
 |  --- | --- | --- |
 |  [continuation?](./paramodel.pageoptions.continuation.md) | string | <i>(Optional)</i> |
-|  [fill?](./paramodel.pageoptions.fill.md) | boolean | <i>(Optional)</i> |
 |  [size?](./paramodel.pageoptions.size.md) | number | <i>(Optional)</i> |
 

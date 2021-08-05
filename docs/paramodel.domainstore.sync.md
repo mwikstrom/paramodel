@@ -7,9 +7,17 @@
 <b>Signature:</b>
 
 ```typescript
-sync(): Promise<DomainStoreStatus<string & keyof Model["views"]>>;
+sync<K extends string & keyof Model["views"]>(this: void, options?: SyncOptions<K>): Promise<number>;
 ```
+
+## Parameters
+
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  this | void |  |
+|  options | [SyncOptions](./paramodel.syncoptions.md)<!-- -->&lt;K&gt; |  |
+
 <b>Returns:</b>
 
-Promise&lt;[DomainStoreStatus](./paramodel.domainstorestatus.md)<!-- -->&lt;string &amp; keyof Model\["views"\]&gt;&gt;
+Promise&lt;number&gt;
 

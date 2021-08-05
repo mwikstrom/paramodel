@@ -16,7 +16,7 @@ export interface Change<T = unknown, K extends string = string>
 |  --- | --- | --- |
 |  [arg](./paramodel.change.arg.md) | T |  |
 |  [key](./paramodel.change.key.md) | K |  |
-|  [offset](./paramodel.change.offset.md) | number |  |
+|  [position](./paramodel.change.position.md) | number |  |
 |  [timestamp](./paramodel.change.timestamp.md) | Date |  |
 |  [version](./paramodel.change.version.md) | number |  |
 

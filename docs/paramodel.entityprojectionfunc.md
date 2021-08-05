@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type EntityProjectionFunc<T, K extends keyof T, C extends Change = Change, R extends ReadModel = ReadModel> = (change: C, state: EntityCollection<T, K>, view: ViewSnapshotFunc<R>) => Promise<void>;
+export declare type EntityProjectionFunc<T, K extends PossibleKeysOf<T>, C extends Change = Change, R extends ReadModel = ReadModel> = (change: C, state: EntityCollection<T, K>, view: ViewSnapshotFunc<R>) => Promise<void>;
 ```
-<b>References:</b> [Change](./paramodel.change.md)<!-- -->, [ReadModel](./paramodel.readmodel.md)<!-- -->, [EntityCollection](./paramodel.entitycollection.md)<!-- -->, [ViewSnapshotFunc](./paramodel.viewsnapshotfunc.md)
+<b>References:</b> [PossibleKeysOf](./paramodel.possiblekeysof.md)<!-- -->, [Change](./paramodel.change.md)<!-- -->, [ReadModel](./paramodel.readmodel.md)<!-- -->, [EntityCollection](./paramodel.entitycollection.md)<!-- -->, [ViewSnapshotFunc](./paramodel.viewsnapshotfunc.md)
 

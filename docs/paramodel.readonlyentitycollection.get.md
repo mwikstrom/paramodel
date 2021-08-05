@@ -7,14 +7,15 @@
 <b>Signature:</b>
 
 ```typescript
-get(key: Pick<T, K>): Promise<T | undefined>;
+get(this: void, key: T[K]): Promise<T | undefined>;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  key | Pick&lt;T, K&gt; |  |
+|  this | void |  |
+|  key | T\[K\] |  |
 
 <b>Returns:</b>
 

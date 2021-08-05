@@ -10,18 +10,13 @@
 export interface DomainStore<Model extends DomainModel> 
 ```
 
-## Properties
-
-|  Property | Type | Description |
-|  --- | --- | --- |
-|  [changes](./paramodel.domainstore.changes.md) | [SortedQueryable](./paramodel.sortedqueryable.md)<!-- -->&lt;[ChangeType](./paramodel.changetype.md)<!-- -->&lt;Model\["events"\]&gt;&gt; |  |
-
 ## Methods
 
 |  Method | Description |
 |  --- | --- |
-|  [do(key, input, options)](./paramodel.domainstore.do.md) |  |
-|  [stat()](./paramodel.domainstore.stat.md) |  |
-|  [sync()](./paramodel.domainstore.sync.md) |  |
-|  [view(key, options)](./paramodel.domainstore.view.md) |  |
+|  [do(this, key, input, options)](./paramodel.domainstore.do.md) |  |
+|  [read(this, options)](./paramodel.domainstore.read.md) |  |
+|  [stat(this)](./paramodel.domainstore.stat.md) |  |
+|  [sync(this, options)](./paramodel.domainstore.sync.md) |  |
+|  [view(this, key, options)](./paramodel.domainstore.view.md) |  |
 

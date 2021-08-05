@@ -14,5 +14,6 @@ export interface ViewOptions
 
 |  Property | Type | Description |
 |  --- | --- | --- |
+|  [signal](./paramodel.viewoptions.signal.md) | AbortSignal |  |
 |  [sync](./paramodel.viewoptions.sync.md) | number |  |
 
