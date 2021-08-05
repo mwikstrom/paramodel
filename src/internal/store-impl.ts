@@ -8,6 +8,7 @@ import { DomainModel, Forbidden } from "../model";
 import { ViewOf, ViewSnapshotFunc } from "../projection";
 import { QueryHandler } from "../query-handler";
 import { QueryView } from "../query-view";
+import { Queryable } from "../queryable";
 import { StateProjection } from "../state-projection";
 import { StateView } from "../state-view";
 import { DomainStore, DomainStoreStatus, ErrorFactory, ReadOptions, SyncOptions, ViewOptions } from "../store";
@@ -45,7 +46,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         version: number,
         authError: ErrorFactory | undefined,
     ): Promise<EntityView> => {        
-        const { kind } = definition;
+        const { kind, auth, dependencies } = definition;
         const envelope = entityEnvelopeType(definition.type);
         const transform = (record: OutputRecord): T => envelope.fromJsonValue(record.value).entity;
         const partitionKey = _partitionKeys.view(viewKey);
@@ -69,10 +70,17 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             }
         ]);
 
-        const query = new _QueryImpl(source, ["value", "entity"], where);
+        let query: Queryable<T> = new _QueryImpl(source, ["value", "entity"], where);
 
-        if (authError && definition.auth) {
-            throw new Error("TODO: Apply auth to query!");
+        if (authError && auth) {
+            const snapshot = this.#createViewSnapshotFunc(dependencies, new Set([viewKey]));
+            const authed = await auth(query, this.#scope, snapshot);
+
+            if (authed === Forbidden) {
+                throw authError();
+            }
+
+            query = authed;
         }
 
         const get: EntityView<T>["get"] = key => query.where(definition.key, "==", key).first();
@@ -102,12 +110,12 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 return state;                
             }
             
-            const result = await auth(this.#scope, state, snapshot);
-            if (result === Forbidden) {
+            const authed = await auth(this.#scope, state, snapshot);
+            if (authed === Forbidden) {
                 throw authError();
             }
             
-            return result;
+            return authed;
         };
 
         let fetched = false;
