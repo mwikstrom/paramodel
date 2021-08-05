@@ -188,7 +188,7 @@ export interface DomainStoreStatus<K extends string> {
     // (undocumented)
     readonly position: number;
     // (undocumented)
-    readonly timestamp: Date;
+    readonly timestamp?: Date;
     // (undocumented)
     readonly version: number;
     // (undocumented)
@@ -490,11 +490,13 @@ export type ViewSnapshotFunc<R extends ReadModel> = <K extends string & keyof R>
 // @public (undocumented)
 export interface ViewStatus {
     // (undocumented)
-    readonly failed: boolean;
+    readonly clean: number;
+    // (undocumented)
+    readonly error: string;
     // (undocumented)
     readonly position: number;
     // (undocumented)
-    readonly timestamp: Date;
+    readonly timestamp?: Date;
     // (undocumented)
     readonly version: number;
 }

@@ -11,7 +11,15 @@ import { QueryView } from "../query-view";
 import { Queryable } from "../queryable";
 import { StateProjection } from "../state-projection";
 import { StateView } from "../state-view";
-import { DomainStore, DomainStoreStatus, ErrorFactory, ReadOptions, SyncOptions, ViewOptions } from "../store";
+import { 
+    DomainStore, 
+    DomainStoreStatus, 
+    ErrorFactory, 
+    ReadOptions, 
+    SyncOptions, 
+    ViewOptions, 
+    ViewStatus 
+} from "../store";
 import { _ActionContextImpl } from "./action-context-impl";
 import { _Commit, _commitType } from "./commit";
 import { _partitionKeys, _rowKeys } from "./data-keys";
@@ -451,7 +459,32 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     }
 
     stat = async (): Promise<DomainStoreStatus<string & keyof Model["views"]>> => {
-        throw new Error("TODO: Method not implemented.");
+        const viewKeys = Object.keys(this.#model.views);
+        const [
+            latest,
+            headers,
+        ] = await Promise.all([
+            this.#getLatestCommit(),
+            Promise.all(viewKeys.map(key => this.#getViewHeader(key))),
+        ]);
+        const views = Object.fromEntries(viewKeys.map((key, index) => {
+            const header = headers[index];
+            const viewStatus: ViewStatus = {
+                version: header?.version || 0,
+                position: header?.position || 0,
+                timestamp: header?.timestamp,
+                clean: header?.clean || 0,
+                error: header?.error || "",
+            };
+            return [key, viewStatus];
+        })) as Readonly<Record<string & keyof Model["views"], ViewStatus>>;
+        const result: DomainStoreStatus<string & keyof Model["views"]> = {
+            version: latest?.version || 0,
+            position: latest?.position || 0,
+            timestamp: latest?.timestamp,
+            views,
+        };
+        return result;
     }
 
     sync = (options: Partial<SyncOptions> = {}): Promise<number> => {
@@ -473,7 +506,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             return void(0);
         }
 
-        let version = header?.sync || 0;
+        let version = header?.version || 0;
         if (sync > version) {
             version = await this.sync({ views: [key], target: sync, signal });
             

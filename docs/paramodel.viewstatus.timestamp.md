@@ -7,5 +7,5 @@
 <b>Signature:</b>
 
 ```typescript
-readonly timestamp: Date;
+readonly timestamp?: Date;
 ```

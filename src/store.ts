@@ -36,15 +36,16 @@ export interface ReadOptions<K extends string> {
 export interface DomainStoreStatus<K extends string> {
     readonly version: number;
     readonly position: number;
-    readonly timestamp: Date;
+    readonly timestamp?: Date;
     readonly views: Readonly<Record<K, ViewStatus>>;
 }
 
 export interface ViewStatus {
     readonly version: number;
     readonly position: number;
-    readonly timestamp: Date;
-    readonly failed: boolean;
+    readonly timestamp?: Date;
+    readonly clean: number;
+    readonly error: string;
 }
 
 export interface ViewOptions {

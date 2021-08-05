@@ -14,8 +14,9 @@ export interface ViewStatus
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [failed](./paramodel.viewstatus.failed.md) | boolean |  |
+|  [clean](./paramodel.viewstatus.clean.md) | number |  |
+|  [error](./paramodel.viewstatus.error.md) | string |  |
 |  [position](./paramodel.viewstatus.position.md) | number |  |
-|  [timestamp](./paramodel.viewstatus.timestamp.md) | Date |  |
+|  [timestamp?](./paramodel.viewstatus.timestamp.md) | Date | <i>(Optional)</i> |
 |  [version](./paramodel.viewstatus.version.md) | number |  |
 

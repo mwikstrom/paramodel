@@ -15,7 +15,7 @@ export interface DomainStoreStatus<K extends string>
 |  Property | Type | Description |
 |  --- | --- | --- |
 |  [position](./paramodel.domainstorestatus.position.md) | number |  |
-|  [timestamp](./paramodel.domainstorestatus.timestamp.md) | Date |  |
+|  [timestamp?](./paramodel.domainstorestatus.timestamp.md) | Date | <i>(Optional)</i> |
 |  [version](./paramodel.domainstorestatus.version.md) | number |  |
 |  [views](./paramodel.domainstorestatus.views.md) | Readonly&lt;Record&lt;K, [ViewStatus](./paramodel.viewstatus.md)<!-- -->&gt;&gt; |  |
 
