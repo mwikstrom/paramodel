@@ -1,7 +1,7 @@
 import { JsonValue, positiveIntegerType, recordType, Type, TypeOf } from "paratype";
 import { ActionOptions, ActionResultType } from "../action";
 import { Change, ChangeType } from "../change";
-import { DomainDriver, InputRecord, OutputRecord } from "../driver";
+import { DomainDriver, FilterSpec, InputRecord, OutputRecord } from "../driver";
 import { EntityProjection } from "../entity-projection";
 import { EntityView } from "../entity-view";
 import { DomainModel } from "../model";
@@ -39,13 +39,51 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         );
     }
 
-    #createEntityView = (
+    #createEntityView = async <T extends Record<string, unknown>>(
         viewKey: string,
-        definition: EntityProjection,
+        definition: EntityProjection<T>,
         version: number,
         authError: ErrorFactory | undefined,
-    ): EntityView => {        
-        throw new Error("TODO: IMPLEMENT");
+    ): Promise<EntityView> => {        
+        const { kind } = definition;
+        const envelope = entityEnvelopeType(definition.type);
+        const transform = (record: OutputRecord): T => envelope.fromJsonValue(record.value).entity;
+        const partitionKey = _partitionKeys.view(viewKey);
+        const source = new _DriverQuerySource(
+            this.#driver,
+            this.#id,
+            partitionKey,
+            transform,
+        );
+        
+        const where: readonly FilterSpec[] = Object.freeze([
+            {
+                path: ["value", "start"],
+                operator: "<=",
+                operand: version,
+            },
+            {
+                path: ["value", "end"],
+                operator: ">",
+                operand: version,
+            }
+        ]);
+
+        const query = new _QueryImpl(source, ["value", "entity"], where);
+
+        if (authError && definition.auth) {
+            throw new Error("TODO: Apply auth to query!");
+        }
+
+        const get: EntityView<T>["get"] = key => query.where(definition.key, "==", key).first();
+        const view: EntityView<T> = {
+            ...query,
+            get,
+            kind,
+            version,
+        };
+
+        return view;
     }
 
     #createStateView = <T>(
@@ -346,7 +384,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
         switch (definition.kind) {
             case "entities":
-                return this.#createEntityView(key, definition, version, authError) as ViewOf<Model["views"][K]>;
+                return await this.#createEntityView(key, definition, version, authError) as ViewOf<Model["views"][K]>;
             case "state":
                 return this.#createStateView(key, definition, version, authError) as ViewOf<Model["views"][K]>;
             case "query":
