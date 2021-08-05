@@ -44,6 +44,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         viewKey: string,
         definition: EntityProjection<T>,
         version: number,
+        circular: readonly string[],
         authError?: ErrorFactory,
     ): Promise<EntityView> => {        
         const { kind, auth, dependencies } = definition;
@@ -73,7 +74,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         let query: Queryable<T> = new _QueryImpl(source, ["value", "entity"], where);
 
         if (authError && auth) {
-            const snapshot = this.#createViewSnapshotFunc(dependencies, new Set([viewKey]));
+            const snapshot = this.#createViewSnapshotFunc(version, dependencies, circular);
             const authed = await auth(query, this.#scope, snapshot);
 
             if (authed === Forbidden) {
@@ -98,13 +99,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         viewKey: string,
         definition: StateProjection<T>,
         version: number,
+        circular: readonly string[],
         authError?: ErrorFactory,
     ): StateView<T> => {
         const { kind, dependencies, auth } = definition;
         const partitionKey = _partitionKeys.view(viewKey);
         const rowKey = _rowKeys.viewState(version);
         
-        const snapshot = this.#createViewSnapshotFunc(dependencies, new Set([viewKey]));
+        const snapshot = this.#createViewSnapshotFunc(version, dependencies, circular);
         const authMapper = async (state: T): Promise<T> => {
             if (!authError || !auth) {
                 return state;                
@@ -140,13 +142,13 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     }
 
     #createQueryView = <P extends Record<string, unknown>, T>(
-        viewKey: string,
         definition: QueryHandler<P, T>,
         version: number,
+        circular: readonly string[],
         authError?: ErrorFactory,
     ): QueryView<P, T> => {
         const { kind, exec, auth, dependencies } = definition;
-        const snapshot = this.#createViewSnapshotFunc(dependencies, new Set([viewKey]));
+        const snapshot = this.#createViewSnapshotFunc(version, dependencies, circular);
 
         const query: QueryView<P, T>["query"] = (
             authError && auth ? async params => {
@@ -163,9 +165,10 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     }
 
     #createViewSnapshotFunc = (
+        version: number,
         dependencies: ReadonlySet<string>,
-        circular: ReadonlySet<string>,
-    ): ViewSnapshotFunc<Model["views"]> => {
+        circular: readonly string[],
+    ): ViewSnapshotFunc<Model["views"]> => async key => {
         throw new Error("TODO: create view snapshot func");
     }
 
@@ -240,7 +243,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
 
         const version = base + 1;
-        const snapshot = this.#createViewSnapshotFunc(handler.dependencies, new Set());
+        const snapshot = this.#createViewSnapshotFunc(base, handler.dependencies, []);
         const fromContext = await new _ActionContextImpl(
             version,
             timestamp,
@@ -423,6 +426,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                     key, 
                     definition, 
                     version, 
+                    [key],
                     authError,
                 ) as ViewOf<Model["views"][K]>;
             case "state":
@@ -430,13 +434,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                     key, 
                     definition, 
                     version, 
+                    [key],
                     authError,
                 ) as ViewOf<Model["views"][K]>;
             case "query":
                 return this.#createQueryView(
-                    key,
                     definition,
                     version,
+                    [key],
                     authError,
                 ) as ViewOf<Model["views"][K]>;
             default:

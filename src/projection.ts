@@ -5,6 +5,7 @@ import { QueryHandler } from "./query-handler";
 import { QueryView } from "./query-view";
 import { StateProjection } from "./state-projection";
 import { StateView } from "./state-view";
+import { ViewOptions } from "./store";
 
 export type AnyProjection = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,4 +30,5 @@ export type View = StateView | QueryView | EntityView<Record<string, string | nu
 export type ViewSnapshotFunc<R extends ReadModel> = <K extends string & keyof R>(
     this: void,
     key: K,
+    options?: Partial<Pick<ViewOptions, "auth">>,
 ) => Promise<ViewOf<R[K]>>;
