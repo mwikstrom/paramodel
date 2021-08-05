@@ -92,16 +92,22 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         version: number,
         authError: ErrorFactory | undefined,
     ): StateView<T> => {
-        const { kind } = definition;
+        const { kind, dependencies, auth } = definition;
         const partitionKey = _partitionKeys.view(viewKey);
         const rowKey = _rowKeys.viewState(version);
         
-        const auth = async (state: T): Promise<T> => {
-            if (!authError || !definition.auth) {
-                return state;
+        const snapshot = this.#createViewSnapshotFunc(dependencies, new Set([viewKey]));
+        const authMapper = async (state: T): Promise<T> => {
+            if (!authError || !auth) {
+                return state;                
             }
-
-            throw new Error("TODO: IMPLEMENT STATE VIEW AUTH");
+            
+            const result = await auth(this.#scope, state, snapshot);
+            if (result === Forbidden) {
+                throw authError();
+            }
+            
+            return result;
         };
 
         let fetched = false;
@@ -117,7 +123,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             }
 
             const mapped = definition.type.fromJsonValue(data.value);
-            const authed = await auth(mapped);
+            const authed = await authMapper(mapped);
 
             return authed;
         };
