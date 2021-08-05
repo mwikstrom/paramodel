@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-forbidden(this: void, message?: string): never;
+forbidden(this: void, message?: string): Forbidden;
 ```
 
 ## Parameters
@@ -19,5 +19,5 @@ forbidden(this: void, message?: string): never;
 
 <b>Returns:</b>
 
-never
+[Forbidden](./paramodel.forbidden.md)
 

@@ -20,5 +20,8 @@ export type DomainModel<
     readonly actions: Actions;
 };
 
+export const Conflict = Symbol();
+export type Conflict = typeof Conflict;
+
 export const Forbidden = Symbol();
 export type Forbidden = typeof Forbidden;

@@ -54,6 +54,7 @@ Run-time domain model for event-sourcing.
 
 |  Variable | Description |
 |  --- | --- |
+|  [Conflict](./paramodel.conflict.md) |  |
 |  [Forbidden](./paramodel.forbidden.md) |  |
 
 ## Type Aliases
@@ -68,6 +69,7 @@ Run-time domain model for event-sourcing.
 |  [ChangeType](./paramodel.changetype.md) |  |
 |  [Comparable](./paramodel.comparable.md) |  |
 |  [ComparisonOperator](./paramodel.comparisonoperator.md) |  |
+|  [Conflict](./paramodel.conflict.md) |  |
 |  [DomainModel](./paramodel.domainmodel.md) |  |
 |  [EntityAuthFunc](./paramodel.entityauthfunc.md) |  |
 |  [EntityChangeHandlers](./paramodel.entitychangehandlers.md) |  |

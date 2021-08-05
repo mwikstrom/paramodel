@@ -11,11 +11,11 @@ import { TypeOf } from 'paratype';
 // @public (undocumented)
 export interface ActionContext<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Scope = unknown, Input = unknown, Output = unknown> {
     // (undocumented)
-    conflict(this: void, message?: string): never;
+    conflict(this: void, message?: string): Conflict;
     // (undocumented)
     emit<K extends string & keyof Events>(this: void, key: K, arg: TypeOf<Events[K]>): void;
     // (undocumented)
-    forbidden(this: void, message?: string): never;
+    forbidden(this: void, message?: string): Forbidden;
     // (undocumented)
     readonly input: Input;
     // (undocumented)
@@ -31,7 +31,7 @@ export interface ActionContext<Events extends ChangeModel = ChangeModel, Views e
 }
 
 // @public (undocumented)
-export type ActionFunc<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Scope = unknown, Input = unknown, Output = unknown> = (context: ActionContext<Events, Views, Scope, Input, Output>) => Promise<void>;
+export type ActionFunc<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Scope = unknown, Input = unknown, Output = unknown> = (context: ActionContext<Events, Views, Scope, Input, Output>) => Promise<Forbidden | Conflict | void>;
 
 // @public (undocumented)
 export interface ActionHandler<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Scope = unknown, Input = unknown, Output = unknown> {
@@ -107,6 +107,12 @@ export type Comparable = number | string | Date;
 
 // @public (undocumented)
 export type ComparisonOperator = ">" | ">=" | "<" | "<=";
+
+// @public (undocumented)
+export const Conflict: unique symbol;
+
+// @public (undocumented)
+export type Conflict = typeof Conflict;
 
 // @public (undocumented)
 export function createDomainProvider(driver: DomainDriver): DomainProvider;

@@ -3,7 +3,7 @@ import { ActionResult } from "../action";
 import { ActionContext } from "../action-context";
 import { ActionHandler } from "../action-handler";
 import { Change } from "../change";
-import { ChangeModel, ReadModel } from "../model";
+import { ChangeModel, Conflict, Forbidden, ReadModel } from "../model";
 import { ViewOf } from "../projection";
 
 /** @internal */
@@ -35,13 +35,12 @@ export class _ActionContextImpl<
         this.#handler = handler;
     }
 
-    #fail = (status: ActionResult["status"], message?: string): never => {
+    #fail = <T>(symbol: T, status: ActionResult["status"], message?: string): T => {
         if (this.#active) {
             this.#status = status;
             this.#message = message;
         }
-
-        throw new Error(message || status);
+        return symbol;
     }
 
     _run = async (): Promise<_ActionContextRunResult<Output>> => {
@@ -81,9 +80,9 @@ export class _ActionContextImpl<
         return result;
     }
 
-    forbidden = (message?: string): never => this.#fail("forbidden", message);
+    forbidden = (message?: string): Forbidden => this.#fail(Forbidden, "forbidden", message);
 
-    conflict = (message?: string): never => this.#fail("conflict", message);
+    conflict = (message?: string): Conflict => this.#fail(Conflict, "conflict", message);
 
     output = (result: Output): void => {
         if (!this.#active) {

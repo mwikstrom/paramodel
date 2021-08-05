@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-conflict(this: void, message?: string): never;
+conflict(this: void, message?: string): Conflict;
 ```
 
 ## Parameters
@@ -19,5 +19,5 @@ conflict(this: void, message?: string): never;
 
 <b>Returns:</b>
 
-never
+[Conflict](./paramodel.conflict.md)
 

@@ -1,6 +1,6 @@
 import { Type } from "paratype";
 import { ActionContext } from "./action-context";
-import { ChangeModel, ReadModel } from "./model";
+import { ChangeModel, Conflict, Forbidden, ReadModel } from "./model";
 
 export interface ActionHandler<
     Events extends ChangeModel = ChangeModel,
@@ -21,4 +21,4 @@ export type ActionFunc<
     Scope = unknown,
     Input = unknown,
     Output = unknown,
-> = (context: ActionContext<Events, Views, Scope, Input, Output>) => Promise<void>;
+> = (context: ActionContext<Events, Views, Scope, Input, Output>) => Promise<Forbidden | Conflict | void>;
