@@ -4,7 +4,7 @@ import { ActionContext } from "../action-context";
 import { ActionHandler } from "../action-handler";
 import { Change } from "../change";
 import { ChangeModel, Conflict, Forbidden, ReadModel } from "../model";
-import { ViewOf } from "../projection";
+import { ViewOf, ViewSnapshotFunc } from "../projection";
 
 /** @internal */
 export class _ActionContextImpl<
@@ -22,6 +22,7 @@ export class _ActionContextImpl<
     #message: ActionResult["message"];
     #emittedEvents: Omit<Change<JsonValue>, "version" | "timestamp" | "position">[] = [];
     #emittedChanges = new Set<string>();
+    #snapshot: ViewSnapshotFunc<Views>;
 
     constructor(
         public readonly version: number,
@@ -30,9 +31,11 @@ export class _ActionContextImpl<
         public readonly scope: Scope,
         events: Events,
         handler: ActionHandler<Events, Views, Scope, Input, Output>,
+        snapshot: ViewSnapshotFunc<Views>,
     ) {
         this.#events = events;
         this.#handler = handler;
+        this.#snapshot = snapshot;
     }
 
     #fail = <T>(symbol: T, status: ActionResult["status"], message?: string): T => {
@@ -131,13 +134,7 @@ export class _ActionContextImpl<
         this.#emittedEvents.push({ key, arg: jsonArg });
     }
 
-    view = <K extends string & keyof Views>(key: K): Promise<ViewOf<Views[K]>> => {
-        if (!this.#handler.dependencies.has(key)) {
-            throw new Error(`Action cannot access view '${key}' because it is not a registered dependency`);
-        }
-
-        throw new Error("TODO: GET VIEW SNAPSHOT");
-    }
+    view = <K extends string & keyof Views>(key: K): Promise<ViewOf<Views[K]>> => this.#snapshot(key);
 }
 
 /** @internal */
