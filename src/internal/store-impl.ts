@@ -7,7 +7,7 @@ import { ViewOf } from "../projection";
 import { DomainStore, DomainStoreStatus, ReadOptions, SyncOptions, ViewOptions } from "../store";
 import { _ActionContextImpl } from "./action-context-impl";
 import { _Commit, _commitType } from "./commit";
-import { _partitionKeys } from "./partition-keys";
+import { _partitionKeys, _rowKeys } from "./data-keys";
 import { _QueryImpl } from "./query-impl";
 import { _DriverQuerySource, _QuerySource } from "./query-source";
 
@@ -142,7 +142,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     }
 
     #tryCommit = (commit: _Commit): Promise<boolean> => {
-        const key = commit.version.toString(10).padStart(16, "0");
+        const key = _rowKeys.commit(commit.version);
         const value = _commitType.toJsonValue(commit);
 
         if (value === void(0)) {
