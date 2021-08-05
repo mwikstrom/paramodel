@@ -6,6 +6,6 @@ export interface EntityView<T, K extends keyof T> extends ReadonlyEntityCollecti
 }
 
 export interface ReadonlyEntityCollection<T, K extends keyof T> extends Queryable<T> {
-    get(key: Pick<T, K>): Promise<T | undefined>;
+    get(this: void, key: Pick<T, K>): Promise<T | undefined>;
 }
 
