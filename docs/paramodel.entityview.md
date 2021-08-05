@@ -18,3 +18,9 @@ export interface EntityView<T, K extends PossibleKeysOf<T>> extends ReadonlyEnti
 |  [kind](./paramodel.entityview.kind.md) | "entities" |  |
 |  [version](./paramodel.entityview.version.md) | number |  |
 
+## Methods
+
+|  Method | Description |
+|  --- | --- |
+|  [auth(this)](./paramodel.entityview.auth.md) |  |
+

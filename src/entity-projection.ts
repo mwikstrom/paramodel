@@ -1,7 +1,7 @@
 import { Type, TypeOf } from "paratype";
 import { Change } from "./change";
 import { PossibleKeysOf, ReadonlyEntityCollection } from "./entity-view";
-import { ChangeModel, ReadModel, Forbidden } from "./model";
+import { ChangeModel, Forbidden, ReadModel } from "./model";
 import { ViewSnapshotFunc } from "./projection";
 import { Queryable } from "./queryable";
 
@@ -19,6 +19,7 @@ export interface EntityProjection<
     readonly dependencies: ReadonlySet<string & keyof R>;
     readonly apply: EntityProjectionFunc<T, K, Change, R>;
     readonly auth: EntityAuthFunc<Scope, T, R> | undefined;
+    // TODO: preauth?
 }
 
 export type EntityAuthFunc<

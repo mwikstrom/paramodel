@@ -29,6 +29,10 @@ export class _StateViewImpl<T> implements StateView<T> {
         this.version = version;
     }
 
+    auth = (): Promise<boolean> => {
+        throw new Error("TODO: Method not implemented.");
+    }
+
     read = async (): Promise<T> => {
         const data = await this.#driver.read(this.#storeId, this.#partitionKey, this.#rowKey);
         

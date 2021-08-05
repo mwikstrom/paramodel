@@ -21,5 +21,6 @@ export interface QueryView<P = unknown, T = unknown>
 
 |  Method | Description |
 |  --- | --- |
-|  [query(params)](./paramodel.queryview.query.md) |  |
+|  [auth(this, params)](./paramodel.queryview.auth.md) |  |
+|  [query(this, params)](./paramodel.queryview.query.md) |  |
 

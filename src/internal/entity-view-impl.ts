@@ -46,6 +46,10 @@ export class _EntityViewImpl<T, K extends PossibleKeysOf<T>> extends _QueryImpl<
         this.version = version;
     }
 
+    auth = (): Promise<boolean> => {
+        throw new Error("TODO: Method not implemented.");
+    }
+
     get = (key: T[K]): Promise<T | undefined> => (
         (this as Queryable<T & {[P in K]: string | number}>)
             .where(this.#keyProp, "==", key)

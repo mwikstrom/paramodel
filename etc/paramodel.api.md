@@ -232,6 +232,8 @@ export type EntityProjectionFunc<T, K extends PossibleKeysOf<T>, C extends Chang
 // @public (undocumented)
 export interface EntityView<T, K extends PossibleKeysOf<T>> extends ReadonlyEntityCollection<T, K> {
     // (undocumented)
+    auth(this: void): Promise<boolean>;
+    // (undocumented)
     readonly kind: "entities";
     // (undocumented)
     readonly version: number;
@@ -368,9 +370,11 @@ export interface QuerySpec {
 // @public (undocumented)
 export interface QueryView<P = unknown, T = unknown> {
     // (undocumented)
+    auth(this: void, params: P): Promise<boolean>;
+    // (undocumented)
     readonly kind: "query";
     // (undocumented)
-    query(params: P): Promise<T | Forbidden>;
+    query(this: void, params: P): Promise<T>;
     // (undocumented)
     readonly version: number;
 }
@@ -442,6 +446,8 @@ export interface StateProjection<T = unknown, C extends ChangeModel = ChangeMode
 // @public (undocumented)
 export interface StateView<T = unknown> {
     // (undocumented)
+    auth(this: void): Promise<boolean>;
+    // (undocumented)
     readonly kind: "state";
     // (undocumented)
     read(this: void): Promise<T>;
@@ -470,6 +476,8 @@ export type ViewOf<H extends Projection> = H extends StateProjection<infer T, an
 
 // @public (undocumented)
 export interface ViewOptions {
+    // (undocumented)
+    readonly auth: boolean | (() => Error);
     // (undocumented)
     readonly signal: AbortSignal;
     // (undocumented)

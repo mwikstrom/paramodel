@@ -1,4 +1,3 @@
-import { Forbidden } from "../model";
 import { QueryHandler } from "../query-handler";
 import { QueryView } from "../query-view";
 
@@ -16,7 +15,11 @@ export class _QueryViewImpl<P extends Record<string, unknown>, T> implements Que
         this.version = version;
     }
 
-    query = (params: P): Promise<T | Forbidden> => {
+    auth = (params: P): Promise<boolean> => {
+        throw new Error("TODO: Method not implemented.");
+    }
+
+    query = (params: P): Promise<T> => {
         throw new Error("TODO: Method not implemented.");
     }
 }
