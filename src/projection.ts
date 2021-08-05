@@ -19,7 +19,7 @@ export type ViewOf<H extends Projection> =
     H extends EntityProjection<infer T, infer K, any, any, any> ? EntityView<T, K> :
     View;
 
-export type View = StateView | QueryView | EntityView<unknown, keyof unknown>;
+export type View = StateView | QueryView | EntityView<Record<string, string | number>, string>;
 
 export type ViewSnapshotFunc<R extends ReadModel> = <K extends string & keyof R>(
     this: void,

@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type View = StateView | QueryView | EntityView<unknown, keyof unknown>;
+export declare type View = StateView | QueryView | EntityView<Record<string, string | number>, string>;
 ```
 <b>References:</b> [StateView](./paramodel.stateview.md)<!-- -->, [QueryView](./paramodel.queryview.md)<!-- -->, [EntityView](./paramodel.entityview.md)
 

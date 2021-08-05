@@ -6,7 +6,10 @@ import { _QueryImpl } from "./query-impl";
 import { _DriverQuerySource } from "./query-source";
 
 /** @internal */
-export class _EntityViewImpl<T, K extends PossibleKeysOf<T>> extends _QueryImpl<T> implements EntityView<T, K> {
+export class _EntityViewImpl<
+    T extends {[P in K]: string | number},
+    K extends PossibleKeysOf<T>
+> extends _QueryImpl<T> implements EntityView<T, K> {
     #keyProp: K;
     public readonly kind = "entities";
     public readonly version: number;

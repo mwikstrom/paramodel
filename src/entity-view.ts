@@ -1,6 +1,9 @@
 import { Queryable } from "./queryable";
 
-export interface EntityView<T, K extends PossibleKeysOf<T>> extends ReadonlyEntityCollection<T, K> {
+export interface EntityView<
+    T extends {[P in K]: string | number},
+    K extends PossibleKeysOf<T>
+> extends ReadonlyEntityCollection<T, K> {
     readonly kind: "entities";
     readonly version: number;
     auth(this: void): Promise<boolean>;

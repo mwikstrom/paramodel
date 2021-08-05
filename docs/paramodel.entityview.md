@@ -7,7 +7,9 @@
 <b>Signature:</b>
 
 ```typescript
-export interface EntityView<T, K extends PossibleKeysOf<T>> extends ReadonlyEntityCollection<T, K> 
+export interface EntityView<T extends {
+    [P in K]: string | number;
+}, K extends PossibleKeysOf<T>> extends ReadonlyEntityCollection<T, K> 
 ```
 <b>Extends:</b> [ReadonlyEntityCollection](./paramodel.readonlyentitycollection.md)<!-- -->&lt;T, K&gt;
 

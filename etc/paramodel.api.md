@@ -230,7 +230,9 @@ export interface EntityProjection<T, K extends PossibleKeysOf<T>, C extends Chan
 export type EntityProjectionFunc<T, K extends PossibleKeysOf<T>, C extends Change = Change, R extends ReadModel = ReadModel> = (change: C, state: EntityCollection<T, K>, view: ViewSnapshotFunc<R>) => Promise<void>;
 
 // @public (undocumented)
-export interface EntityView<T, K extends PossibleKeysOf<T>> extends ReadonlyEntityCollection<T, K> {
+export interface EntityView<T extends {
+    [P in K]: string | number;
+}, K extends PossibleKeysOf<T>> extends ReadonlyEntityCollection<T, K> {
     // (undocumented)
     auth(this: void): Promise<boolean>;
     // (undocumented)
@@ -469,7 +471,7 @@ export interface SyncOptions<K extends string = string> {
 }
 
 // @public (undocumented)
-export type View = StateView | QueryView | EntityView<unknown, keyof unknown>;
+export type View = StateView | QueryView | EntityView<Record<string, string | number>, string>;
 
 // @public (undocumented)
 export type ViewOf<H extends Projection> = H extends StateProjection<infer T, any, any, any> ? StateView<T> : H extends QueryHandler<infer P, infer T, any, any> ? QueryView<P, T> : H extends EntityProjection<infer T, infer K, any, any, any> ? EntityView<T, K> : View;
