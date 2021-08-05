@@ -4,8 +4,8 @@ import { Change, ChangeType } from "../change";
 import { DomainDriver, FilterSpec, InputRecord, OutputRecord } from "../driver";
 import { EntityProjection } from "../entity-projection";
 import { EntityView } from "../entity-view";
-import { DomainModel } from "../model";
-import { ViewOf } from "../projection";
+import { DomainModel, Forbidden } from "../model";
+import { ViewOf, ViewSnapshotFunc } from "../projection";
 import { QueryHandler } from "../query-handler";
 import { QueryView } from "../query-view";
 import { StateProjection } from "../state-projection";
@@ -91,7 +91,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         definition: StateProjection<T>,
         version: number,
         authError: ErrorFactory | undefined,
-    ): StateView => {
+    ): StateView<T> => {
         const { kind } = definition;
         const partitionKey = _partitionKeys.view(viewKey);
         const rowKey = _rowKeys.viewState(version);
@@ -106,7 +106,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
         let fetched = false;
         let data: OutputRecord | undefined;
-        const read: StateView["read"] = async () => {
+        const read: StateView<T>["read"] = async () => {
             if (!fetched) {
                 data = await this.#driver.read(this.#id, partitionKey, rowKey);
                 fetched = true;
@@ -121,18 +121,35 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
             return authed;
         };
-        const view: StateView = Object.freeze({ kind, version, read });
+        const view: StateView<T> = Object.freeze({ kind, version, read });
         return view;
     }
 
-    #createQueryView = (
+    #createQueryView = <P extends Record<string, unknown>, T>(
         viewKey: string,
-        definition: QueryHandler,
+        definition: QueryHandler<P, T>,
         version: number,
-        authError: ErrorFactory | undefined,
-    ): QueryView => {
-        throw new Error("TODO: IMPLEMENT");
-    }    
+        authError: ErrorFactory,
+    ): QueryView<P, T> => {
+        const { kind, exec, dependencies } = definition;
+        const snapshot = this.#createViewSnapshotFunc(dependencies, new Set([viewKey]));
+        const query: QueryView<P, T>["query"] = async params => {
+            const result = await exec(snapshot, params, this.#scope);
+            if (result === Forbidden) {
+                throw authError();
+            }
+            return result;
+        };
+        const view: QueryView<P, T> = Object.freeze({ kind, version, query });
+        return view;
+    }
+
+    #createViewSnapshotFunc = (
+        dependencies: ReadonlySet<string>,
+        circular: ReadonlySet<string>,
+    ): ViewSnapshotFunc<Model["views"]> => {
+        throw new Error("TODO: create view snapshot func");
+    }
 
     #deserializeChangeArg = (
         key: string, 
@@ -377,18 +394,31 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
 
         const authError: ErrorFactory | undefined = (
-            typeof auth === "function" ? auth :
-                auth === true ? () => new Error("Forbidden") :
-                    void(0)
+            typeof auth === "function" ? auth : auth === true ? defaultAuthError : void(0)
         );
 
         switch (definition.kind) {
             case "entities":
-                return await this.#createEntityView(key, definition, version, authError) as ViewOf<Model["views"][K]>;
+                return await this.#createEntityView(
+                    key, 
+                    definition, 
+                    version, 
+                    authError
+                ) as ViewOf<Model["views"][K]>;
             case "state":
-                return this.#createStateView(key, definition, version, authError) as ViewOf<Model["views"][K]>;
+                return this.#createStateView(
+                    key, 
+                    definition, 
+                    version, 
+                    authError
+                ) as ViewOf<Model["views"][K]>;
             case "query":
-                return this.#createQueryView(key, definition, version, authError) as ViewOf<Model["views"][K]>;
+                return this.#createQueryView(
+                    key,
+                    definition,
+                    version,
+                    authError || defaultAuthError
+                ) as ViewOf<Model["views"][K]>;
             default:
                 return void(0);
         }
@@ -406,3 +436,5 @@ const entityEnvelopeType = <T>(valueType: Type<T>): Type<EntityEnvelope<T>> => r
     end: positiveIntegerType,
     entity: valueType,
 });
+
+const defaultAuthError: ErrorFactory = () => new Error("Forbidden");

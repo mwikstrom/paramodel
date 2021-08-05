@@ -20,4 +20,4 @@ export type QueryFunc<
     P extends Record<string, unknown> = Record<string, unknown>,
     Scope = unknown,
     T = unknown,
-> = (view: ViewSnapshotFunc<R>, params: P, scope: Scope) => Promise<T | Forbidden>;
+> = (this: void, view: ViewSnapshotFunc<R>, params: P, scope: Scope) => Promise<T | Forbidden>;
