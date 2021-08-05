@@ -485,7 +485,7 @@ export interface ViewOptions {
 }
 
 // @public (undocumented)
-export type ViewSnapshotFunc<R extends ReadModel> = <K extends string & keyof R>(this: void, key: K) => Promise<ViewOf<R[K]>>;
+export type ViewSnapshotFunc<R extends ReadModel> = <K extends string & keyof R>(this: void, key: K, options?: Partial<Pick<ViewOptions, "auth">>) => Promise<ViewOf<R[K]>>;
 
 // @public (undocumented)
 export interface ViewStatus {
