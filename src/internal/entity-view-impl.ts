@@ -2,6 +2,7 @@ import { positiveIntegerType, recordType, Type } from "paratype";
 import { DomainDriver, FilterSpec, OutputRecord } from "../driver";
 import { EntityAuthFunc } from "../entity-projection";
 import { EntityView, PossibleKeysOf } from "../entity-view";
+import { Forbidden } from "../model";
 import { FilterOperand, FilterOperator, Page, PageOptions, Queryable, SortDirection } from "../queryable";
 import { _QueryImpl } from "./query-impl";
 import { _DriverQuerySource } from "./query-source";
@@ -14,6 +15,7 @@ export class _EntityViewImpl<
     #query: Queryable<T & {[P in K]: string | number}>;
     #keyProp: K;
     #authResult: undefined | boolean;
+    #authFunc: (query: Queryable<T>) => Promise<Queryable<T> | Forbidden>;
     public readonly kind = "entities";
     public readonly version: number;    
 
@@ -24,6 +26,7 @@ export class _EntityViewImpl<
         partitionKey: string,
         keyProp: K,
         version: number,
+        authFunc: (query: Queryable<T>) => Promise<Queryable<T> | Forbidden>,
     ) {
         const envelope = envelopeType(type);
         const transform = (record: OutputRecord): T => envelope.fromJsonValue(record.value).entity;
@@ -49,12 +52,19 @@ export class _EntityViewImpl<
 
         this.#query = new _QueryImpl(source, ["value", "entity"], where);
         this.#keyProp = keyProp;
+        this.#authFunc = authFunc;
         this.version = version;
     }
 
     auth = async (): Promise<boolean> => {
         if (this.#authResult === void(0)) {
-            throw new Error("TODO: Method not implemented.");
+            const authResult = await this.#authFunc(this.#query);
+            if (authResult === Forbidden) {
+                this.#authResult = false;
+            } else {
+                this.#query = authResult;
+                this.#authResult = true;
+            }
         }
         
         return this.#authResult;
