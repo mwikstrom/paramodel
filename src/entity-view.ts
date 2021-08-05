@@ -6,7 +6,6 @@ export interface EntityView<
 > extends ReadonlyEntityCollection<T, K> {
     readonly kind: "entities";
     readonly version: number;
-    auth(this: void): Promise<boolean>;
 }
 
 export interface ReadonlyEntityCollection<T, K extends PossibleKeysOf<T>> extends Queryable<T> {
