@@ -6,8 +6,8 @@ import { ViewSnapshotFunc } from "./projection";
 import { Queryable } from "./queryable";
 
 export interface EntityProjection<
-    T,
-    K extends PossibleKeysOf<T>,
+    T extends Record<string, unknown> = Record<string, unknown>,
+    K extends PossibleKeysOf<T> = PossibleKeysOf<T>,
     C extends ChangeModel = ChangeModel,
     R extends ReadModel = ReadModel,
     Scope = unknown

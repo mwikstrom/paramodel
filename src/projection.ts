@@ -6,9 +6,7 @@ import { QueryView } from "./query-view";
 import { StateProjection } from "./state-projection";
 import { StateView } from "./state-view";
 
-export type Projection = {
-    kind: "state" | "query" | "entities"
-};
+export type Projection = StateProjection | QueryHandler | EntityProjection;
 
 export type ViewOf<H extends Projection> =
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

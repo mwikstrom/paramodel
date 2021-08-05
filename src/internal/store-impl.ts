@@ -2,8 +2,14 @@ import { JsonValue, TypeOf } from "paratype";
 import { ActionOptions, ActionResultType } from "../action";
 import { Change, ChangeType } from "../change";
 import { DomainDriver, InputRecord, OutputRecord } from "../driver";
+import { EntityProjection } from "../entity-projection";
+import { EntityView } from "../entity-view";
 import { DomainModel } from "../model";
 import { ViewOf } from "../projection";
+import { QueryHandler } from "../query-handler";
+import { QueryView } from "../query-view";
+import { StateProjection } from "../state-projection";
+import { StateView } from "../state-view";
 import { DomainStore, DomainStoreStatus, ReadOptions, SyncOptions, ViewOptions } from "../store";
 import { _ActionContextImpl } from "./action-context-impl";
 import { _Commit, _commitType } from "./commit";
@@ -31,6 +37,30 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             _partitionKeys.commits,
             record => _commitType.fromJsonValue(record.value)
         );
+    }
+
+    #createEntityView = (
+        definition: EntityProjection,
+        version: number,
+        options: Partial<ViewOptions>,
+    ): EntityView => {
+        throw new Error("TODO: IMPLEMENT");
+    }
+
+    #createStateView = (
+        definition: StateProjection,
+        version: number,
+        options: Partial<ViewOptions>,
+    ): StateView => {
+        throw new Error("TODO: IMPLEMENT");
+    }
+
+    #createQueryView = (
+        definition: QueryHandler,
+        version: number,
+        options: Partial<ViewOptions>,
+    ): QueryView => {
+        throw new Error("TODO: IMPLEMENT");
     }
 
     #deserializeChangeArg = (
@@ -255,15 +285,35 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         key: K, 
         options: Partial<ViewOptions> = {}
     ): Promise<ViewOf<Model["views"][K]> | undefined> => {
-        const { sync, signal } = options;
+        const { sync = 0, signal } = options;
+        const definition = this.#model.views[key];
+        if (!definition) {
+            return void(0);
+        }
 
-        if (typeof sync === "number") {
-            const done = await this.sync({ views: [key], target: sync, signal });
-            if (done < sync) {
+        const header = await this.#getViewHeader(key);
+        if (header && header.kind !== definition.kind) {
+            return void(0);
+        }
+
+        let version = header?.sync || 0;
+        if (sync > version) {
+            version = await this.sync({ views: [key], target: sync, signal });
+            
+            if (sync > version) {
                 return void(0);
             }
         }
 
-        throw new Error("TODO: Method not implemented.");
+        switch (definition.kind) {
+            case "entities":
+                return this.#createEntityView(definition, version, options) as ViewOf<Model["views"][K]>;
+            case "state":
+                return this.#createStateView(definition, version, options) as ViewOf<Model["views"][K]>;
+            case "query":
+                return this.#createQueryView(definition, version, options) as ViewOf<Model["views"][K]>;
+            default:
+                return void(0);
+        }
     }
 }

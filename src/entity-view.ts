@@ -1,8 +1,8 @@
 import { Queryable } from "./queryable";
 
 export interface EntityView<
-    T extends {[P in K]: string | number},
-    K extends PossibleKeysOf<T>
+    T extends Record<string, unknown> = Record<string, unknown>,
+    K extends PossibleKeysOf<T> = PossibleKeysOf<T>
 > extends ReadonlyEntityCollection<T, K> {
     readonly kind: "entities";
     readonly version: number;
