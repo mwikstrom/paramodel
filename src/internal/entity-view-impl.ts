@@ -23,7 +23,7 @@ export class _EntityViewImpl<
         keyProp: K,
         version: number,
     ) {
-        const envelope = envelopeType(type);
+        const envelope = entityEnvelopeType(type);
         const transform = (record: OutputRecord): T => envelope.fromJsonValue(record.value).entity;
         const source = new _DriverQuerySource(
             driver,
@@ -78,13 +78,13 @@ export class _EntityViewImpl<
     ): Queryable<T> => this.#query.where(property, operator, operand);
 }
 
-type Envelope<T> = {
+type EntityEnvelope<T> = {
     start: number;
     end: number;
     entity: T;
 };
 
-const envelopeType = <T>(valueType: Type<T>): Type<Envelope<T>> => recordType({
+const entityEnvelopeType = <T>(valueType: Type<T>): Type<EntityEnvelope<T>> => recordType({
     start: positiveIntegerType,
     end: positiveIntegerType,
     entity: valueType,

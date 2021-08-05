@@ -1,4 +1,4 @@
-import { JsonValue, TypeOf } from "paratype";
+import { JsonValue, positiveIntegerType, recordType, Type, TypeOf } from "paratype";
 import { ActionOptions, ActionResultType } from "../action";
 import { Change, ChangeType } from "../change";
 import { DomainDriver, InputRecord, OutputRecord } from "../driver";
@@ -10,7 +10,7 @@ import { QueryHandler } from "../query-handler";
 import { QueryView } from "../query-view";
 import { StateProjection } from "../state-projection";
 import { StateView } from "../state-view";
-import { DomainStore, DomainStoreStatus, ReadOptions, SyncOptions, ViewOptions } from "../store";
+import { DomainStore, DomainStoreStatus, ErrorFactory, ReadOptions, SyncOptions, ViewOptions } from "../store";
 import { _ActionContextImpl } from "./action-context-impl";
 import { _Commit, _commitType } from "./commit";
 import { _partitionKeys, _rowKeys } from "./data-keys";
@@ -40,28 +40,61 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     }
 
     #createEntityView = (
+        viewKey: string,
         definition: EntityProjection,
         version: number,
-        options: Partial<ViewOptions>,
-    ): EntityView => {
+        authError: ErrorFactory | undefined,
+    ): EntityView => {        
         throw new Error("TODO: IMPLEMENT");
     }
 
-    #createStateView = (
-        definition: StateProjection,
+    #createStateView = <T>(
+        viewKey: string,
+        definition: StateProjection<T>,
         version: number,
-        options: Partial<ViewOptions>,
+        authError: ErrorFactory | undefined,
     ): StateView => {
-        throw new Error("TODO: IMPLEMENT");
+        const { kind } = definition;
+        const partitionKey = _partitionKeys.view(viewKey);
+        const rowKey = _rowKeys.viewState(version);
+        
+        const auth = async (state: T): Promise<T> => {
+            if (!authError || !definition.auth) {
+                return state;
+            }
+
+            throw new Error("TODO: IMPLEMENT STATE VIEW AUTH");
+        };
+
+        let fetched = false;
+        let data: OutputRecord | undefined;
+        const read: StateView["read"] = async () => {
+            if (!fetched) {
+                data = await this.#driver.read(this.#id, partitionKey, rowKey);
+                fetched = true;
+            }
+
+            if (!data) {
+                throw new Error(`State not found: ${this.#id}/${partitionKey}/${rowKey}`);
+            }
+
+            const mapped = definition.type.fromJsonValue(data.value);
+            const authed = await auth(mapped);
+
+            return authed;
+        };
+        const view: StateView = Object.freeze({ kind, version, read });
+        return view;
     }
 
     #createQueryView = (
+        viewKey: string,
         definition: QueryHandler,
         version: number,
-        options: Partial<ViewOptions>,
+        authError: ErrorFactory | undefined,
     ): QueryView => {
         throw new Error("TODO: IMPLEMENT");
-    }
+    }    
 
     #deserializeChangeArg = (
         key: string, 
@@ -285,7 +318,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         key: K, 
         options: Partial<ViewOptions> = {}
     ): Promise<ViewOf<Model["views"][K]> | undefined> => {
-        const { sync = 0, signal } = options;
+        const { sync = 0, signal, auth } = options;
         const definition = this.#model.views[key];
         if (!definition) {
             return void(0);
@@ -305,15 +338,33 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             }
         }
 
+        const authError: ErrorFactory | undefined = (
+            typeof auth === "function" ? auth :
+                auth === true ? () => new Error("Forbidden") :
+                    void(0)
+        );
+
         switch (definition.kind) {
             case "entities":
-                return this.#createEntityView(definition, version, options) as ViewOf<Model["views"][K]>;
+                return this.#createEntityView(key, definition, version, authError) as ViewOf<Model["views"][K]>;
             case "state":
-                return this.#createStateView(definition, version, options) as ViewOf<Model["views"][K]>;
+                return this.#createStateView(key, definition, version, authError) as ViewOf<Model["views"][K]>;
             case "query":
-                return this.#createQueryView(definition, version, options) as ViewOf<Model["views"][K]>;
+                return this.#createQueryView(key, definition, version, authError) as ViewOf<Model["views"][K]>;
             default:
                 return void(0);
         }
     }
 }
+
+type EntityEnvelope<T> = {
+    start: number;
+    end: number;
+    entity: T;
+};
+
+const entityEnvelopeType = <T>(valueType: Type<T>): Type<EntityEnvelope<T>> => recordType({
+    start: positiveIntegerType,
+    end: positiveIntegerType,
+    entity: valueType,
+});

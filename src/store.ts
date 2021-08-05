@@ -50,7 +50,7 @@ export interface ViewStatus {
 export interface ViewOptions {
     readonly sync: number;
     readonly signal: AbortSignal;
-    readonly auth: boolean | (() => Error);
+    readonly auth: boolean | ErrorFactory;
 }
 
 export interface SyncOptions<K extends string = string> {
@@ -58,3 +58,5 @@ export interface SyncOptions<K extends string = string> {
     readonly views: readonly K[];
     readonly signal: AbortSignal;
 }
+
+export type ErrorFactory = () => Error;
