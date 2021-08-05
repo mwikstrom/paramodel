@@ -44,7 +44,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         viewKey: string,
         definition: EntityProjection<T>,
         version: number,
-        authError: ErrorFactory | undefined,
+        authError?: ErrorFactory,
     ): Promise<EntityView> => {        
         const { kind, auth, dependencies } = definition;
         const envelope = entityEnvelopeType(definition.type);
@@ -98,7 +98,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         viewKey: string,
         definition: StateProjection<T>,
         version: number,
-        authError: ErrorFactory | undefined,
+        authError?: ErrorFactory,
     ): StateView<T> => {
         const { kind, dependencies, auth } = definition;
         const partitionKey = _partitionKeys.view(viewKey);
@@ -143,17 +143,21 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         viewKey: string,
         definition: QueryHandler<P, T>,
         version: number,
-        authError: ErrorFactory,
+        authError?: ErrorFactory,
     ): QueryView<P, T> => {
-        const { kind, exec, dependencies } = definition;
+        const { kind, exec, auth, dependencies } = definition;
         const snapshot = this.#createViewSnapshotFunc(dependencies, new Set([viewKey]));
-        const query: QueryView<P, T>["query"] = async params => {
-            const result = await exec(snapshot, params, this.#scope);
-            if (result === Forbidden) {
-                throw authError();
-            }
-            return result;
-        };
+
+        const query: QueryView<P, T>["query"] = (
+            authError && auth ? async params => {
+                const result = await auth(exec, snapshot, params, this.#scope);
+                if (result === Forbidden) {
+                    throw authError();
+                }
+                return result;    
+            } : params => exec(snapshot, params, this.#scope)
+        );
+
         const view: QueryView<P, T> = Object.freeze({ kind, version, query });
         return view;
     }
@@ -417,21 +421,21 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                     key, 
                     definition, 
                     version, 
-                    authError
+                    authError,
                 ) as ViewOf<Model["views"][K]>;
             case "state":
                 return this.#createStateView(
                     key, 
                     definition, 
                     version, 
-                    authError
+                    authError,
                 ) as ViewOf<Model["views"][K]>;
             case "query":
                 return this.#createQueryView(
                     key,
                     definition,
                     version,
-                    authError || defaultAuthError
+                    authError,
                 ) as ViewOf<Model["views"][K]>;
             default:
                 return void(0);

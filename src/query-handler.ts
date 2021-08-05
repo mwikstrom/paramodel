@@ -12,12 +12,31 @@ export interface QueryHandler<
     readonly type: Type<T>;
     readonly params: Type<P>;
     readonly dependencies: ReadonlySet<string & keyof R>;
-    readonly exec: QueryFunc<R, P, Scope, T>;
+    readonly exec: QueryExecFunc<R, P, Scope, T>;
+    readonly auth?: QueryAuthFunc<R, P, Scope, T>;
 }
 
-export type QueryFunc<
+export type QueryExecFunc<
     R extends ReadModel = ReadModel,
     P extends Record<string, unknown> = Record<string, unknown>,
     Scope = unknown,
     T = unknown,
-> = (this: void, view: ViewSnapshotFunc<R>, params: P, scope: Scope) => Promise<T | Forbidden>;
+> = (
+    this: void, 
+    view: ViewSnapshotFunc<R>, 
+    params: P, 
+    scope: Scope
+) => Promise<T>;
+
+export type QueryAuthFunc<
+    R extends ReadModel = ReadModel,
+    P extends Record<string, unknown> = Record<string, unknown>,
+    Scope = unknown,
+    T = unknown,
+> = (
+    this: void, 
+    exec: QueryExecFunc<R, P, Scope, T>,
+    view: ViewSnapshotFunc<R>, 
+    params: P, 
+    scope: Scope, 
+) => Promise<T | Forbidden>;
