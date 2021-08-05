@@ -21,6 +21,5 @@ export interface StateView<T = unknown>
 
 |  Method | Description |
 |  --- | --- |
-|  [auth(this)](./paramodel.stateview.auth.md) |  |
 |  [read(this)](./paramodel.stateview.read.md) |  |
 

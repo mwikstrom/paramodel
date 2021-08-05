@@ -14,7 +14,7 @@ export interface ViewOptions
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [auth](./paramodel.viewoptions.auth.md) | boolean \| (() =&gt; Error) |  |
+|  [auth](./paramodel.viewoptions.auth.md) | boolean \| [ErrorFactory](./paramodel.errorfactory.md) |  |
 |  [signal](./paramodel.viewoptions.signal.md) | AbortSignal |  |
 |  [sync](./paramodel.viewoptions.sync.md) | number |  |
 

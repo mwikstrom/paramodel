@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type ReadModel<K extends string = string, T extends Projection = Projection> = Readonly<Record<K, T>>;
+export declare type ReadModel<K extends string = string, T extends AnyProjection = AnyProjection> = Readonly<Record<K, T>>;
 ```
-<b>References:</b> [Projection](./paramodel.projection.md)
+<b>References:</b> [AnyProjection](./paramodel.anyprojection.md)
 

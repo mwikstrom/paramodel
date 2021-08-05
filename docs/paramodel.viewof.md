@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type ViewOf<H extends Projection> = H extends StateProjection<infer T, any, any, any> ? StateView<T> : H extends QueryHandler<infer P, infer T, any, any> ? QueryView<P, T> : H extends EntityProjection<infer T, infer K, any, any, any> ? EntityView<T, K> : View;
+export declare type ViewOf<H extends AnyProjection> = H extends StateProjection<infer T, any, any, any> ? StateView<T> : H extends QueryHandler<infer P, infer T, any, any> ? QueryView<P, T> : H extends EntityProjection<infer T, infer K, any, any, any> ? EntityView<T, K> : View;
 ```
-<b>References:</b> [Projection](./paramodel.projection.md)<!-- -->, [StateProjection](./paramodel.stateprojection.md)<!-- -->, [StateView](./paramodel.stateview.md)<!-- -->, [QueryHandler](./paramodel.queryhandler.md)<!-- -->, [QueryView](./paramodel.queryview.md)<!-- -->, [EntityProjection](./paramodel.entityprojection.md)<!-- -->, [EntityView](./paramodel.entityview.md)<!-- -->, [View](./paramodel.view.md)
+<b>References:</b> [AnyProjection](./paramodel.anyprojection.md)<!-- -->, [StateProjection](./paramodel.stateprojection.md)<!-- -->, [StateView](./paramodel.stateview.md)<!-- -->, [QueryHandler](./paramodel.queryhandler.md)<!-- -->, [QueryView](./paramodel.queryview.md)<!-- -->, [EntityProjection](./paramodel.entityprojection.md)<!-- -->, [EntityView](./paramodel.entityview.md)<!-- -->, [View](./paramodel.view.md)
 

@@ -7,5 +7,5 @@
 <b>Signature:</b>
 
 ```typescript
-readonly auth: boolean | (() => Error);
+readonly auth: boolean | ErrorFactory;
 ```

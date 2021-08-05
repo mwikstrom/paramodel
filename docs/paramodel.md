@@ -14,7 +14,7 @@ Run-time domain model for event-sourcing.
 |  [createMemoryDriver()](./paramodel.creatememorydriver.md) |  |
 |  [defineAction(input, exec, dependencies, output)](./paramodel.defineaction.md) |  |
 |  [defineEntity(type, key, on, auth, dependencies)](./paramodel.defineentity.md) |  |
-|  [defineQuery(type, params, dependencies, exec)](./paramodel.definequery.md) |  |
+|  [defineQuery(type, params, dependencies, exec, auth)](./paramodel.definequery.md) |  |
 |  [defineState(type, initial, on, dependencies, auth)](./paramodel.definestate.md) |  |
 
 ## Interfaces
@@ -63,6 +63,7 @@ Run-time domain model for event-sourcing.
 |  --- | --- |
 |  [ActionFunc](./paramodel.actionfunc.md) |  |
 |  [ActionResultType](./paramodel.actionresulttype.md) |  |
+|  [AnyProjection](./paramodel.anyprojection.md) |  |
 |  [ArrayAnyOperator](./paramodel.arrayanyoperator.md) |  |
 |  [ArrayOperator](./paramodel.arrayoperator.md) |  |
 |  [ChangeModel](./paramodel.changemodel.md) |  |
@@ -76,6 +77,7 @@ Run-time domain model for event-sourcing.
 |  [EntityProjectionFunc](./paramodel.entityprojectionfunc.md) |  |
 |  [EqualityOperator](./paramodel.equalityoperator.md) |  |
 |  [Equatable](./paramodel.equatable.md) |  |
+|  [ErrorFactory](./paramodel.errorfactory.md) |  |
 |  [FilterOperand](./paramodel.filteroperand.md) |  |
 |  [FilterOperator](./paramodel.filteroperator.md) |  |
 |  [Forbidden](./paramodel.forbidden.md) |  |
@@ -83,8 +85,8 @@ Run-time domain model for event-sourcing.
 |  [IsOperator](./paramodel.isoperator.md) |  |
 |  [OutputRecord](./paramodel.outputrecord.md) |  |
 |  [PossibleKeysOf](./paramodel.possiblekeysof.md) |  |
-|  [Projection](./paramodel.projection.md) |  |
-|  [QueryFunc](./paramodel.queryfunc.md) |  |
+|  [QueryAuthFunc](./paramodel.queryauthfunc.md) |  |
+|  [QueryExecFunc](./paramodel.queryexecfunc.md) |  |
 |  [ReadModel](./paramodel.readmodel.md) |  |
 |  [SortableProps](./paramodel.sortableprops.md) |  |
 |  [SortDirection](./paramodel.sortdirection.md) |  |

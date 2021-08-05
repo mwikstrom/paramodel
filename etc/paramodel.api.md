@@ -75,6 +75,9 @@ export interface ActionResult<Output = unknown> {
 export type ActionResultType<Model extends Pick<DomainModel, "actions" | "events">, Action extends string & keyof Model["actions"]> = (ActionResult<TypeOf<Model["actions"][Action]["output"]>>);
 
 // @public (undocumented)
+export type AnyProjection = (StateProjection<any, any, any, any> | QueryHandler<any, any, any, any> | EntityProjection<any, any, any, any, any>);
+
+// @public (undocumented)
 export type ArrayAnyOperator = ("includes-any" | "not-includes-any");
 
 // @public (undocumented)
@@ -124,12 +127,12 @@ export function createMemoryDriver(): DomainDriver;
 export function defineAction<Input, Output, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(input: Type<Input>, exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>, dependencies?: Dependencies, output?: Type<Output>): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>;
 
 // @public (undocumented)
-export function defineEntity<Props, Key extends PossibleKeysOf<Props>, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(type: Type<Props>, key: Key, on: {
+export function defineEntity<Props extends Record<string, unknown>, Key extends PossibleKeysOf<Props>, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(type: Type<Props>, key: Key, on: {
     [K in Mutators[number]]: (EntityProjectionFunc<Props, Key, Change<TypeOf<Events[K]>, K>, Pick<Views, Dependencies[number]>>);
 }, auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number]>>, dependencies?: Dependencies): EntityProjection<Props, Key, Events, Views, Scope>;
 
 // @public (undocumented)
-export function defineQuery<Views extends ReadModel, Result, Params extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, Dependencies extends (string & keyof Views)[] = []>(type: Type<Result>, params: Type<Params>, dependencies: Dependencies, exec: QueryFunc<Pick<Views, Dependencies[number]>, Params, Scope, Result>): QueryHandler<Params, Result, Pick<Views, Dependencies[number]>, Scope>;
+export function defineQuery<Views extends ReadModel, Result, Params extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, Dependencies extends (string & keyof Views)[] = []>(type: Type<Result>, params: Type<Params>, dependencies: Dependencies, exec: QueryExecFunc<Pick<Views, Dependencies[number]>, Params, Scope, Result>, auth?: QueryAuthFunc<Pick<Views, Dependencies[number]>, Params, Scope, Result>): QueryHandler<Params, Result, Pick<Views, Dependencies[number]>, Scope>;
 
 // @public (undocumented)
 export function defineState<State, Events extends ChangeModel = ChangeModel, Scope = unknown, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(type: Type<State>, initial: State, on: {
@@ -209,7 +212,7 @@ export interface EntityCollection<T, K extends PossibleKeysOf<T>> extends Readon
 }
 
 // @public (undocumented)
-export interface EntityProjection<T, K extends PossibleKeysOf<T>, C extends ChangeModel = ChangeModel, R extends ReadModel = ReadModel, Scope = unknown> {
+export interface EntityProjection<T extends Record<string, unknown> = Record<string, unknown>, K extends PossibleKeysOf<T> = PossibleKeysOf<T>, C extends ChangeModel = ChangeModel, R extends ReadModel = ReadModel, Scope = unknown> {
     // (undocumented)
     readonly apply: EntityProjectionFunc<T, K, Change, R>;
     // (undocumented)
@@ -230,11 +233,7 @@ export interface EntityProjection<T, K extends PossibleKeysOf<T>, C extends Chan
 export type EntityProjectionFunc<T, K extends PossibleKeysOf<T>, C extends Change = Change, R extends ReadModel = ReadModel> = (change: C, state: EntityCollection<T, K>, view: ViewSnapshotFunc<R>) => Promise<void>;
 
 // @public (undocumented)
-export interface EntityView<T extends {
-    [P in K]: string | number;
-}, K extends PossibleKeysOf<T>> extends ReadonlyEntityCollection<T, K> {
-    // (undocumented)
-    auth(this: void): Promise<boolean>;
+export interface EntityView<T extends Record<string, unknown> = Record<string, unknown>, K extends PossibleKeysOf<T> = PossibleKeysOf<T>> extends ReadonlyEntityCollection<T, K> {
     // (undocumented)
     readonly kind: "entities";
     // (undocumented)
@@ -246,6 +245,9 @@ export type EqualityOperator = "==" | "!=" | "in" | "not-in";
 
 // @public (undocumented)
 export type Equatable = null | boolean | Comparable;
+
+// @public (undocumented)
+export type ErrorFactory = () => Error;
 
 // @public (undocumented)
 export type FilterOperand<T, O> = (O extends IsOperator ? IsOperand<T> : O extends EqualityOperator ? T : O extends ComparisonOperator ? T : O extends ArrayAnyOperator ? T : O extends ArrayOperator ? T extends unknown[infer E] ? E : never : O extends StringOperator ? string : never);
@@ -318,11 +320,6 @@ export type PossibleKeysOf<T> = {
 }[keyof T];
 
 // @public (undocumented)
-export type Projection = {
-    kind: "state" | "query" | "entities";
-};
-
-// @public (undocumented)
 export interface Queryable<T> {
     // (undocumented)
     all(this: void): AsyncIterable<T>;
@@ -341,14 +338,19 @@ export interface Queryable<T> {
 }
 
 // @public (undocumented)
-export type QueryFunc<R extends ReadModel = ReadModel, P extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, T = unknown> = (view: ViewSnapshotFunc<R>, params: P, scope: Scope) => Promise<T | Forbidden>;
+export type QueryAuthFunc<R extends ReadModel = ReadModel, P extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, T = unknown> = (this: void, exec: QueryExecFunc<R, P, Scope, T>, view: ViewSnapshotFunc<R>, params: P, scope: Scope) => Promise<T | Forbidden>;
+
+// @public (undocumented)
+export type QueryExecFunc<R extends ReadModel = ReadModel, P extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, T = unknown> = (this: void, view: ViewSnapshotFunc<R>, params: P, scope: Scope) => Promise<T>;
 
 // @public (undocumented)
 export interface QueryHandler<P extends Record<string, unknown> = Record<string, unknown>, T = unknown, R extends ReadModel = ReadModel, Scope = unknown> {
     // (undocumented)
+    readonly auth?: QueryAuthFunc<R, P, Scope, T>;
+    // (undocumented)
     readonly dependencies: ReadonlySet<string & keyof R>;
     // (undocumented)
-    readonly exec: QueryFunc<R, P, Scope, T>;
+    readonly exec: QueryExecFunc<R, P, Scope, T>;
     // (undocumented)
     readonly kind: "query";
     // (undocumented)
@@ -372,8 +374,6 @@ export interface QuerySpec {
 // @public (undocumented)
 export interface QueryView<P = unknown, T = unknown> {
     // (undocumented)
-    auth(this: void, params: P): Promise<boolean>;
-    // (undocumented)
     readonly kind: "query";
     // (undocumented)
     query(this: void, params: P): Promise<T>;
@@ -382,7 +382,7 @@ export interface QueryView<P = unknown, T = unknown> {
 }
 
 // @public (undocumented)
-export type ReadModel<K extends string = string, T extends Projection = Projection> = Readonly<Record<K, T>>;
+export type ReadModel<K extends string = string, T extends AnyProjection = AnyProjection> = Readonly<Record<K, T>>;
 
 // @public (undocumented)
 export interface ReadonlyEntityCollection<T, K extends PossibleKeysOf<T>> extends Queryable<T> {
@@ -448,8 +448,6 @@ export interface StateProjection<T = unknown, C extends ChangeModel = ChangeMode
 // @public (undocumented)
 export interface StateView<T = unknown> {
     // (undocumented)
-    auth(this: void): Promise<boolean>;
-    // (undocumented)
     readonly kind: "state";
     // (undocumented)
     read(this: void): Promise<T>;
@@ -474,12 +472,12 @@ export interface SyncOptions<K extends string = string> {
 export type View = StateView | QueryView | EntityView<Record<string, string | number>, string>;
 
 // @public (undocumented)
-export type ViewOf<H extends Projection> = H extends StateProjection<infer T, any, any, any> ? StateView<T> : H extends QueryHandler<infer P, infer T, any, any> ? QueryView<P, T> : H extends EntityProjection<infer T, infer K, any, any, any> ? EntityView<T, K> : View;
+export type ViewOf<H extends AnyProjection> = H extends StateProjection<infer T, any, any, any> ? StateView<T> : H extends QueryHandler<infer P, infer T, any, any> ? QueryView<P, T> : H extends EntityProjection<infer T, infer K, any, any, any> ? EntityView<T, K> : View;
 
 // @public (undocumented)
 export interface ViewOptions {
     // (undocumented)
-    readonly auth: boolean | (() => Error);
+    readonly auth: boolean | ErrorFactory;
     // (undocumented)
     readonly signal: AbortSignal;
     // (undocumented)

@@ -5,7 +5,7 @@ import { PossibleKeysOf } from "./entity-view";
 import { ChangeModel, ReadModel } from "./model";
 
 export function defineEntity<
-    Props,
+    Props extends Record<string, unknown>,
     Key extends PossibleKeysOf<Props>,
     Scope = unknown,
     Events extends ChangeModel = ChangeModel,

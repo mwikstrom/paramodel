@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface EntityProjection<T, K extends PossibleKeysOf<T>, C extends ChangeModel = ChangeModel, R extends ReadModel = ReadModel, Scope = unknown> 
+export interface EntityProjection<T extends Record<string, unknown> = Record<string, unknown>, K extends PossibleKeysOf<T> = PossibleKeysOf<T>, C extends ChangeModel = ChangeModel, R extends ReadModel = ReadModel, Scope = unknown> 
 ```
 
 ## Properties

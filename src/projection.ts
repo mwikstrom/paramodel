@@ -6,9 +6,16 @@ import { QueryView } from "./query-view";
 import { StateProjection } from "./state-projection";
 import { StateView } from "./state-view";
 
-export type Projection = StateProjection | QueryHandler | EntityProjection;
+export type AnyProjection = (
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    StateProjection<any, any, any, any> | 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    QueryHandler<any, any, any, any> | 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    EntityProjection<any, any, any, any, any>
+);
 
-export type ViewOf<H extends Projection> =
+export type ViewOf<H extends AnyProjection> =
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     H extends StateProjection<infer T, any, any, any> ? StateView<T> :
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare function defineEntity<Props, Key extends PossibleKeysOf<Props>, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(type: Type<Props>, key: Key, on: {
+export declare function defineEntity<Props extends Record<string, unknown>, Key extends PossibleKeysOf<Props>, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(type: Type<Props>, key: Key, on: {
     [K in Mutators[number]]: (EntityProjectionFunc<Props, Key, Change<TypeOf<Events[K]>, K>, Pick<Views, Dependencies[number]>>);
 }, auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number]>>, dependencies?: Dependencies): EntityProjection<Props, Key, Events, Views, Scope>;
 ```

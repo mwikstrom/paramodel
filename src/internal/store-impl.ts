@@ -240,6 +240,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
 
         const version = base + 1;
+        const snapshot = this.#createViewSnapshotFunc(handler.dependencies, new Set());
         const fromContext = await new _ActionContextImpl(
             version,
             timestamp,
@@ -247,6 +248,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             this.#scope,
             this.#model.events,
             handler,
+            snapshot,
         )._run();
 
         if (fromContext.status !== "success") {
