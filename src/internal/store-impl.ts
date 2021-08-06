@@ -298,7 +298,32 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     }
 
     #getMaterialViewDependencies = (key: string): string[] => {
-        throw new Error("TODO: Get material view dependencies");
+        const processed = new Set<string>();
+        const result: string[] = [];
+        const todo: string[] = [];
+        
+        for (let next: string | undefined = key; next !== void(0); next = todo.shift()) {
+            if (processed.has(next)) {
+                continue;
+            }
+
+            processed.add(next);
+            
+            const definition = this.#model.views[next];
+            if (!definition) {
+                continue;
+            }
+
+            if (_materialViewKindType.test(definition.kind)) {
+                result.push(next);
+            }
+
+            for (const dependency of definition.dependencies) {
+                todo.push(dependency);
+            }
+        }
+
+        return result;
     };
 
     #tryAction = async <K extends string & keyof Model["actions"]>(
