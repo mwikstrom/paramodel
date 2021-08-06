@@ -16,7 +16,6 @@ import {
     DomainStoreStatus, 
     ErrorFactory, 
     PurgeOptions, 
-    PurgeResult, 
     ReadOptions, 
     SyncOptions, 
     ViewOptions, 
@@ -926,7 +925,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return synced;
     }
 
-    purge = (options: Partial<PurgeOptions> = {}): Promise<PurgeResult> => {
+    purge = (options: Partial<PurgeOptions> = {}): Promise<number> => {
         // When implementing: Remember to NOT COMPETE with sync!
         // Old versions may be needed (and recreated) when syncing a new view with
         // dependencies!
