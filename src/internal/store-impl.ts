@@ -337,17 +337,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return result;
     };
 
-    #readCommits = (
-        options: Partial<ReadOptions<string & keyof Model["events"]>> = {}
-    ): AsyncIterable<_Commit> => {
+    #getCommitQuery = (
+        options: Partial<ReadOptions<string & keyof Model["events"]>>
+    ): Queryable<_Commit> => {
         const { first, last, excludeFirst, excludeLast, filter } = options;
         let query = new _QueryImpl(this.#commitSource, ["value"]).by("version");
-        let minVersion = 1;
-        let minPosition = 1;
 
         if (typeof first === "number") {
             query = query.where("version", excludeFirst ? ">" : ">=", first);
-            minVersion = excludeFirst ? first + 1 : first;
         }
 
         if (typeof last === "number") {
@@ -356,6 +353,21 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
         if (Array.isArray(filter)) {
             query = query.where("changes", "includes-any", filter);
+        }
+
+        return query;
+    }
+
+    #readCommits = (
+        options: Partial<ReadOptions<string & keyof Model["events"]>>
+    ): AsyncIterable<_Commit> => {
+        const { first, excludeFirst } = options;
+        const query = this.#getCommitQuery(options);
+        let minVersion = 1;
+        let minPosition = 1;
+
+        if (typeof first === "number") {
+            minVersion = excludeFirst ? first + 1 : first;
         }
 
         return {[Symbol.asyncIterator]: async function*() {
