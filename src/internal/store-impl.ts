@@ -59,10 +59,19 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         version: number,
         circular: readonly string[],
         authError?: ErrorFactory,
+        metaMap?: WeakMap<T, EntityMetadata>,
     ): Promise<ReadonlyEntityCollection<T>> => {        
         const { auth, dependencies } = definition;
-        const envelope = entityEnvelopeType(definition.type);
-        const transform = (record: OutputRecord): T => envelope.fromJsonValue(record.value).entity;
+        const envelopeType = entityEnvelopeType(definition.type);
+        const transform = (record: OutputRecord): T => {
+            const { value, ...meta } = record;
+            const envelope = envelopeType.fromJsonValue(value);
+            const entity = envelope.entity;
+            if (metaMap) {
+                metaMap.set(entity, meta);
+            }
+            return entity;
+        };
         const partitionKey = _partitionKeys.view(viewKey);
         const source = new _DriverQuerySource(
             this.#driver,
@@ -79,7 +88,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             },
             {
                 path: ["value", "end"],
-                operator: ">",
+                operator: ">=",
                 operand: version,
             }
         ]);
@@ -515,13 +524,17 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     #syncEntities = async (commit: _Commit, definition: EntityProjection, viewKey: string): Promise<boolean> => {
         const changes = _getChangesFromCommit(commit, this.#model.events, definition.mutators);
         const snapshot = this.#createViewSnapshotFunc(commit.version, definition.dependencies, [viewKey]);
+        const metaMap = new WeakMap<Record<string, unknown>, EntityMetadata>();
         const { get: baseGet, ...base } = await this.#createReadonlyEntityCollection(
             viewKey,
             definition,
             commit.version - 1,
-            [viewKey]
+            [viewKey],
+            undefined,
+            metaMap,
         );
-        const written = new Map<string, { token: string }>();
+        const written = new Set<string>();
+        const actions: Promise<unknown>[] = [];
         const pk = _partitionKeys.view(viewKey);
         const rk = (key: string): string => _rowKeys.entity(key, commit.version);
         const get: EntityCollection["get"] = async (key: string) => {
@@ -534,11 +547,53 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 return await baseGet(key);
             }
         };
-        const put: EntityCollection["put"] = async props => {
+        const innerPut: EntityCollection["put"] = async props => {
             throw new Error("TODO: PUT ENTITY!");
         };
-        const del: EntityCollection["del"] = async key => {
-            throw new Error("TODO: DEL ENTITY!");
+        const innerDel: EntityCollection["del"] = async (key: string) => {
+            if (written.has(key)) {
+                const output = await this.#driver.read(this.#id, pk, rk(key));
+                if (!output) {
+                    return false; // already deleted
+                }                
+                const input: InputRecord = {
+                    key: output.key,
+                    value: null,
+                    replace: output.token,
+                    ttl: 0,
+                };
+                await this.#driver.write(this.#id, pk, input);
+                return true;
+            } else {
+                const entity = await baseGet(key);
+                if (!entity) {
+                    written.add(key);
+                    return false; // did not exist
+                }
+                const meta = metaMap.get(entity);
+                if (!meta) {
+                    throw new Error("Entity metadata was not populated");
+                }
+                const input: InputRecord = {
+                    key: meta.key,
+                    value: null,
+                    replace: meta.token,
+                    ttl: 0,
+                };
+                await this.#driver.write(this.#id, pk, input);
+                written.add(key);
+                return true;
+            }
+        };
+        const put: EntityCollection["put"] = props => {
+            const promise = innerPut(props);
+            actions.push(promise);
+            return promise;
+        };
+        const del: EntityCollection["del"] = (key: string) => {
+            const promise = innerDel(key);
+            actions.push(promise);
+            return promise;
         };
         const collection: EntityCollection = {
             ...base,
@@ -550,6 +605,9 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         for (const change of changes) {
             await definition.apply(change, collection, snapshot);
         }
+
+        // ensure all actions were successful
+        await Promise.all(actions);
 
         return written.size > 0;
     }
@@ -1001,3 +1059,5 @@ const getViewHeaderForCommit = (
         return header;
     }
 };
+
+type EntityMetadata = Omit<OutputRecord, "value">;

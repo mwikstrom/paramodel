@@ -39,7 +39,7 @@ export interface EntityCollection<
     K extends PossibleKeysOf<T> = PossibleKeysOf<T>
 > extends ReadonlyEntityCollection<T, K> {
     put(this: void, props: T): Promise<void>;
-    del(this: void, key: T[K]): Promise<void>;
+    del(this: void, key: T[K]): Promise<boolean>;
 }
 
 export type EntityChangeHandlers<

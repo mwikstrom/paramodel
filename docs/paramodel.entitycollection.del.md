@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-del(this: void, key: T[K]): Promise<void>;
+del(this: void, key: T[K]): Promise<boolean>;
 ```
 
 ## Parameters
@@ -19,5 +19,5 @@ del(this: void, key: T[K]): Promise<void>;
 
 <b>Returns:</b>
 
-Promise&lt;void&gt;
+Promise&lt;boolean&gt;
 

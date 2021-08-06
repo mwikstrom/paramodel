@@ -208,7 +208,7 @@ export type EntityChangeHandlers<C extends ChangeModel, T, K extends PossibleKey
 // @public (undocumented)
 export interface EntityCollection<T = Record<string, unknown>, K extends PossibleKeysOf<T> = PossibleKeysOf<T>> extends ReadonlyEntityCollection<T, K> {
     // (undocumented)
-    del(this: void, key: T[K]): Promise<void>;
+    del(this: void, key: T[K]): Promise<boolean>;
     // (undocumented)
     put(this: void, props: T): Promise<void>;
 }
