@@ -8,7 +8,8 @@ import {
     timestampType, 
     Type 
 } from "paratype";
-import { Change } from "../change";
+import { Change, ChangeType } from "../change";
+import { ChangeModel } from "../model";
 
 /** @internal */
 export type _Commit = {
@@ -40,3 +41,40 @@ export const _commitType: Type<_Commit> = recordType({
         );
     }
 );
+
+/** @internal */
+export const _getChangesFromCommit = <Events extends ChangeModel>(
+    commit: _Commit,
+    model: Events,
+    filter?: ReadonlySet<string>,
+): ChangeType<Events>[] => {
+    const { timestamp, version } = commit;
+    const result: ChangeType<Events>[]= [];
+    let { position } = commit;
+
+    for (const entry of commit.events) {
+        const { key, arg, ...rest } = entry;
+
+        if (filter === void(0) || filter.has(key)) {
+            const eventType = model[key];
+            if (!eventType) {
+                throw new Error(`Cannot read unknown event: ${key}`);
+            }
+
+            const change: Change = {
+                ...rest,
+                key: key,
+                timestamp, 
+                version, 
+                position,
+                arg: eventType.fromJsonValue(arg),
+            };
+
+            result.push(change as ChangeType<Events>);
+        }
+
+        ++position;
+    }
+
+    return result;
+};

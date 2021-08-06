@@ -318,7 +318,7 @@ export interface PageOptions {
 
 // @public (undocumented)
 export type PossibleKeysOf<T> = {
-    [P in keyof T]: T[P] extends (string | number) ? P extends string ? P : never : never;
+    [P in keyof T]: T[P] extends (string | number | unknown) ? P extends string ? P : never : never;
 }[keyof T];
 
 // @public (undocumented)

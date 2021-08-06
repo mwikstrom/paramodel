@@ -23,7 +23,7 @@ import {
     ViewStatus 
 } from "../store";
 import { _ActionContextImpl } from "./action-context-impl";
-import { _Commit, _commitType } from "./commit";
+import { _Commit, _commitType, _getChangesFromCommit } from "./commit";
 import { _partitionKeys, _rowKeys } from "./data-keys";
 import { _QueryImpl } from "./query-impl";
 import { _DriverQuerySource, _QuerySource } from "./query-source";
@@ -251,20 +251,16 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return view as ViewOf<Model["views"][typeof key]>;
     }
 
-    #deserializeChangeArg = (
-        key: string, 
-        arg: JsonValue
-    ): unknown => {
-        if (key in this.#model.events) {
-            return this.#model.events[key].fromJsonValue(arg);
-        } else {
-            return arg;
-        }
-    }
-
     #getLatestCommit = (): Promise<_Commit | undefined> => (
         new _QueryImpl(this.#commitSource, ["value"]).by("version", "descending").first()
     )
+
+    #getCommit = async (version: number): Promise<_Commit | undefined> => {
+        const record = await this.#driver.read(this.#id, _partitionKeys.commits, _rowKeys.commit(version));
+        if (record) {
+            return _commitType.fromJsonValue(record.value);
+        }
+    }
 
     #getViewHeaderRecord = (key: string): Promise<OutputRecord | undefined> => {
         const partition = _partitionKeys.view(key);
@@ -386,8 +382,110 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }};
     }
 
-    #syncNext = async (infoMap: Map<string, SyncViewInfo>): Promise<number> => {
-        throw new Error("TODO: #syncNext not implemented.");
+    #syncNext = async (
+        infoMap: Map<string, SyncViewInfo>,
+        last?: number,
+        signal?: AbortSignal,
+    ): Promise<number> => {
+        let first: number | undefined = void(0);
+
+        // determine first version to sync
+        for (const [, info] of infoMap) {
+            if (first === void(0) || info.sync_version < first) {
+                first = info.sync_version + 1;
+            }
+        }
+        
+        if (first === void(0)) {
+            return 0;
+        }
+
+        // determine which views to sync and possibly limit the last commit to be synced
+        const viewsToSync = new Set<string>();
+        for (const [key, info] of infoMap) {
+            const notSynced = info.sync_version < first;
+            const purged = info.purge_start_version <= first && info.purge_end_version >= first;
+            if (notSynced || purged) {
+                viewsToSync.add(key);
+            }
+            if (purged && (last === void(0) || last > info.purge_end_version)) {
+                last = info.purge_end_version;
+            }
+        }
+
+        // determine which events that needs to be synced
+        const eventsToSync = new Set<string>();
+        for (const key of viewsToSync) {
+            const definition = this.#model.views[key];
+            if (definition?.kind === "state" || definition?.kind === "entities") {
+                definition.mutators.forEach(e => eventsToSync.add(e));
+            } else {
+                throw new Error(`Don't know how to sync view: ${key}`);
+            }
+        }
+
+        let latest: _Commit | undefined;
+
+        if (last === void(0)) {
+            latest = await this.#getLatestCommit();
+            if (!latest) {
+                return 0;
+            }
+            last = latest.version;
+        }
+
+        const filter = Array.from(eventsToSync);
+        let synced = 0;
+        for await (const commit of this.#readCommits({ first, last, filter })) {
+            await this.#syncCommit(commit, infoMap, viewsToSync);
+            synced = commit.version;
+            if (signal?.aborted) {
+                return synced;
+            }
+        }
+
+        if (synced < last) {
+            if (!latest) {
+                latest = await this.#getCommit(last);
+            }
+            if (latest) {
+                await this.#syncCommit(latest, infoMap, viewsToSync);
+                synced = latest.version;
+            }
+        }
+
+        return synced;
+    }
+
+    #syncCommit = async (commit: _Commit, infoMap: Map<string, SyncViewInfo>, keys: Set<string>): Promise<void> => {
+        for (const key of keys) {
+            const info = infoMap.get(key);
+            const definition = this.#model.views[key];
+            
+            if (!info) {
+                throw new Error("Invalid view info map");
+            }
+            
+            if (definition?.kind === "entities") {
+                await this.#syncEntities(commit, definition);
+            } else if (definition?.kind === "state") {
+                await this.#syncState(commit, definition);
+            } else {
+                throw new Error(`Don't know how to sync view: ${key}`);
+            }
+
+            throw new Error("TODO: store new view header");
+        }
+    }
+
+    #syncEntities = async (commit: _Commit, definition: EntityProjection): Promise<void> => {
+        const changes = _getChangesFromCommit(commit, this.#model.events, definition.mutators);
+        throw new Error("TODO: syncEntities");
+    }
+
+    #syncState = async (commit: _Commit, definition: StateProjection): Promise<void> => {
+        const changes = _getChangesFromCommit(commit, this.#model.events, definition.mutators);
+        throw new Error("TODO: syncState");
     }
 
     #tryAction = async <K extends string & keyof Model["actions"]>(
@@ -526,26 +624,16 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     read = (
         options: Partial<ReadOptions<string & keyof Model["events"]>> = {}
     ): AsyncIterable<ChangeType<Model["events"]>> => {
-        const deserializeChangeArg = this.#deserializeChangeArg;
+        const changeModel = this.#model.events;
         const readCommits = () => this.#readCommits(options);
+        let filter: ReadonlySet<string> | undefined = void(0);
+        if (options.filter) {
+            filter = new Set(options.filter);
+        }
         return {[Symbol.asyncIterator]: async function*() {
             for await (const commit of readCommits()) {
-                const { timestamp, version } = commit;
-                let { position } = commit;
-
-                for (const entry of commit.events) {
-                    const { key, arg, ...rest } = entry;
-                    const change: Change = {
-                        ...rest,
-                        key: key,
-                        timestamp, 
-                        version, 
-                        position,
-                        arg: deserializeChangeArg(key, arg),
-                    };
-
+                for (const change of _getChangesFromCommit(commit, changeModel, filter)) {
                     yield change as ChangeType<Model["events"]>;
-                    ++position;
                 }
             }
         }};
@@ -583,40 +671,28 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     }
 
     sync = async (options: Partial<SyncOptions> = {}): Promise<number> => {
-        const {
-            signal,
-            target = (await this.#getLatestCommit())?.version || 0,
-        } = options;
+        const { signal, target } = options;
         const viewKeys = options.views ?
             this.#getMaterialViewDependencies(...options.views) :
             this.#getAllMaterialViews();
-        const infoMap = new Map<string, SyncViewInfo>();
-        let syncVersion: number | undefined;
+        const infoMap = new Map<string, SyncViewInfo>(
+            (await Promise.all(viewKeys.map(this.#getViewHeaderRecord))).map((record, index) => ([
+                viewKeys[index],
+                getSyncInfoFromRecord(record),
+            ]))    
+        );
 
-        (await Promise.all(viewKeys.map(this.#getViewHeaderRecord))).forEach((record, index) => {
-            const info = syncViewInfoFromRecord(record);
-
-            if (syncVersion === void(0) || info.sync_version < syncVersion) {
-                syncVersion = info.sync_version;
-            }
-
-            infoMap.set(viewKeys[index], info);
-        });
-
-        if (syncVersion === void(0)) {
-            syncVersion = 0;
-        }
-
-        while (syncVersion < target && !(signal?.aborted)) {
-            const next = await this.#syncNext(infoMap);
-            if (next > syncVersion) {
-                syncVersion = next;
+        let synced = 0;
+        do { 
+            const next = await this.#syncNext(infoMap, target, signal); 
+            if (next > synced) {
+                synced = next;
             } else {
                 break;
             }
         }
-
-        return syncVersion;
+        while (!signal?.aborted && synced < (target || 0));
+        return synced;
     }
 
     purge = (options: Partial<PurgeOptions> = {}): Promise<PurgeResult> => {
@@ -684,7 +760,7 @@ type SyncViewInfo = {
     readonly purge_end_version: number;
 }
 
-const syncViewInfoFromRecord = (record: OutputRecord | undefined): SyncViewInfo => {
+const getSyncInfoFromRecord = (record: OutputRecord | undefined): SyncViewInfo => {
     let sync_version = 0;
     let purge_start_version = 0;
     let purge_end_version = 0;
