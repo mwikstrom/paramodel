@@ -29,6 +29,9 @@ import { _QueryImpl } from "./query-impl";
 import { _DriverQuerySource, _QuerySource } from "./query-source";
 import { _getMinSyncVersion, _materialViewKindType, _viewHeader, _ViewHeader } from "./view-header";
 
+// TODO: Continuation tokens must include version and timestamp and shall expire when too old
+//       (older than purge ttl) - or be renewed in case version is still not purged!
+
 /** @internal */
 export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model> {
     readonly #driver: DomainDriver;
