@@ -25,7 +25,7 @@ import { _Commit, _commitType } from "./commit";
 import { _partitionKeys, _rowKeys } from "./data-keys";
 import { _QueryImpl } from "./query-impl";
 import { _DriverQuerySource, _QuerySource } from "./query-source";
-import { _viewHeader, _ViewHeader } from "./view-header";
+import { _materialViewKindType, _viewHeader, _ViewHeader } from "./view-header";
 
 /** @internal */
 export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model> {
@@ -272,6 +272,35 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return record && _viewHeader.fromJsonValue(record.value);
     }
 
+    #getViewSyncVersion = async (key: string, definition?: AnyProjection): Promise<number | undefined> => {
+        if (!definition) {
+            definition = this.#model.views[key];
+            if (!definition) {
+                return void(0);
+            }
+        }
+
+        if (_materialViewKindType.test(definition.kind)) {
+            const header = await this.#getViewHeader(key);
+            
+            if (!header) {
+                return 0;
+            }
+
+            if (header.kind !== definition.kind) {
+                throw new Error("View header has unexpected kind");
+            }
+
+            return header.sync_version;
+        }
+
+        throw new Error("TODO: Get view version of non material view");
+    }
+
+    #getMaterialViewDependencies = (key: string): string[] => {
+        throw new Error("TODO: Get material view dependencies");
+    };
+
     #tryAction = async <K extends string & keyof Model["actions"]>(
         latest: _Commit | undefined,
         minBase: number,
@@ -458,16 +487,19 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }};
     }
 
-    stat = async (): Promise<DomainStoreStatus<string & keyof Model["views"]>> => {
-        const viewKeys = Object.keys(this.#model.views);
+    stat = async (): Promise<DomainStoreStatus> => {
+        const materialViewKeys = Object
+            .entries(this.#model.views)
+            .filter(([,def]) => _materialViewKindType.test(def))
+            .map(([key]) => key);
         const [
             latest,
             headers,
         ] = await Promise.all([
             this.#getLatestCommit(),
-            Promise.all(viewKeys.map(key => this.#getViewHeader(key))),
+            Promise.all(materialViewKeys.map(key => this.#getViewHeader(key))),
         ]);
-        const views = Object.fromEntries(viewKeys.map((key, index) => {
+        const views = Object.fromEntries(materialViewKeys.map((key, index) => {
             const header = headers[index];
             const viewStatus: ViewStatus = {
                 sync_version: header?.sync_version || 0,
@@ -479,8 +511,8 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 purge_end_version: header?.purge_end_version || 0,
             };
             return [key, viewStatus];
-        })) as Readonly<Record<string & keyof Model["views"], ViewStatus>>;
-        const result: DomainStoreStatus<string & keyof Model["views"]> = {
+        }));
+        const result: DomainStoreStatus = {
             version: latest?.version || 0,
             position: latest?.position || 0,
             timestamp: latest?.timestamp,
@@ -499,16 +531,12 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     ): Promise<ViewOf<Model["views"][K]> | undefined> => {
         const { sync = 0, signal } = options;
         const definition = this.#model.views[key];
-        if (!definition) {
+        let version = await this.#getViewSyncVersion(key, definition);
+        
+        if (version === void(0)) {
             return void(0);
         }
 
-        const header = await this.#getViewHeader(key);
-        if (header && header.kind !== definition.kind) {
-            return void(0);
-        }
-
-        let version = header?.sync_version || 0;
         if (sync > version) {
             version = await this.sync({ views: [key], target: sync, signal });
             

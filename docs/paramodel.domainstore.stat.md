@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-stat(this: void): Promise<DomainStoreStatus<string & keyof Model["views"]>>;
+stat(this: void): Promise<DomainStoreStatus>;
 ```
 
 ## Parameters
@@ -18,5 +18,5 @@ stat(this: void): Promise<DomainStoreStatus<string & keyof Model["views"]>>;
 
 <b>Returns:</b>
 
-Promise&lt;[DomainStoreStatus](./paramodel.domainstorestatus.md)<!-- -->&lt;string &amp; keyof Model\["views"\]&gt;&gt;
+Promise&lt;[DomainStoreStatus](./paramodel.domainstorestatus.md)<!-- -->&gt;
 

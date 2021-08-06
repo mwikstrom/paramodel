@@ -2,7 +2,7 @@ import { enumType, nonNegativeIntegerType, recordType, timestampType, Type } fro
 
 /** @internal */
 export type _ViewHeader = {
-    readonly kind: "state" | "entities" | "query";
+    readonly kind: _MaterialViewKind;
     readonly sync_version: number;
     readonly sync_position: number;
     readonly sync_timestamp: Date;
@@ -13,8 +13,14 @@ export type _ViewHeader = {
 };
 
 /** @internal */
+export type _MaterialViewKind = "state" | "entities";
+
+/** @internal */
+export const _materialViewKindType: Type<_MaterialViewKind> = enumType(["state", "entities"]);
+
+/** @internal */
 export const _viewHeader: Type<_ViewHeader> = recordType({
-    kind: enumType(["state", "entities", "query"]),
+    kind: _materialViewKindType,
     sync_version: nonNegativeIntegerType,
     sync_position: nonNegativeIntegerType,
     sync_timestamp: timestampType,

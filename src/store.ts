@@ -15,7 +15,7 @@ export interface DomainStore<Model extends DomainModel> {
         this: void, 
         options?: Partial<ReadOptions<string & keyof Model["events"]>>,
     ): AsyncIterable<ChangeType<Model["events"]>>;
-    stat(this: void): Promise<DomainStoreStatus<string & keyof Model["views"]>>;
+    stat(this: void): Promise<DomainStoreStatus>;
     sync<K extends string & keyof Model["views"]>(
         this: void,
         options?: SyncOptions<K>
@@ -33,11 +33,11 @@ export interface ReadOptions<K extends string> {
     readonly changes: readonly K[];
 }
 
-export interface DomainStoreStatus<K extends string> {
+export interface DomainStoreStatus {
     readonly version: number;
     readonly position: number;
     readonly timestamp?: Date;
-    readonly views: Readonly<Record<K, ViewStatus>>;
+    readonly views: Readonly<Record<string, ViewStatus>>;
 }
 
 export interface ViewStatus {

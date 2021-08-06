@@ -176,7 +176,7 @@ export interface DomainStore<Model extends DomainModel> {
     // (undocumented)
     read(this: void, options?: Partial<ReadOptions<string & keyof Model["events"]>>): AsyncIterable<ChangeType<Model["events"]>>;
     // (undocumented)
-    stat(this: void): Promise<DomainStoreStatus<string & keyof Model["views"]>>;
+    stat(this: void): Promise<DomainStoreStatus>;
     // (undocumented)
     sync<K extends string & keyof Model["views"]>(this: void, options?: SyncOptions<K>): Promise<number>;
     // (undocumented)
@@ -184,7 +184,7 @@ export interface DomainStore<Model extends DomainModel> {
 }
 
 // @public (undocumented)
-export interface DomainStoreStatus<K extends string> {
+export interface DomainStoreStatus {
     // (undocumented)
     readonly position: number;
     // (undocumented)
@@ -192,7 +192,7 @@ export interface DomainStoreStatus<K extends string> {
     // (undocumented)
     readonly version: number;
     // (undocumented)
-    readonly views: Readonly<Record<K, ViewStatus>>;
+    readonly views: Readonly<Record<string, ViewStatus>>;
 }
 
 // @public (undocumented)

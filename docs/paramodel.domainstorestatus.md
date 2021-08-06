@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface DomainStoreStatus<K extends string> 
+export interface DomainStoreStatus 
 ```
 
 ## Properties
@@ -17,5 +17,5 @@ export interface DomainStoreStatus<K extends string>
 |  [position](./paramodel.domainstorestatus.position.md) | number |  |
 |  [timestamp?](./paramodel.domainstorestatus.timestamp.md) | Date | <i>(Optional)</i> |
 |  [version](./paramodel.domainstorestatus.version.md) | number |  |
-|  [views](./paramodel.domainstorestatus.views.md) | Readonly&lt;Record&lt;K, [ViewStatus](./paramodel.viewstatus.md)<!-- -->&gt;&gt; |  |
+|  [views](./paramodel.domainstorestatus.views.md) | Readonly&lt;Record&lt;string, [ViewStatus](./paramodel.viewstatus.md)<!-- -->&gt;&gt; |  |
 

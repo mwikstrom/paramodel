@@ -7,5 +7,5 @@
 <b>Signature:</b>
 
 ```typescript
-readonly views: Readonly<Record<K, ViewStatus>>;
+readonly views: Readonly<Record<string, ViewStatus>>;
 ```
