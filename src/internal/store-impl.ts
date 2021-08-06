@@ -2,8 +2,8 @@ import { positiveIntegerType, recordType, Type, TypeOf } from "paratype";
 import { ActionOptions, ActionResultType } from "../action";
 import { ChangeType } from "../change";
 import { DomainDriver, FilterSpec, InputRecord, OutputRecord } from "../driver";
-import { EntityProjection } from "../entity-projection";
-import { EntityView } from "../entity-view";
+import { EntityCollection, EntityProjection } from "../entity-projection";
+import { EntityView, ReadonlyEntityCollection } from "../entity-view";
 import { DomainModel, Forbidden } from "../model";
 import { AnyProjection, View, ViewOf, ViewSnapshotFunc } from "../projection";
 import { QueryHandler } from "../query-handler";
@@ -53,14 +53,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         );
     }
 
-    #createEntityView = async <T extends Record<string, unknown>>(
+    #createReadonlyEntityCollection = async <T extends Record<string, unknown>>(
         viewKey: string,
         definition: EntityProjection<T>,
         version: number,
         circular: readonly string[],
         authError?: ErrorFactory,
-    ): Promise<EntityView> => {        
-        const { kind, auth, dependencies } = definition;
+    ): Promise<ReadonlyEntityCollection<T>> => {        
+        const { auth, dependencies } = definition;
         const envelope = entityEnvelopeType(definition.type);
         const transform = (record: OutputRecord): T => envelope.fromJsonValue(record.value).entity;
         const partitionKey = _partitionKeys.view(viewKey);
@@ -98,9 +98,31 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
 
         const get: EntityView<T>["get"] = key => query.where(definition.key, "==", key).first();
-        const view: EntityView<T> = {
+        const collection: ReadonlyEntityCollection<T> = {
             ...query,
             get,
+        };
+
+        return collection;
+    }
+
+    #createEntityView = async <T extends Record<string, unknown>>(
+        viewKey: string,
+        definition: EntityProjection<T>,
+        version: number,
+        circular: readonly string[],
+        authError?: ErrorFactory,
+    ): Promise<EntityView> => {        
+        const { kind,  } = definition;
+        const collection = await this.#createReadonlyEntityCollection(
+            viewKey, 
+            definition, 
+            version, 
+            circular, 
+            authError
+        );
+        const view: EntityView<T> = {
+            ...collection,
             kind,
             version,
         };
@@ -493,7 +515,38 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     #syncEntities = async (commit: _Commit, definition: EntityProjection, key: string): Promise<boolean> => {
         const changes = _getChangesFromCommit(commit, this.#model.events, definition.mutators);
         const snapshot = this.#createViewSnapshotFunc(commit.version, definition.dependencies, [key]);
-        throw new Error("TODO: syncEntities");
+        const { get: baseGet, ...base } = await this.#createReadonlyEntityCollection(
+            key,
+            definition,
+            commit.version - 1,
+            [key]
+        );
+        const written = new Map<string, { token: string }>();
+        const get: EntityCollection["get"] = async key => {
+            if (written.has(key as string)) {
+                throw new Error("TODO: READ WRITTEN ENTITY!");
+            } else {
+                return await baseGet(key);
+            }
+        };
+        const put: EntityCollection["put"] = async props => {
+            throw new Error("TODO: PUT ENTITY!");
+        };
+        const del: EntityCollection["del"] = async key => {
+            throw new Error("TODO: DEL ENTITY!");
+        };
+        const collection: EntityCollection = {
+            ...base,
+            get,
+            put,
+            del,            
+        };
+
+        for (const change of changes) {
+            await definition.apply(change, collection, snapshot);
+        }
+
+        return written.size > 0;
     }
 
     #syncState = async (commit: _Commit, definition: StateProjection, key: string): Promise<boolean> => {

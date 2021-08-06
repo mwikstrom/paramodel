@@ -34,9 +34,12 @@ export type EntityProjectionFunc<
     R extends ReadModel = ReadModel,
 > = (change: C, state: EntityCollection<T, K>, view: ViewSnapshotFunc<R>) => Promise<void>;
 
-export interface EntityCollection<T, K extends PossibleKeysOf<T>> extends ReadonlyEntityCollection<T, K> {
-    put(props: T): Promise<void>;
-    del(key: T[K]): Promise<void>;
+export interface EntityCollection<
+    T = Record<string, unknown>, 
+    K extends PossibleKeysOf<T> = PossibleKeysOf<T>
+> extends ReadonlyEntityCollection<T, K> {
+    put(this: void, props: T): Promise<void>;
+    del(this: void, key: T[K]): Promise<void>;
 }
 
 export type EntityChangeHandlers<

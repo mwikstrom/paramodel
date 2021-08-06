@@ -206,11 +206,11 @@ export type EntityChangeHandlers<C extends ChangeModel, T, K extends PossibleKey
 }>;
 
 // @public (undocumented)
-export interface EntityCollection<T, K extends PossibleKeysOf<T>> extends ReadonlyEntityCollection<T, K> {
+export interface EntityCollection<T = Record<string, unknown>, K extends PossibleKeysOf<T> = PossibleKeysOf<T>> extends ReadonlyEntityCollection<T, K> {
     // (undocumented)
-    del(key: T[K]): Promise<void>;
+    del(this: void, key: T[K]): Promise<void>;
     // (undocumented)
-    put(props: T): Promise<void>;
+    put(this: void, props: T): Promise<void>;
 }
 
 // @public (undocumented)
@@ -399,7 +399,7 @@ export interface QueryView<P = unknown, T = unknown> {
 export type ReadModel<K extends string = string, T extends AnyProjection = AnyProjection> = Readonly<Record<K, T>>;
 
 // @public (undocumented)
-export interface ReadonlyEntityCollection<T, K extends PossibleKeysOf<T>> extends Queryable<T> {
+export interface ReadonlyEntityCollection<T, K extends PossibleKeysOf<T> = PossibleKeysOf<T>> extends Queryable<T> {
     // (undocumented)
     get(this: void, key: T[K]): Promise<T | undefined>;
 }

@@ -8,7 +8,7 @@ export interface EntityView<
     readonly version: number;
 }
 
-export interface ReadonlyEntityCollection<T, K extends PossibleKeysOf<T>> extends Queryable<T> {
+export interface ReadonlyEntityCollection<T, K extends PossibleKeysOf<T> = PossibleKeysOf<T>> extends Queryable<T> {
     get(this: void, key: T[K]): Promise<T | undefined>;
 }
 

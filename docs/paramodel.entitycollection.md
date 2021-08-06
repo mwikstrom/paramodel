@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface EntityCollection<T, K extends PossibleKeysOf<T>> extends ReadonlyEntityCollection<T, K> 
+export interface EntityCollection<T = Record<string, unknown>, K extends PossibleKeysOf<T> = PossibleKeysOf<T>> extends ReadonlyEntityCollection<T, K> 
 ```
 <b>Extends:</b> [ReadonlyEntityCollection](./paramodel.readonlyentitycollection.md)<!-- -->&lt;T, K&gt;
 
@@ -15,6 +15,6 @@ export interface EntityCollection<T, K extends PossibleKeysOf<T>> extends Readon
 
 |  Method | Description |
 |  --- | --- |
-|  [del(key)](./paramodel.entitycollection.del.md) |  |
-|  [put(props)](./paramodel.entitycollection.put.md) |  |
+|  [del(this, key)](./paramodel.entitycollection.del.md) |  |
+|  [put(this, props)](./paramodel.entitycollection.put.md) |  |
 

@@ -7,13 +7,14 @@
 <b>Signature:</b>
 
 ```typescript
-del(key: T[K]): Promise<void>;
+del(this: void, key: T[K]): Promise<void>;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
+|  this | void |  |
 |  key | T\[K\] |  |
 
 <b>Returns:</b>

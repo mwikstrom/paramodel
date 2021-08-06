@@ -7,13 +7,14 @@
 <b>Signature:</b>
 
 ```typescript
-put(props: T): Promise<void>;
+put(this: void, props: T): Promise<void>;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
+|  this | void |  |
 |  props | T |  |
 
 <b>Returns:</b>

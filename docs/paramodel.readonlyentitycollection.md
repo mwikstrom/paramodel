@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface ReadonlyEntityCollection<T, K extends PossibleKeysOf<T>> extends Queryable<T> 
+export interface ReadonlyEntityCollection<T, K extends PossibleKeysOf<T> = PossibleKeysOf<T>> extends Queryable<T> 
 ```
 <b>Extends:</b> [Queryable](./paramodel.queryable.md)<!-- -->&lt;T&gt;
 
