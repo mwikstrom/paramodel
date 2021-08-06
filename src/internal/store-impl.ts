@@ -1,6 +1,6 @@
-import { JsonValue, positiveIntegerType, recordType, Type, TypeOf } from "paratype";
+import { positiveIntegerType, recordType, Type, TypeOf } from "paratype";
 import { ActionOptions, ActionResultType } from "../action";
-import { Change, ChangeType } from "../change";
+import { ChangeType } from "../change";
 import { DomainDriver, FilterSpec, InputRecord, OutputRecord } from "../driver";
 import { EntityProjection } from "../entity-projection";
 import { EntityView } from "../entity-view";
