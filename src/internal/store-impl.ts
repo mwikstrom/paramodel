@@ -537,6 +537,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         const actions: Promise<unknown>[] = [];
         const pk = _partitionKeys.view(viewKey);
         const rk = (key: string): string => _rowKeys.entity(key, commit.version);
+
         const get: EntityCollection["get"] = async (key: string) => {
             if (written.has(key)) {
                 const record = await this.#driver.read(this.#id, pk, rk(key));
@@ -547,9 +548,11 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 return await baseGet(key);
             }
         };
+
         const innerPut: EntityCollection["put"] = async props => {
             throw new Error("TODO: PUT ENTITY!");
         };
+
         const innerDel: EntityCollection["del"] = async (key: string) => {
             if (written.has(key)) {
                 const output = await this.#driver.read(this.#id, pk, rk(key));
@@ -585,16 +588,17 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 return true;
             }
         };
-        const put: EntityCollection["put"] = props => {
-            const promise = innerPut(props);
-            actions.push(promise);
-            return promise;
-        };
-        const del: EntityCollection["del"] = (key: string) => {
-            const promise = innerDel(key);
-            actions.push(promise);
-            return promise;
-        };
+
+        const wrap = <Args extends unknown[], Result>(
+            inner: (...args: Args) => Promise<Result>
+        ): ((...args: Args) => Promise<Result>) => (...args) => {
+                const promise = inner(...args);
+                actions.push(promise);
+                return promise;
+            };
+
+        const put = wrap(innerPut);
+        const del = wrap(innerDel);
         const collection: EntityCollection = {
             ...base,
             get,
