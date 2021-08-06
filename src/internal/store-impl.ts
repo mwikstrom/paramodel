@@ -801,7 +801,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             operator: "<=",
             operand: purgeVersion,
         };
-        return this.#expireViewRecords(viewKey, purgeVersion, condition, signal);
+        return this.#expireViewRecords(viewKey, condition, signal);
     }
 
     #expirePurgedState = async (
@@ -814,12 +814,11 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             operator: "<=",
             operand: _rowKeys.viewState(purgeVersion),
         };
-        return this.#expireViewRecords(viewKey, purgeVersion, condition, signal);
+        return this.#expireViewRecords(viewKey, condition, signal);
     }
 
     #expireViewRecords = async (
         viewKey: string,
-        purgeVersion: number,
         condition: FilterSpec,
         signal?: AbortSignal,
     ): Promise<boolean> => {
@@ -828,7 +827,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         const filter: FilterSpec[] = [
             {
                 path: ["ttl"],
-                operator: "!=",
+                operator: "==",
                 operand: -1,
             },
             {
@@ -836,6 +835,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 operator: "!=",
                 operand: _rowKeys.viewHeader,
             },
+            condition
         ];
 
         const query = new _QueryImpl(source, [], filter);
