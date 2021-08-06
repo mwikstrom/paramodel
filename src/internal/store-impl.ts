@@ -64,10 +64,11 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         const { auth, dependencies } = definition;
         const envelopeType = entityEnvelopeType(definition.type);
         const transform = (record: OutputRecord): T => {
-            const { value, ...meta } = record;
+            const { value, key, token, ttl } = record;
             const envelope = envelopeType.fromJsonValue(value);
             const entity = envelope.entity;
             if (metaMap) {
+                const meta: EntityMetadata = Object.freeze({ key, token, ttl, envelope });
                 metaMap.set(entity, meta);
             }
             return entity;
@@ -521,14 +522,22 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return true;
     }
 
+    #writeSuccess = async (partition: string, input: InputRecord): Promise<void> => {
+        const output = await this.#driver.write(this.#id, partition, input);
+        if (!output) {
+            throw new Error(`Optimistic write failed: ${this.#id}/${partition}/${input.key}`);
+        }
+    }
+
     #syncEntities = async (commit: _Commit, definition: EntityProjection, viewKey: string): Promise<boolean> => {
         const changes = _getChangesFromCommit(commit, this.#model.events, definition.mutators);
         const snapshot = this.#createViewSnapshotFunc(commit.version, definition.dependencies, [viewKey]);
         const metaMap = new WeakMap<Record<string, unknown>, EntityMetadata>();
+        const baseVerison = commit.version - 1;
         const { get: baseGet, ...base } = await this.#createReadonlyEntityCollection(
             viewKey,
             definition,
-            commit.version - 1,
+            baseVerison,
             [viewKey],
             undefined,
             metaMap,
@@ -537,6 +546,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         const actions: Promise<unknown>[] = [];
         const pk = _partitionKeys.view(viewKey);
         const rk = (key: string): string => _rowKeys.entity(key, commit.version);
+        const envelopeType = entityEnvelopeType(definition.type);
 
         const get: EntityCollection["get"] = async (key: string) => {
             if (written.has(key)) {
@@ -549,8 +559,31 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             }
         };
 
-        const innerPut: EntityCollection["put"] = async props => {
-            throw new Error("TODO: PUT ENTITY!");
+        const innerPut: EntityCollection["put"] = async (props: Record<string, unknown>) => {
+            const key = props[definition.key] as string;
+            const value = definition.type.toJsonValue(props);            
+            if (value === void(0)) {
+                throw new Error("Could not serialize entity");
+            }
+
+            let replace: string | null = null;
+            if (written.has(key)) {
+                const output = await this.#driver.read(this.#id, pk, rk(key));
+                replace = output ? output.token : null;
+            }
+
+            const newRecord: InputRecord = {
+                key: rk(key),
+                value,
+                replace,
+                ttl: -1,
+            };
+
+            await this.#writeSuccess(pk, newRecord);
+
+            if (!written.has(key)) {
+                await replaceOld(key);
+            }
         };
 
         const innerDel: EntityCollection["del"] = async (key: string) => {
@@ -559,34 +592,50 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 if (!output) {
                     return false; // already deleted
                 }                
-                const input: InputRecord = {
+                const newRecord: InputRecord = {
                     key: output.key,
                     value: null,
                     replace: output.token,
                     ttl: 0,
                 };
-                await this.#driver.write(this.#id, pk, input);
+                await this.#writeSuccess(pk, newRecord);
                 return true;
             } else {
-                const entity = await baseGet(key);
-                if (!entity) {
-                    written.add(key);
-                    return false; // did not exist
-                }
-                const meta = metaMap.get(entity);
-                if (!meta) {
-                    throw new Error("Entity metadata was not populated");
-                }
-                const input: InputRecord = {
-                    key: meta.key,
-                    value: null,
-                    replace: meta.token,
-                    ttl: 0,
-                };
-                await this.#driver.write(this.#id, pk, input);
-                written.add(key);
-                return true;
+                return await replaceOld(key);
             }
+        };
+
+        const replaceOld = async (key: string): Promise<boolean> => {
+            const entity = await baseGet(key);
+            if (!entity) {
+                written.add(key);
+                return false; // did not exist
+            }
+
+            const meta = metaMap.get(entity);
+            if (!meta) {
+                throw new Error("Entity metadata was not populated");
+            }
+
+            const rewrittenEnvelope = {
+                start: meta.envelope.start,
+                entity: meta.envelope.entity,
+                end: baseVerison,
+            };
+            const rewrittenValue = envelopeType.toJsonValue(rewrittenEnvelope);
+            if (rewrittenValue === void(0)) {
+                throw new Error("Could not rewrite entity envelope");
+            }
+
+            const oldRecord: InputRecord = {
+                key: meta.key,
+                value: rewrittenValue,
+                replace: meta.token,
+                ttl: meta.ttl,
+            };
+            await this.#writeSuccess(pk, oldRecord);
+            written.add(key);
+            return true;
         };
 
         const wrap = <Args extends unknown[], Result>(
@@ -639,7 +688,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             ttl: -1,
             
         };
-        await this.#driver.write(this.#id, _partitionKeys.view(key), input);
+        await this.#writeSuccess(_partitionKeys.view(key), input);
         return commit.version === 1 || before !== after;
     }
 
@@ -1064,4 +1113,7 @@ const getViewHeaderForCommit = (
     }
 };
 
-type EntityMetadata = Omit<OutputRecord, "value">;
+type EntityMetadata = (
+    Pick<OutputRecord, "key" | "token" | "ttl"> & 
+    { envelope: EntityEnvelope<Record<string, unknown>> }
+);
