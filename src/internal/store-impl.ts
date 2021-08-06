@@ -334,6 +334,43 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return result;
     };
 
+    #readCommits = (
+        options: Partial<ReadOptions<string & keyof Model["events"]>> = {}
+    ): AsyncIterable<_Commit> => {
+        const { first, last, excludeFirst, excludeLast, filter } = options;
+        let query = new _QueryImpl(this.#commitSource, ["value"]).by("version");
+        let minVersion = 1;
+        let minPosition = 1;
+
+        if (typeof first === "number") {
+            query = query.where("version", excludeFirst ? ">" : ">=", first);
+            minVersion = excludeFirst ? first + 1 : first;
+        }
+
+        if (typeof last === "number") {
+            query = query.where("version", excludeLast ? "<" : "<=", last);
+        }
+
+        if (Array.isArray(filter)) {
+            query = query.where("changes", "includes-any", filter);
+        }
+
+        return {[Symbol.asyncIterator]: async function*() {
+            for await (const commit of query.all()) {
+                const { version, position } = commit;
+
+                if (version < minVersion || position < minPosition) {
+                    throw new Error("Detected inconsistent commit history");
+                }
+
+                yield commit;
+
+                minVersion = version + 1;
+                minPosition = position;
+            }
+        }};
+    }
+
     #syncNext = async (infoMap: Map<string, SyncViewInfo>): Promise<number> => {
         throw new Error("TODO: #syncNext not implemented.");
     }
@@ -474,34 +511,12 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     read = (
         options: Partial<ReadOptions<string & keyof Model["events"]>> = {}
     ): AsyncIterable<ChangeType<Model["events"]>> => {
-        const { first, last, excludeFirst, excludeLast, filter } = options;
         const deserializeChangeArg = this.#deserializeChangeArg;
-        
-        let query = new _QueryImpl(this.#commitSource, ["value"]).by("version");
-        let minVersion = 1;
-        let minPosition = 1;
-
-        if (typeof first === "number") {
-            query = query.where("version", excludeFirst ? ">" : ">=", first);
-            minVersion = first;
-        }
-
-        if (typeof last === "number") {
-            query = query.where("version", excludeLast ? "<" : "<=", last);
-        }
-
-        if (Array.isArray(filter)) {
-            query = query.where("changes", "includes-any", filter);
-        }
-
+        const readCommits = () => this.#readCommits(options);
         return {[Symbol.asyncIterator]: async function*() {
-            for await (const commit of query.all()) {
+            for await (const commit of readCommits()) {
                 const { timestamp, version } = commit;
                 let { position } = commit;
-
-                if (version < minVersion || position < minPosition) {
-                    throw new Error("Detected inconsistent commit history");
-                }
 
                 for (const entry of commit.events) {
                     const { key, arg, ...rest } = entry;
@@ -517,9 +532,6 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                     yield change as ChangeType<Model["events"]>;
                     ++position;
                 }
-
-                minVersion = version + 1;
-                minPosition = position;
             }
         }};
     }
