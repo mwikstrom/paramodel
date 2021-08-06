@@ -18,8 +18,9 @@ export interface DomainStore<Model extends DomainModel> {
     stat(this: void): Promise<DomainStoreStatus>;
     sync<K extends string & keyof Model["views"]>(
         this: void,
-        options?: SyncOptions<K>
+        options?: Partial<SyncOptions<K>>
     ): Promise<number>;
+    purge(this: void, options?: Partial<PurgeOptions>): Promise<PurgeResult>;
     view<K extends string & keyof Model["views"]>(
         this: void,
         key: K,
@@ -60,6 +61,14 @@ export interface SyncOptions<K extends string = string> {
     readonly target: number;
     readonly views: readonly K[];
     readonly signal: AbortSignal;
+}
+
+export interface PurgeOptions {
+    readonly signal: AbortSignal;
+}
+
+export interface PurgeResult {
+    readonly done: boolean;
 }
 
 export type ErrorFactory = () => Error;

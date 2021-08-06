@@ -15,6 +15,8 @@ import {
     DomainStore, 
     DomainStoreStatus, 
     ErrorFactory, 
+    PurgeOptions, 
+    PurgeResult, 
     ReadOptions, 
     SyncOptions, 
     ViewOptions, 
@@ -558,7 +560,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     }
 
     sync = (options: Partial<SyncOptions> = {}): Promise<number> => {
-        throw new Error("TODO: Method not implemented.");
+        throw new Error("TODO: sync not implemented.");
+    }
+
+    purge = (options: Partial<PurgeOptions> = {}): Promise<PurgeResult> => {
+        // When implementing: Remember to NOT COMPETE with sync!
+        // Old versions may be needed (and recreated) when syncing a new view with
+        // dependencies!
+        throw new Error("TODO: purge not implemented.");
     }
 
     view = async <K extends string & keyof Model["views"]>(

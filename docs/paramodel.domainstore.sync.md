@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-sync<K extends string & keyof Model["views"]>(this: void, options?: SyncOptions<K>): Promise<number>;
+sync<K extends string & keyof Model["views"]>(this: void, options?: Partial<SyncOptions<K>>): Promise<number>;
 ```
 
 ## Parameters
@@ -15,7 +15,7 @@ sync<K extends string & keyof Model["views"]>(this: void, options?: SyncOptions<
 |  Parameter | Type | Description |
 |  --- | --- | --- |
 |  this | void |  |
-|  options | [SyncOptions](./paramodel.syncoptions.md)<!-- -->&lt;K&gt; |  |
+|  options | Partial&lt;[SyncOptions](./paramodel.syncoptions.md)<!-- -->&lt;K&gt;&gt; |  |
 
 <b>Returns:</b>
 

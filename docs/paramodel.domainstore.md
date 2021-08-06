@@ -15,6 +15,7 @@ export interface DomainStore<Model extends DomainModel>
 |  Method | Description |
 |  --- | --- |
 |  [do(this, key, input, options)](./paramodel.domainstore.do.md) |  |
+|  [purge(this, options)](./paramodel.domainstore.purge.md) |  |
 |  [read(this, options)](./paramodel.domainstore.read.md) |  |
 |  [stat(this)](./paramodel.domainstore.stat.md) |  |
 |  [sync(this, options)](./paramodel.domainstore.sync.md) |  |

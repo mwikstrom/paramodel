@@ -174,11 +174,13 @@ export interface DomainStore<Model extends DomainModel> {
     // (undocumented)
     do<K extends string & keyof Model["actions"]>(this: void, key: K, input: TypeOf<Model["actions"][K]["input"]>, options?: Partial<ActionOptions>): Promise<ActionResultType<Model, K>>;
     // (undocumented)
+    purge(this: void, options?: Partial<PurgeOptions>): Promise<PurgeResult>;
+    // (undocumented)
     read(this: void, options?: Partial<ReadOptions<string & keyof Model["events"]>>): AsyncIterable<ChangeType<Model["events"]>>;
     // (undocumented)
     stat(this: void): Promise<DomainStoreStatus>;
     // (undocumented)
-    sync<K extends string & keyof Model["views"]>(this: void, options?: SyncOptions<K>): Promise<number>;
+    sync<K extends string & keyof Model["views"]>(this: void, options?: Partial<SyncOptions<K>>): Promise<number>;
     // (undocumented)
     view<K extends string & keyof Model["views"]>(this: void, key: K, options?: Partial<ViewOptions>): Promise<ViewOf<Model["views"][K]> | undefined>;
 }
@@ -318,6 +320,18 @@ export interface PageOptions {
 export type PossibleKeysOf<T> = {
     [P in keyof T]: T[P] extends (string | number) ? P extends string ? P : never : never;
 }[keyof T];
+
+// @public (undocumented)
+export interface PurgeOptions {
+    // (undocumented)
+    readonly signal: AbortSignal;
+}
+
+// @public (undocumented)
+export interface PurgeResult {
+    // (undocumented)
+    readonly done: boolean;
+}
 
 // @public (undocumented)
 export interface Queryable<T> {
