@@ -796,7 +796,43 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         purgeVersion: number,
         signal?: AbortSignal,
     ): Promise<boolean> => {
-        throw new Error("TODO: expirePurgedEntities");
+        const pk = _partitionKeys.view(viewKey);
+        const source = new _DriverQuerySource(this.#driver, this.#id, pk, record => record);
+        const filter: FilterSpec[] = [
+            {
+                path: ["ttl"],
+                operator: "!=",
+                operand: -1,
+            },
+            {
+                path: ["key"],
+                operator: "!=",
+                operand: _rowKeys.viewHeader,
+            },
+            {
+                path: ["value", "end"],
+                operator: "<=",
+                operand: purgeVersion,
+            }
+        ];
+        
+        const query = new _QueryImpl(source, [], filter);
+        for await (const before of query.all()) {
+            const input: InputRecord = {
+                key: before.key,
+                value: before.value,
+                replace: before.token,
+                ttl: PURGE_TTL,
+            };
+
+            await this.#driver.write(this.#id, pk, input);
+
+            if (signal?.aborted) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     #expirePurgedState = async (
@@ -1076,6 +1112,8 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return view as ViewOf<Model["views"][K]>;
     }
 }
+
+const PURGE_TTL = 24 * 3600; // 1 day
 
 type EntityEnvelope<T> = {
     start: number;
