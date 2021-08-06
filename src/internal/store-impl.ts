@@ -707,14 +707,46 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         kind: _MaterialViewKind,
         prev: SyncViewInfo,
         modified: boolean
+    ): Promise<SyncViewInfo | undefined> => this.#storeViewHeader(
+        key, 
+        prev, 
+        info => getViewHeaderRecordForCommit(commit, info, kind, modified)
+    );
+
+    #storeViewHeaderForPurge = async (
+        key: string,
+        purgeVersion: number,
+        prev: SyncViewInfo,
     ): Promise<SyncViewInfo | undefined> => {
+        const definition = this.#model.views[key];
+        if (!definition) {
+            return void(0);
+        }
+
+        const { kind } = definition;
+        if (!_materialViewKindType.test(kind)) {
+            return void(0);
+        }
+
+        return await this.#storeViewHeader(
+            key, 
+            prev, 
+            info => getViewHeaderRecordForPurge(purgeVersion, info, kind)
+        );
+    }
+
+    #storeViewHeader = async (
+        key: string, 
+        prev: SyncViewInfo, 
+        update: (info: SyncViewInfo) => InputRecord | undefined
+    ): Promise<SyncViewInfo | undefined> => {
+        const pk = _partitionKeys.view(key);
         for (;;) {
-            const input = getViewHeaderRecordForCommit(commit, prev, kind, modified);
+            const input = update(prev);
             if (!input) {
                 return void(0);
             }
-
-            const pk = _partitionKeys.view(key);
+            
             let output = await this.#driver.write(this.#id, pk, input);
 
             if (output) {
@@ -725,14 +757,6 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             output = await this.#driver.read(this.#id, pk, input.key);
             prev = getSyncInfoFromRecord(output);
         }
-    }
-
-    #storeViewHeaderForPurge = async (
-        key: string,
-        purgeVersion: number,
-        prev: SyncViewInfo,
-    ): Promise<SyncViewInfo | undefined> => {
-        throw new Error("TODO: storeViewHeaderForPurge");
     }
 
     #expirePurgedViewData = async (
@@ -1084,6 +1108,15 @@ const getSyncInfoFromRecord = (record: OutputRecord | undefined): SyncViewInfo =
     });
 };
 
+const getViewHeaderRecordForPurge = (
+    purgeVersion: number,
+    prev: SyncViewInfo,
+    kind: _MaterialViewKind,
+): InputRecord | undefined => {
+    const header = getViewHeaderForPurge(purgeVersion, prev, kind);
+    return getViewHeaderRecord(header, prev.update_token);
+};
+
 const getViewHeaderRecordForCommit = (
     commit: _Commit,
     prev: SyncViewInfo,
@@ -1091,7 +1124,13 @@ const getViewHeaderRecordForCommit = (
     modified: boolean,
 ): InputRecord | undefined => {
     const header = getViewHeaderForCommit(commit, prev, kind, modified);
+    return getViewHeaderRecord(header, prev.update_token);
+};
 
+const getViewHeaderRecord = (
+    header: _ViewHeader | undefined,
+    token: string | null,
+): InputRecord | undefined => {
     if(!header) {
         return void(0);
     }
@@ -1105,11 +1144,34 @@ const getViewHeaderRecordForCommit = (
     const input: InputRecord = {
         key: _rowKeys.viewHeader,
         value: jsonHeader,
-        replace: prev.update_token,
+        replace: token,
         ttl: -1,
     };
 
     return input;
+};
+
+const getViewHeaderForPurge = (
+    purgeVersion: number,
+    prev: SyncViewInfo,
+    kind: _MaterialViewKind,
+): _ViewHeader | undefined => {
+    if (prev.sync_version <= purgeVersion || !prev.sync_timestamp || !prev.last_change_timestamp) {
+        return void(0);
+    }
+
+    const header: _ViewHeader = Object.freeze({
+        kind,
+        sync_version: prev.sync_version,
+        sync_position: prev.sync_position,
+        sync_timestamp: prev.sync_timestamp,
+        last_change_version: prev.last_change_version,
+        last_change_timestamp: prev.last_change_timestamp,
+        purge_start_version: 0,
+        purge_end_version: purgeVersion,
+    });
+
+    return header;
 };
 
 const getViewHeaderForCommit = (
