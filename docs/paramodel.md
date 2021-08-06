@@ -38,6 +38,7 @@ Run-time domain model for event-sourcing.
 |  [Page](./paramodel.page.md) |  |
 |  [PageOptions](./paramodel.pageoptions.md) |  |
 |  [PurgeOptions](./paramodel.purgeoptions.md) |  |
+|  [PurgeResult](./paramodel.purgeresult.md) |  |
 |  [Queryable](./paramodel.queryable.md) |  |
 |  [QueryHandler](./paramodel.queryhandler.md) |  |
 |  [QuerySpec](./paramodel.queryspec.md) |  |

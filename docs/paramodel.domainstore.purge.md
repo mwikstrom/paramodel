@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-purge<K extends string & keyof Model["views"]>(this: void, options?: Partial<PurgeOptions<K>>): Promise<number>;
+purge(this: void, options?: Partial<PurgeOptions>): Promise<PurgeResult>;
 ```
 
 ## Parameters
@@ -15,9 +15,9 @@ purge<K extends string & keyof Model["views"]>(this: void, options?: Partial<Pur
 |  Parameter | Type | Description |
 |  --- | --- | --- |
 |  this | void |  |
-|  options | Partial&lt;[PurgeOptions](./paramodel.purgeoptions.md)<!-- -->&lt;K&gt;&gt; |  |
+|  options | Partial&lt;[PurgeOptions](./paramodel.purgeoptions.md)<!-- -->&gt; |  |
 
 <b>Returns:</b>
 
-Promise&lt;number&gt;
+Promise&lt;[PurgeResult](./paramodel.purgeresult.md)<!-- -->&gt;
 

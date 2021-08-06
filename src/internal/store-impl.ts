@@ -16,6 +16,7 @@ import {
     DomainStoreStatus, 
     ErrorFactory, 
     PurgeOptions, 
+    PurgeResult, 
     ReadOptions, 
     SyncOptions, 
     ViewOptions, 
@@ -293,6 +294,15 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
     }
 
+    #getSyncInfoMap = async (
+        viewKeys: readonly string[]
+    ): Promise<Map<string, SyncViewInfo>> => new Map<string, SyncViewInfo>(
+        (await Promise.all(viewKeys.map(this.#getViewHeaderRecord))).map((record, index) => ([
+            viewKeys[index],
+            getSyncInfoFromRecord(record),
+        ]))    
+    );    
+
     #getViewHeaderRecord = (key: string): Promise<OutputRecord | undefined> => {
         const partition = _partitionKeys.view(key);
         const row = _rowKeys.viewHeader;
@@ -491,14 +501,6 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return synced;
     }
 
-    #purgeNext = async (
-        infoMap: Map<string, SyncViewInfo>,
-        last?: number,
-        signal?: AbortSignal,
-    ): Promise<number> => {
-        throw new Error("TODO: #purgeNext");
-    }   
-
     #syncCommit = async (commit: _Commit, infoMap: Map<string, SyncViewInfo>, keys: Set<string>): Promise<boolean> => {
         for (const key of keys) {
             const info = infoMap.get(key);
@@ -518,7 +520,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 throw new Error(`Don't know how to sync view: ${key}`);
             }
 
-            const newInfo = await this.#storeViewHeader(commit, key, definition.kind, info, modified);
+            const newInfo = await this.#storeViewHeaderForCommit(commit, key, definition.kind, info, modified);
             if (!newInfo) {
                 return false;
             }
@@ -699,7 +701,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return commit.version === 1 || before !== after;
     }
 
-    #storeViewHeader = async (
+    #storeViewHeaderForCommit = async (
         commit: _Commit,
         key: string,
         kind: _MaterialViewKind,
@@ -723,6 +725,22 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             output = await this.#driver.read(this.#id, pk, input.key);
             prev = getSyncInfoFromRecord(output);
         }
+    }
+
+    #storeViewHeaderForPurge = async (
+        key: string,
+        purgeVersion: number,
+        prev: SyncViewInfo,
+    ): Promise<SyncViewInfo | undefined> => {
+        throw new Error("TODO: storeViewHeaderForPurge");
+    }
+
+    #expirePurgedViewData = async (
+        key: string,
+        info: SyncViewInfo,
+        signal?: AbortSignal
+    ): Promise<void> => {
+        throw new Error("TODO: expirePurgedViewData");
     }
 
     #tryAction = async <K extends string & keyof Model["actions"]>(
@@ -913,12 +931,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         const viewKeys = options.views ?
             this.#getMaterialViewDependencies(...options.views) :
             this.#getMaterialViews();
-        const infoMap = new Map<string, SyncViewInfo>(
-            (await Promise.all(viewKeys.map(this.#getViewHeaderRecord))).map((record, index) => ([
-                viewKeys[index],
-                getSyncInfoFromRecord(record),
-            ]))    
-        );
+        const infoMap = await this.#getSyncInfoMap(viewKeys);
 
         let synced = 0;
         do { 
@@ -933,27 +946,46 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return synced;
     }
 
-    purge = async (options: Partial<PurgeOptions> = {}): Promise<number> => {
-        const { signal, target } = options;
-        const viewKeys = this.#getMaterialViews(options.views);
-        const infoMap = new Map<string, SyncViewInfo>(
-            (await Promise.all(viewKeys.map(this.#getViewHeaderRecord))).map((record, index) => ([
-                viewKeys[index],
-                getSyncInfoFromRecord(record),
-            ]))    
-        );
+    purge = async (options: Partial<PurgeOptions> = {}): Promise<PurgeResult> => {
+        const { signal } = options;
+        const viewKeys = this.#getMaterialViews();
+        const infoMap = await this.#getSyncInfoMap(viewKeys);
+        const purgeVersion = _getMinSyncVersion(infoMap.values()) - 1;
+        let aborted = false;
 
-        let purged = 0;
-        do { 
-            const next = await this.#purgeNext(infoMap, target, signal); 
-            if (next > purged) {
-                purged = next;
+        // Phase 1: Update the purged range of all material views
+        for (const key of viewKeys) {
+            const oldInfo = infoMap.get(key);
+            if (!oldInfo) {
+                aborted = true;
             } else {
-                break;
+                const newInfo = await this.#storeViewHeaderForPurge(key, purgeVersion, oldInfo);
+                if (!newInfo) {
+                    aborted = true;
+                }
             }
+            
+            aborted ||= !!signal?.aborted;           
+            if (aborted) {
+                break;
+            }            
         }
-        while (!signal?.aborted && purged < (target || 0));
-        return purged;
+
+        // Phase 2: Mark all state/entity records in the purged range with a TTL
+        for (const [key, info] of infoMap) {
+            await this.#expirePurgedViewData(key, info, signal);
+            aborted ||= !!signal?.aborted;
+            if (aborted) {
+                break;
+            }            
+        }
+
+        const done = !aborted && viewKeys.every(key => {
+            const info = infoMap.get(key);
+            return info && info.purge_start_version === 0 && info.purge_end_version >= purgeVersion;
+        });
+        
+        return { done };
     }
 
     view = async <K extends string & keyof Model["views"]>(

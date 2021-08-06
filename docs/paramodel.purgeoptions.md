@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export interface PurgeOptions<K extends string = string> 
+export interface PurgeOptions 
 ```
 
 ## Properties
@@ -15,6 +15,4 @@ export interface PurgeOptions<K extends string = string>
 |  Property | Type | Description |
 |  --- | --- | --- |
 |  [signal](./paramodel.purgeoptions.signal.md) | AbortSignal |  |
-|  [target](./paramodel.purgeoptions.target.md) | number |  |
-|  [views](./paramodel.purgeoptions.views.md) | readonly K\[\] |  |
 

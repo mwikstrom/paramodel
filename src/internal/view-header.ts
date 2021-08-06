@@ -31,7 +31,7 @@ export const _viewHeader: Type<_ViewHeader> = recordType({
 });
 
 /** @internal */
-export const _getMinSyncVersion = (headers: (_ViewHeader | undefined)[]): number => {
+export const _getMinSyncVersion = (headers: Iterable<(Pick<_ViewHeader, "sync_version"> | undefined)>): number => {
     let version: number | undefined;
     for (const header of headers) {
         if (!header) {
