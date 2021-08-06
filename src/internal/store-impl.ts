@@ -512,19 +512,24 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return true;
     }
 
-    #syncEntities = async (commit: _Commit, definition: EntityProjection, key: string): Promise<boolean> => {
+    #syncEntities = async (commit: _Commit, definition: EntityProjection, viewKey: string): Promise<boolean> => {
         const changes = _getChangesFromCommit(commit, this.#model.events, definition.mutators);
-        const snapshot = this.#createViewSnapshotFunc(commit.version, definition.dependencies, [key]);
+        const snapshot = this.#createViewSnapshotFunc(commit.version, definition.dependencies, [viewKey]);
         const { get: baseGet, ...base } = await this.#createReadonlyEntityCollection(
-            key,
+            viewKey,
             definition,
             commit.version - 1,
-            [key]
+            [viewKey]
         );
         const written = new Map<string, { token: string }>();
-        const get: EntityCollection["get"] = async key => {
-            if (written.has(key as string)) {
-                throw new Error("TODO: READ WRITTEN ENTITY!");
+        const pk = _partitionKeys.view(viewKey);
+        const rk = (key: string): string => _rowKeys.entity(key, commit.version);
+        const get: EntityCollection["get"] = async (key: string) => {
+            if (written.has(key)) {
+                const record = await this.#driver.read(this.#id, pk, rk(key));
+                if (record) {
+                    return definition.type.fromJsonValue(record.value);
+                }
             } else {
                 return await baseGet(key);
             }
