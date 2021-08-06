@@ -292,9 +292,20 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             }
 
             return header.sync_version;
+        } else {
+            const headers = await Promise.all(this.#getMaterialViewDependencies(key).map(this.#getViewHeader));
+            let version: number | undefined;
+            for (const header of headers) {
+                if (!header) {
+                    continue;
+                } else if (version === void(0)) {
+                    version = header.sync_version;
+                } else {
+                    version = Math.min(version, header.sync_version);
+                }
+            }
+            return version || 0;
         }
-
-        throw new Error("TODO: Get view version of non material view");
     }
 
     #getMaterialViewDependencies = (key: string): string[] => {
