@@ -791,9 +791,36 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
     }
 
-    #expirePurgedEntities = async (
+    #expirePurgedEntities = (
         viewKey: string,
         purgeVersion: number,
+        signal?: AbortSignal,
+    ): Promise<boolean> => {
+        const condition: FilterSpec = {
+            path: ["value", "end"],
+            operator: "<=",
+            operand: purgeVersion,
+        };
+        return this.#expireViewRecords(viewKey, purgeVersion, condition, signal);
+    }
+
+    #expirePurgedState = async (
+        viewKey: string,
+        purgeVersion: number,
+        signal?: AbortSignal,
+    ): Promise<boolean> => {
+        const condition: FilterSpec = {
+            path: ["key"],
+            operator: "<=",
+            operand: _rowKeys.viewState(purgeVersion),
+        };
+        return this.#expireViewRecords(viewKey, purgeVersion, condition, signal);
+    }
+
+    #expireViewRecords = async (
+        viewKey: string,
+        purgeVersion: number,
+        condition: FilterSpec,
         signal?: AbortSignal,
     ): Promise<boolean> => {
         const pk = _partitionKeys.view(viewKey);
@@ -809,13 +836,8 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 operator: "!=",
                 operand: _rowKeys.viewHeader,
             },
-            {
-                path: ["value", "end"],
-                operator: "<=",
-                operand: purgeVersion,
-            }
         ];
-        
+
         const query = new _QueryImpl(source, [], filter);
         for await (const before of query.all()) {
             const input: InputRecord = {
@@ -833,14 +855,6 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
 
         return true;
-    }
-
-    #expirePurgedState = async (
-        viewKey: string,
-        purgeVersion: number,
-        signal?: AbortSignal,
-    ): Promise<boolean> => {
-        throw new Error("TODO: expirePurgedState");
     }
 
     #tryAction = async <K extends string & keyof Model["actions"]>(
