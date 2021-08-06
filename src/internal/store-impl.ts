@@ -692,4 +692,4 @@ const syncViewInfoFromRecord = (record: OutputRecord | undefined): SyncViewInfo 
         purge_end_version, 
         update_token
     });
-}
+};
