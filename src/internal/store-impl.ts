@@ -27,7 +27,7 @@ import { _Commit, _commitType, _getChangesFromCommit } from "./commit";
 import { _partitionKeys, _rowKeys } from "./data-keys";
 import { _QueryImpl } from "./query-impl";
 import { _DriverQuerySource, _QuerySource } from "./query-source";
-import { _getMinSyncVersion, _materialViewKindType, _viewHeader, _ViewHeader } from "./view-header";
+import { _getMinSyncVersion, _MaterialViewKind, _materialViewKindType, _viewHeader, _ViewHeader } from "./view-header";
 
 // TODO: Continuation tokens must include version and timestamp and shall expire when too old
 //       (older than purge ttl) - or be renewed in case version is still not purged!
@@ -466,24 +466,53 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 throw new Error("Invalid view info map");
             }
             
+            let modified: boolean;
+
             if (definition?.kind === "entities") {
-                await this.#syncEntities(commit, definition);
+                modified = await this.#syncEntities(commit, definition);
             } else if (definition?.kind === "state") {
-                await this.#syncState(commit, definition);
+                modified = await this.#syncState(commit, definition);
             } else {
                 throw new Error(`Don't know how to sync view: ${key}`);
             }
 
-            throw new Error("TODO: store new view header");
+            const newInfo = await this.#storeViewHeader(commit, key, definition.kind, info, modified);
+            infoMap.set(key, newInfo);
         }
     }
 
-    #syncEntities = async (commit: _Commit, definition: EntityProjection): Promise<void> => {
+    #storeViewHeader = async (
+        commit: _Commit,
+        key: string,
+        kind: _MaterialViewKind,
+        prev: SyncViewInfo,
+        modified: boolean
+    ): Promise<SyncViewInfo> => {
+        for (;;) {
+            const input = getViewHeaderRecordForCommit(commit, prev, kind, modified);
+            if (!input) {
+                return prev;
+            }
+
+            const pk = _partitionKeys.view(key);
+            let output = await this.#driver.write(this.#id, pk, input);
+
+            if (output) {
+                return getSyncInfoFromRecord(output);
+            }
+
+            // Update token mismatch. Read current header and try again (loop continues)
+            output = await this.#driver.read(this.#id, pk, input.key);
+            prev = getSyncInfoFromRecord(output);
+        }
+    }
+
+    #syncEntities = async (commit: _Commit, definition: EntityProjection): Promise<boolean> => {
         const changes = _getChangesFromCommit(commit, this.#model.events, definition.mutators);
         throw new Error("TODO: syncEntities");
     }
 
-    #syncState = async (commit: _Commit, definition: StateProjection): Promise<void> => {
+    #syncState = async (commit: _Commit, definition: StateProjection): Promise<boolean> => {
         const changes = _getChangesFromCommit(commit, this.#model.events, definition.mutators);
         throw new Error("TODO: syncState");
     }
@@ -757,28 +786,128 @@ const authErrorFromOptions = (options: Partial<Pick<ViewOptions, "auth">>): Erro
 type SyncViewInfo = {
     readonly update_token: string | null;
     readonly sync_version: number;
+    readonly sync_position: number;
+    readonly sync_timestamp?: Date;
+    readonly last_change_version: number;
+    readonly last_change_timestamp?: Date;
     readonly purge_start_version: number;
     readonly purge_end_version: number;
 }
 
 const getSyncInfoFromRecord = (record: OutputRecord | undefined): SyncViewInfo => {
+    let update_token: string | null = null;
     let sync_version = 0;
+    let sync_position = 0;
+    let sync_timestamp: Date | undefined = void(0);
+    let last_change_version = 0;
+    let last_change_timestamp: Date | undefined = void(0);
     let purge_start_version = 0;
     let purge_end_version = 0;
-    let update_token: string | null = null;
 
     if (record) {
         const header = _viewHeader.fromJsonValue(record.value);
+        update_token = record.token;
         sync_version = header.sync_version;
+        sync_position = header.sync_position;
+        sync_timestamp = header.sync_timestamp;
+        last_change_version = header.last_change_version;
+        last_change_timestamp = header.last_change_timestamp;
         purge_start_version = header.purge_start_version;
         purge_end_version = header.purge_end_version;
-        update_token = record.token;
     }
 
     return Object.freeze({
+        update_token,
         sync_version, 
+        sync_position,
+        sync_timestamp,
+        last_change_version,
+        last_change_timestamp,
         purge_start_version, 
         purge_end_version, 
-        update_token
     });
+};
+
+const getViewHeaderRecordForCommit = (
+    commit: _Commit,
+    prev: SyncViewInfo,
+    kind: _MaterialViewKind,
+    modified: boolean,
+): InputRecord | undefined => {
+    const header = getViewHeaderForCommit(commit, prev, kind, modified);
+
+    if(!header) {
+        return void(0);
+    }
+
+    const jsonHeader = _viewHeader.toJsonValue(header);
+
+    if (jsonHeader === void(0)) {
+        throw new Error("Failed to serialize new view header");
+    }
+
+    const input: InputRecord = {
+        key: _rowKeys.viewHeader,
+        value: jsonHeader,
+        replace: prev.update_token,
+        ttl: -1,
+    };
+
+    return input;
+};
+
+const getViewHeaderForCommit = (
+    commit: _Commit,
+    prev: SyncViewInfo,
+    kind: _MaterialViewKind,
+    modified: boolean,
+): _ViewHeader | undefined => {
+    if (prev.sync_version < commit.version) {
+        let last_change_timestamp: Date;
+
+        if (modified) {
+            last_change_timestamp = commit.timestamp;
+        } else if (!prev.last_change_timestamp) {
+            throw new Error("Unmodified change must have previous timestamp");
+        } else {
+            last_change_timestamp = prev.last_change_timestamp;
+        }
+
+        const header: _ViewHeader = Object.freeze({
+            kind,
+            sync_version: commit.version,
+            sync_position: commit.position + commit.changes.length,
+            sync_timestamp: commit.timestamp,
+            last_change_version: modified ? commit.version : prev.last_change_version,
+            last_change_timestamp,
+            purge_start_version: prev.purge_start_version,
+            purge_end_version: prev.purge_end_version,
+        });
+
+        return header;
+    } else if (prev.purge_start_version <= commit.version && prev.purge_end_version >= commit.version) {
+        let purge_start_version = commit.version + 1;
+        let purge_end_version = prev.purge_end_version;
+
+        if (purge_start_version > purge_end_version) {
+            purge_start_version = purge_end_version = 0;
+        }
+
+        if (!prev.sync_timestamp || !prev.last_change_timestamp) {
+            throw new Error("Non-latest change must have previous timestamp");
+        }
+
+        const header: _ViewHeader = Object.freeze({
+            kind,
+            sync_version: prev.sync_version,
+            sync_position: prev.sync_position,
+            sync_timestamp: prev.sync_timestamp,
+            last_change_version: prev.last_change_version,
+            last_change_timestamp: prev.last_change_timestamp,
+            purge_start_version,
+            purge_end_version,
+        });
+
+        return header;
+    }
 };
