@@ -14,7 +14,9 @@ export interface ReadOptions<K extends string>
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [changes](./paramodel.readoptions.changes.md) | readonly K\[\] |  |
+|  [excludeFirst](./paramodel.readoptions.excludefirst.md) | boolean |  |
+|  [excludeLast](./paramodel.readoptions.excludelast.md) | boolean |  |
+|  [filter](./paramodel.readoptions.filter.md) | readonly K\[\] |  |
 |  [first](./paramodel.readoptions.first.md) | number |  |
 |  [last](./paramodel.readoptions.last.md) | number |  |
 

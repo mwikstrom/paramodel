@@ -407,7 +407,11 @@ export interface ReadonlyEntityCollection<T, K extends PossibleKeysOf<T>> extend
 // @public (undocumented)
 export interface ReadOptions<K extends string> {
     // (undocumented)
-    readonly changes: readonly K[];
+    readonly excludeFirst: boolean;
+    // (undocumented)
+    readonly excludeLast: boolean;
+    // (undocumented)
+    readonly filter: readonly K[];
     // (undocumented)
     readonly first: number;
     // (undocumented)

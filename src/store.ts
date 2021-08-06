@@ -31,7 +31,9 @@ export interface DomainStore<Model extends DomainModel> {
 export interface ReadOptions<K extends string> {
     readonly first: number;
     readonly last: number;
-    readonly changes: readonly K[];
+    readonly excludeFirst: boolean;
+    readonly excludeLast: boolean;
+    readonly filter: readonly K[];
 }
 
 export interface DomainStoreStatus {

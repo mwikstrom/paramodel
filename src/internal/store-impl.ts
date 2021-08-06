@@ -474,7 +474,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     read = (
         options: Partial<ReadOptions<string & keyof Model["events"]>> = {}
     ): AsyncIterable<ChangeType<Model["events"]>> => {
-        const { first, last, changes } = options;
+        const { first, last, excludeFirst, excludeLast, filter } = options;
         const deserializeChangeArg = this.#deserializeChangeArg;
         
         let query = new _QueryImpl(this.#commitSource, ["value"]).by("version");
@@ -482,16 +482,16 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         let minPosition = 1;
 
         if (typeof first === "number") {
-            query = query.where("version", ">=", first);
+            query = query.where("version", excludeFirst ? ">" : ">=", first);
             minVersion = first;
         }
 
         if (typeof last === "number") {
-            query = query.where("version", "<=", last);
+            query = query.where("version", excludeLast ? "<" : "<=", last);
         }
 
-        if (Array.isArray(changes)) {
-            query = query.where("changes", "includes-any", changes);
+        if (Array.isArray(filter)) {
+            query = query.where("changes", "includes-any", filter);
         }
 
         return {[Symbol.asyncIterator]: async function*() {
