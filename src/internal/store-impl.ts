@@ -582,19 +582,13 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         let syncVersion: number | undefined;
 
         (await Promise.all(viewKeys.map(this.#getViewHeaderRecord))).forEach((record, index) => {
-            let version = 0;
-            let token: string | null = null;
+            const info = syncViewInfoFromRecord(record);
 
-            if (record) {
-                version = _viewHeader.fromJsonValue(record.value).sync_version;
-                token = record.token;
+            if (syncVersion === void(0) || info.sync_version < syncVersion) {
+                syncVersion = info.sync_version;
             }
 
-            if (syncVersion === void(0) || version < syncVersion) {
-                syncVersion = version;
-            }
-
-            infoMap.set(viewKeys[index], Object.freeze({ version, token }));
+            infoMap.set(viewKeys[index], info);
         });
 
         if (syncVersion === void(0)) {
@@ -672,6 +666,30 @@ const authErrorFromOptions = (options: Partial<Pick<ViewOptions, "auth">>): Erro
 };
 
 type SyncViewInfo = {
-    readonly token: string | null;
-    readonly version: number;
+    readonly update_token: string | null;
+    readonly sync_version: number;
+    readonly purge_start_version: number;
+    readonly purge_end_version: number;
+}
+
+const syncViewInfoFromRecord = (record: OutputRecord | undefined): SyncViewInfo => {
+    let sync_version = 0;
+    let purge_start_version = 0;
+    let purge_end_version = 0;
+    let update_token: string | null = null;
+
+    if (record) {
+        const header = _viewHeader.fromJsonValue(record.value);
+        sync_version = header.sync_version;
+        purge_start_version = header.purge_start_version;
+        purge_end_version = header.purge_end_version;
+        update_token = record.token;
+    }
+
+    return Object.freeze({
+        sync_version, 
+        purge_start_version, 
+        purge_end_version, 
+        update_token
+    });
 }
