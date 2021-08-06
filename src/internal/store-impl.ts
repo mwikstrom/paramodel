@@ -27,7 +27,7 @@ import { _Commit, _commitType } from "./commit";
 import { _partitionKeys, _rowKeys } from "./data-keys";
 import { _QueryImpl } from "./query-impl";
 import { _DriverQuerySource, _QuerySource } from "./query-source";
-import { _materialViewKindType, _viewHeader, _ViewHeader } from "./view-header";
+import { _getMinSyncVersion, _materialViewKindType, _viewHeader, _ViewHeader } from "./view-header";
 
 /** @internal */
 export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model> {
@@ -296,19 +296,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             return header.sync_version;
         } else {
             const headers = await Promise.all(this.#getMaterialViewDependencies(key).map(this.#getViewHeader));
-            let version: number | undefined;
-            for (const header of headers) {
-                if (!header) {
-                    continue;
-                } else if (version === void(0)) {
-                    version = header.sync_version;
-                } else {
-                    version = Math.min(version, header.sync_version);
-                }
-            }
-            return version || 0;
+            return _getMinSyncVersion(headers);
         }
     }
+
+    #getAllMaterialViews = (): string[] => Object
+        .entries(this.#model.views)
+        .filter(([,def]) => _materialViewKindType.test(def))
+        .map(([key]) => key);
 
     #getMaterialViewDependencies = (...keys: string[]): string[] => {
         const [key, ...queue] = keys;
@@ -526,10 +521,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     }
 
     stat = async (): Promise<DomainStoreStatus> => {
-        const materialViewKeys = Object
-            .entries(this.#model.views)
-            .filter(([,def]) => _materialViewKindType.test(def))
-            .map(([key]) => key);
+        const materialViewKeys = this.#getAllMaterialViews();
         const [
             latest,
             headers,
@@ -559,8 +551,28 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return result;
     }
 
-    sync = (options: Partial<SyncOptions> = {}): Promise<number> => {
-        throw new Error("TODO: sync not implemented.");
+    sync = async (options: Partial<SyncOptions> = {}): Promise<number> => {
+        const {
+            signal,
+            target = (await this.#getLatestCommit())?.version || 0,
+        } = options;
+        const viewKeys = options.views ?
+            this.#getMaterialViewDependencies(...options.views) :
+            this.#getAllMaterialViews();
+        const viewRecords = new Map<string, OutputRecord>();
+        (await Promise.all(viewKeys.map(this.#getViewHeaderRecord))).forEach((record, index) => {
+            if (record) {
+                viewRecords.set(viewKeys[index], record);
+            }
+        });
+        const viewHeaders = Object.values(viewRecords).map(record => _viewHeader.fromJsonValue(record.value));
+        const syncVersion = _getMinSyncVersion(viewHeaders);
+
+        while (syncVersion < target && !(signal?.aborted)) {
+            throw new Error("TODO: sync not implemented.");
+        }
+
+        return syncVersion;
     }
 
     purge = (options: Partial<PurgeOptions> = {}): Promise<PurgeResult> => {

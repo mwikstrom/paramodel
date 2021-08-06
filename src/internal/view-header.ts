@@ -29,3 +29,18 @@ export const _viewHeader: Type<_ViewHeader> = recordType({
     purge_start_version: nonNegativeIntegerType,
     purge_end_version: nonNegativeIntegerType,
 });
+
+/** @internal */
+export const _getMinSyncVersion = (headers: (_ViewHeader | undefined)[]): number => {
+    let version: number | undefined;
+    for (const header of headers) {
+        if (!header) {
+            continue;
+        } else if (version === void(0)) {
+            version = header.sync_version;
+        } else {
+            version = Math.min(version, header.sync_version);
+        }
+    }
+    return version || 0;
+};
