@@ -470,11 +470,13 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         const views = Object.fromEntries(viewKeys.map((key, index) => {
             const header = headers[index];
             const viewStatus: ViewStatus = {
-                version: header?.version || 0,
-                position: header?.position || 0,
-                timestamp: header?.timestamp,
-                clean: header?.clean || 0,
-                error: header?.error || "",
+                sync_version: header?.sync_version || 0,
+                sync_position: header?.sync_position || 0,
+                sync_timestamp: header?.sync_timestamp,
+                last_change_version: header?.last_change_version || 0,
+                last_change_timestamp: header?.last_change_timestamp,
+                purge_start_version: header?.purge_start_version || 0,
+                purge_end_version: header?.purge_end_version || 0,
             };
             return [key, viewStatus];
         })) as Readonly<Record<string & keyof Model["views"], ViewStatus>>;
@@ -506,7 +508,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             return void(0);
         }
 
-        let version = header?.version || 0;
+        let version = header?.sync_version || 0;
         if (sync > version) {
             version = await this.sync({ views: [key], target: sync, signal });
             

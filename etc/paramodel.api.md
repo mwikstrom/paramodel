@@ -490,15 +490,19 @@ export type ViewSnapshotFunc<R extends ReadModel> = <K extends string & keyof R>
 // @public (undocumented)
 export interface ViewStatus {
     // (undocumented)
-    readonly clean: number;
+    readonly last_change_timestamp?: Date;
     // (undocumented)
-    readonly error: string;
+    readonly last_change_version: number;
     // (undocumented)
-    readonly position: number;
+    readonly purge_end_version: number;
     // (undocumented)
-    readonly timestamp?: Date;
+    readonly purge_start_version: number;
     // (undocumented)
-    readonly version: number;
+    readonly sync_position: number;
+    // (undocumented)
+    readonly sync_timestamp?: Date;
+    // (undocumented)
+    readonly sync_version: number;
 }
 
 // @public (undocumented)

@@ -14,9 +14,11 @@ export interface ViewStatus
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [clean](./paramodel.viewstatus.clean.md) | number |  |
-|  [error](./paramodel.viewstatus.error.md) | string |  |
-|  [position](./paramodel.viewstatus.position.md) | number |  |
-|  [timestamp?](./paramodel.viewstatus.timestamp.md) | Date | <i>(Optional)</i> |
-|  [version](./paramodel.viewstatus.version.md) | number |  |
+|  [last\_change\_timestamp?](./paramodel.viewstatus.last_change_timestamp.md) | Date | <i>(Optional)</i> |
+|  [last\_change\_version](./paramodel.viewstatus.last_change_version.md) | number |  |
+|  [purge\_end\_version](./paramodel.viewstatus.purge_end_version.md) | number |  |
+|  [purge\_start\_version](./paramodel.viewstatus.purge_start_version.md) | number |  |
+|  [sync\_position](./paramodel.viewstatus.sync_position.md) | number |  |
+|  [sync\_timestamp?](./paramodel.viewstatus.sync_timestamp.md) | Date | <i>(Optional)</i> |
+|  [sync\_version](./paramodel.viewstatus.sync_version.md) | number |  |
 
