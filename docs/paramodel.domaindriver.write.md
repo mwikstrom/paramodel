@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-write(this: void, store: string, partition: string, input: InputRecord): Promise<boolean>;
+write(this: void, store: string, partition: string, input: InputRecord): Promise<OutputRecord | undefined>;
 ```
 
 ## Parameters
@@ -21,5 +21,5 @@ write(this: void, store: string, partition: string, input: InputRecord): Promise
 
 <b>Returns:</b>
 
-Promise&lt;boolean&gt;
+Promise&lt;[OutputRecord](./paramodel.outputrecord.md) \| undefined&gt;
 

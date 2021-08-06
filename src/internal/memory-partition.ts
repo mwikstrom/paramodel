@@ -51,19 +51,20 @@ export class _MemoryPartition {
         return { ...stored, key };
     }
 
-    write = (input: InputRecord): boolean => {
+    write = (input: InputRecord): OutputRecord | undefined => {
         const { key, value, replace, ttl } = input;
         const output = this.read(key);
 
         if ((!output && replace !== null) || (output && replace !== output.token)) {
-            return false;
+            return void(0);
         }
 
         const token = (++this.#tokenCounter).toString(10);
         const timestamp = this.#time.now();
         const stored: StoredRecord = Object.freeze({ value, token, ttl, timestamp });
         this.#records.set(key, stored);
-        return true;
+        
+        return { ...stored, key };
     }
 }
 

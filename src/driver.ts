@@ -37,7 +37,7 @@ export interface DomainDriver {
         store: string,
         partition: string,
         input: InputRecord,
-    ): Promise<boolean>;
+    ): Promise<OutputRecord | undefined>;
 }
 
 export interface QuerySpec {

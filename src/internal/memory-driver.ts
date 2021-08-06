@@ -74,6 +74,6 @@ export class _MemoryDriver implements DomainDriver {
         store: string, 
         partition: string, 
         input: InputRecord,
-    ): Promise<boolean> => this.#items(store, partition).write(input);
+    ): Promise<OutputRecord | undefined> => this.#items(store, partition).write(input);
 }
 

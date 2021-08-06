@@ -584,7 +584,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return result;
     }
 
-    #tryCommit = (commit: _Commit): Promise<boolean> => {
+    #tryCommit = async (commit: _Commit): Promise<boolean> => {
         const key = _rowKeys.commit(commit.version);
         const value = _commitType.toJsonValue(commit);
 
@@ -599,7 +599,8 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             ttl: -1,
         };
 
-        return this.#driver.write(this.#id, _partitionKeys.commits, input);
+        const output = await this.#driver.write(this.#id, _partitionKeys.commits, input);
+        return !!output;
     };
 
     do = async <K extends string & keyof Model["actions"]>(

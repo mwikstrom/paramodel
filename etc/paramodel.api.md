@@ -152,7 +152,7 @@ export interface DomainDriver {
     // (undocumented)
     timestamp(this: void): Date;
     // (undocumented)
-    write(this: void, store: string, partition: string, input: InputRecord): Promise<boolean>;
+    write(this: void, store: string, partition: string, input: InputRecord): Promise<OutputRecord | undefined>;
 }
 
 // @public (undocumented)
