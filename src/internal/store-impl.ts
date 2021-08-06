@@ -334,6 +334,10 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return result;
     };
 
+    #syncNext = async (infoMap: Map<string, SyncViewInfo>): Promise<number> => {
+        throw new Error("TODO: #syncNext not implemented.");
+    }
+
     #tryAction = async <K extends string & keyof Model["actions"]>(
         latest: _Commit | undefined,
         minBase: number,
@@ -559,17 +563,36 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         const viewKeys = options.views ?
             this.#getMaterialViewDependencies(...options.views) :
             this.#getAllMaterialViews();
-        const viewRecords = new Map<string, OutputRecord>();
+        const infoMap = new Map<string, SyncViewInfo>();
+        let syncVersion: number | undefined;
+
         (await Promise.all(viewKeys.map(this.#getViewHeaderRecord))).forEach((record, index) => {
+            let version = 0;
+            let token: string | null = null;
+
             if (record) {
-                viewRecords.set(viewKeys[index], record);
+                version = _viewHeader.fromJsonValue(record.value).sync_version;
+                token = record.token;
             }
+
+            if (syncVersion === void(0) || version < syncVersion) {
+                syncVersion = version;
+            }
+
+            infoMap.set(viewKeys[index], Object.freeze({ version, token }));
         });
-        const viewHeaders = Object.values(viewRecords).map(record => _viewHeader.fromJsonValue(record.value));
-        const syncVersion = _getMinSyncVersion(viewHeaders);
+
+        if (syncVersion === void(0)) {
+            syncVersion = 0;
+        }
 
         while (syncVersion < target && !(signal?.aborted)) {
-            throw new Error("TODO: sync not implemented.");
+            const next = await this.#syncNext(infoMap);
+            if (next > syncVersion) {
+                syncVersion = next;
+            } else {
+                break;
+            }
         }
 
         return syncVersion;
@@ -632,3 +655,8 @@ const authErrorFromOptions = (options: Partial<Pick<ViewOptions, "auth">>): Erro
         return void(0);
     }
 };
+
+type SyncViewInfo = {
+    readonly token: string | null;
+    readonly version: number;
+}
