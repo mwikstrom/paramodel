@@ -311,9 +311,9 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     #getMaterialViewDependencies = (key: string): string[] => {
         const processed = new Set<string>();
         const result: string[] = [];
-        const todo: string[] = [];
+        const queue: string[] = [];
         
-        for (let next: string | undefined = key; next !== void(0); next = todo.shift()) {
+        for (let next: string | undefined = key; next !== void(0); next = queue.shift()) {
             if (processed.has(next)) {
                 continue;
             }
@@ -330,7 +330,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             }
 
             for (const dependency of definition.dependencies) {
-                todo.push(dependency);
+                queue.push(dependency);
             }
         }
 
