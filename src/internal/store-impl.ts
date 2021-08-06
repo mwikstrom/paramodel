@@ -763,8 +763,48 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         key: string,
         info: SyncViewInfo,
         signal?: AbortSignal
-    ): Promise<void> => {
-        throw new Error("TODO: expirePurgedViewData");
+    ): Promise<boolean> => {
+        if (info.purge_start_version !== 0) {
+            return false;
+        }
+
+        if (info.purge_end_version === 0) {
+            return true;
+        }
+
+        const definition = this.#model.views[key];
+        if (!definition) {
+            return false;
+        }
+
+        const { kind } = definition;
+        if (!_materialViewKindType.test(kind)) {
+            return false;
+        }
+
+        if (kind === "entities") {
+            return await this.#expirePurgedEntities(key, info.purge_end_version, signal);
+        } else if (kind === "state") {
+            return await this.#expirePurgedState(key, info.purge_end_version, signal);
+        } else {
+            return false;
+        }
+    }
+
+    #expirePurgedEntities = async (
+        viewKey: string,
+        purgeVersion: number,
+        signal?: AbortSignal,
+    ): Promise<boolean> => {
+        throw new Error("TODO: expirePurgedEntities");
+    }
+
+    #expirePurgedState = async (
+        viewKey: string,
+        purgeVersion: number,
+        signal?: AbortSignal,
+    ): Promise<boolean> => {
+        throw new Error("TODO: expirePurgedState");
     }
 
     #tryAction = async <K extends string & keyof Model["actions"]>(
@@ -997,8 +1037,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
         // Phase 2: Mark all state/entity records in the purged range with a TTL
         for (const [key, info] of infoMap) {
-            await this.#expirePurgedViewData(key, info, signal);
-            aborted ||= !!signal?.aborted;
+            aborted ||= !await this.#expirePurgedViewData(key, info, signal) || !!signal?.aborted;
             if (aborted) {
                 break;
             }            
@@ -1168,7 +1207,7 @@ const getViewHeaderForPurge = (
         last_change_version: prev.last_change_version,
         last_change_timestamp: prev.last_change_timestamp,
         purge_start_version: 0,
-        purge_end_version: purgeVersion,
+        purge_end_version: Math.max(prev.purge_end_version, purgeVersion),
     });
 
     return header;
