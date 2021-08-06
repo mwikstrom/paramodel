@@ -472,9 +472,9 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             let modified: boolean;
 
             if (definition?.kind === "entities") {
-                modified = await this.#syncEntities(commit, definition);
+                modified = await this.#syncEntities(commit, definition, key);
             } else if (definition?.kind === "state") {
-                modified = await this.#syncState(commit, definition);
+                modified = await this.#syncState(commit, definition, key);
             } else {
                 throw new Error(`Don't know how to sync view: ${key}`);
             }
@@ -488,6 +488,39 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
 
         return true;
+    }
+
+    #syncEntities = async (commit: _Commit, definition: EntityProjection, key: string): Promise<boolean> => {
+        const changes = _getChangesFromCommit(commit, this.#model.events, definition.mutators);
+        const snapshot = this.#createViewSnapshotFunc(commit.version, definition.dependencies, [key]);
+        throw new Error("TODO: syncEntities");
+    }
+
+    #syncState = async (commit: _Commit, definition: StateProjection, key: string): Promise<boolean> => {
+        const changes = _getChangesFromCommit(commit, this.#model.events, definition.mutators);
+        const snapshot = this.#createViewSnapshotFunc(commit.version, definition.dependencies, [key]);
+        const before = commit.version === 1 ?
+            definition.initial :
+            await this.#createStateView(key, definition, commit.version - 1, [key]).read();
+        let after = before;      
+        for (const change of changes) {
+            after = await definition.apply(change, after, snapshot);
+        }
+        
+        const jsonState = definition.type.toJsonValue(after);
+        if (jsonState === void(0)) {
+            throw new Error("Could not serialize view state to json");
+        }
+
+        const input: InputRecord = {
+            key: _rowKeys.viewState(commit.version),
+            value: jsonState,
+            replace: null,
+            ttl: -1,
+            
+        };
+        await this.#driver.write(this.#id, _partitionKeys.view(key), input);
+        return commit.version === 1 || before !== after;
     }
 
     #storeViewHeader = async (
@@ -514,16 +547,6 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             output = await this.#driver.read(this.#id, pk, input.key);
             prev = getSyncInfoFromRecord(output);
         }
-    }
-
-    #syncEntities = async (commit: _Commit, definition: EntityProjection): Promise<boolean> => {
-        const changes = _getChangesFromCommit(commit, this.#model.events, definition.mutators);
-        throw new Error("TODO: syncEntities");
-    }
-
-    #syncState = async (commit: _Commit, definition: StateProjection): Promise<boolean> => {
-        const changes = _getChangesFromCommit(commit, this.#model.events, definition.mutators);
-        throw new Error("TODO: syncState");
     }
 
     #tryAction = async <K extends string & keyof Model["actions"]>(
