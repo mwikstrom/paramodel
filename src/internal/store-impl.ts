@@ -330,9 +330,9 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
     }
 
-    #getAllMaterialViews = (): string[] => Object
+    #getMaterialViews = (filter?: readonly string[]): string[] => Object
         .entries(this.#model.views)
-        .filter(([,def]) => _materialViewKindType.test(def))
+        .filter(([key,def]) => (filter === void(0) || filter.includes(key)) && _materialViewKindType.test(def))
         .map(([key]) => key);
 
     #getMaterialViewDependencies = (...keys: string[]): string[] => {
@@ -490,6 +490,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
         return synced;
     }
+
+    #purgeNext = async (
+        infoMap: Map<string, SyncViewInfo>,
+        last?: number,
+        signal?: AbortSignal,
+    ): Promise<number> => {
+        throw new Error("TODO: #purgeNext");
+    }   
 
     #syncCommit = async (commit: _Commit, infoMap: Map<string, SyncViewInfo>, keys: Set<string>): Promise<boolean> => {
         for (const key of keys) {
@@ -870,7 +878,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     }
 
     stat = async (): Promise<DomainStoreStatus> => {
-        const materialViewKeys = this.#getAllMaterialViews();
+        const materialViewKeys = this.#getMaterialViews();
         const [
             latest,
             headers,
@@ -904,7 +912,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         const { signal, target } = options;
         const viewKeys = options.views ?
             this.#getMaterialViewDependencies(...options.views) :
-            this.#getAllMaterialViews();
+            this.#getMaterialViews();
         const infoMap = new Map<string, SyncViewInfo>(
             (await Promise.all(viewKeys.map(this.#getViewHeaderRecord))).map((record, index) => ([
                 viewKeys[index],
@@ -925,11 +933,27 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return synced;
     }
 
-    purge = (options: Partial<PurgeOptions> = {}): Promise<number> => {
-        // When implementing: Remember to NOT COMPETE with sync!
-        // Old versions may be needed (and recreated) when syncing a new view with
-        // dependencies!
-        throw new Error("TODO: purge not implemented.");
+    purge = async (options: Partial<PurgeOptions> = {}): Promise<number> => {
+        const { signal, target } = options;
+        const viewKeys = this.#getMaterialViews(options.views);
+        const infoMap = new Map<string, SyncViewInfo>(
+            (await Promise.all(viewKeys.map(this.#getViewHeaderRecord))).map((record, index) => ([
+                viewKeys[index],
+                getSyncInfoFromRecord(record),
+            ]))    
+        );
+
+        let purged = 0;
+        do { 
+            const next = await this.#purgeNext(infoMap, target, signal); 
+            if (next > purged) {
+                purged = next;
+            } else {
+                break;
+            }
+        }
+        while (!signal?.aborted && purged < (target || 0));
+        return purged;
     }
 
     view = async <K extends string & keyof Model["views"]>(
