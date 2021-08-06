@@ -310,10 +310,10 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
     }
 
-    #getMaterialViewDependencies = (key: string): string[] => {
+    #getMaterialViewDependencies = (...keys: string[]): string[] => {
+        const [key, ...queue] = keys;
         const processed = new Set<string>();
         const result: string[] = [];
-        const queue: string[] = [];
         
         for (let next: string | undefined = key; next !== void(0); next = queue.shift()) {
             if (processed.has(next)) {
