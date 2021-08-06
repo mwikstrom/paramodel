@@ -437,7 +437,9 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         const filter = Array.from(eventsToSync);
         let synced = 0;
         for await (const commit of this.#readCommits({ first, last, filter })) {
-            await this.#syncCommit(commit, infoMap, viewsToSync);
+            if (!await this.#syncCommit(commit, infoMap, viewsToSync)) {
+                return synced;
+            }
             synced = commit.version;
             if (signal?.aborted) {
                 return synced;
@@ -449,15 +451,16 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 latest = await this.#getCommit(last);
             }
             if (latest) {
-                await this.#syncCommit(latest, infoMap, viewsToSync);
-                synced = latest.version;
+                if (await this.#syncCommit(latest, infoMap, viewsToSync)) {
+                    synced = latest.version;
+                }                
             }
         }
 
         return synced;
     }
 
-    #syncCommit = async (commit: _Commit, infoMap: Map<string, SyncViewInfo>, keys: Set<string>): Promise<void> => {
+    #syncCommit = async (commit: _Commit, infoMap: Map<string, SyncViewInfo>, keys: Set<string>): Promise<boolean> => {
         for (const key of keys) {
             const info = infoMap.get(key);
             const definition = this.#model.views[key];
@@ -477,8 +480,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             }
 
             const newInfo = await this.#storeViewHeader(commit, key, definition.kind, info, modified);
+            if (!newInfo) {
+                return false;
+            }
+
             infoMap.set(key, newInfo);
         }
+
+        return true;
     }
 
     #storeViewHeader = async (
@@ -487,11 +496,11 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         kind: _MaterialViewKind,
         prev: SyncViewInfo,
         modified: boolean
-    ): Promise<SyncViewInfo> => {
+    ): Promise<SyncViewInfo | undefined> => {
         for (;;) {
             const input = getViewHeaderRecordForCommit(commit, prev, kind, modified);
             if (!input) {
-                return prev;
+                return void(0);
             }
 
             const pk = _partitionKeys.view(key);
