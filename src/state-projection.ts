@@ -3,7 +3,6 @@ import { Change } from "./change";
 import { ChangeModel, Forbidden, ReadModel } from "./model";
 import { ViewSnapshotFunc } from "./projection";
 
-// TODO: Rename to StateDefinition
 export interface StateProjection<
     T = unknown,
     C extends ChangeModel = ChangeModel,
