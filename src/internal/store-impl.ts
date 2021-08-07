@@ -83,6 +83,11 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         
         const where: readonly FilterSpec[] = Object.freeze([
             {
+                path: ["key"],
+                operator: "!=",
+                operand: _rowKeys.viewHeader,
+            },
+            {
                 path: ["value", "start"],
                 operator: "<=",
                 operand: version,
