@@ -570,10 +570,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
         const innerPut: EntityCollection["put"] = async (props: Record<string, unknown>) => {
             const key = props[definition.key] as string;
-            const value = definition.type.toJsonValue(props);            
-            if (value === void(0)) {
-                throw new Error("Could not serialize entity");
-            }
+            const value = definition.type.toJsonValue(props, msg => new Error(`Could not serialize entity: ${msg}`));
 
             let replace: string | null = null;
             if (written.has(key)) {
@@ -631,10 +628,11 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 entity: meta.envelope.entity,
                 end: baseVerison,
             };
-            const rewrittenValue = envelopeType.toJsonValue(rewrittenEnvelope);
-            if (rewrittenValue === void(0)) {
-                throw new Error("Could not rewrite entity envelope");
-            }
+
+            const rewrittenValue = envelopeType.toJsonValue(
+                rewrittenEnvelope,
+                msg => new Error(`Could not rewrite entity envelope: ${msg}`)
+            );
 
             const oldRecord: InputRecord = {
                 key: meta.key,
@@ -685,10 +683,10 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             after = await definition.apply(change, after, snapshot);
         }
         
-        const jsonState = definition.type.toJsonValue(after);
-        if (jsonState === void(0)) {
-            throw new Error("Could not serialize view state to json");
-        }
+        const jsonState = definition.type.toJsonValue(
+            after,
+            msg => new Error(`Could not serialize view state to json: ${msg}`)
+        );
 
         const input: InputRecord = {
             key: _rowKeys.viewState(commit.version),
@@ -955,12 +953,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
     #tryCommit = async (commit: _Commit): Promise<boolean> => {
         const key = _rowKeys.commit(commit.version);
-        const value = _commitType.toJsonValue(commit);
-
-        if (value === void(0)) {
-            throw new Error("Failed to serialize commit");
-        }
-
+        const value = _commitType.toJsonValue(commit, msg => new Error(`Failed to serialize commit: ${msg}`));
         const input: InputRecord = {
             key,
             value,
@@ -1226,12 +1219,7 @@ const getViewHeaderRecord = (
         return void(0);
     }
 
-    const jsonHeader = _viewHeader.toJsonValue(header);
-
-    if (jsonHeader === void(0)) {
-        throw new Error("Failed to serialize new view header");
-    }
-
+    const jsonHeader = _viewHeader.toJsonValue(header, msg => new Error(`Failed to serialize view header: ${msg}`));
     const input: InputRecord = {
         key: _rowKeys.viewHeader,
         value: jsonHeader,

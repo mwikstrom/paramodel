@@ -1,4 +1,4 @@
-import { JsonValue, TypeOf } from "paratype";
+import { JsonValue, Type, TypeOf } from "paratype";
 import { ActionResult } from "../action";
 import { ActionContext } from "../action-context";
 import { ActionHandler } from "../action-handler";
@@ -102,11 +102,7 @@ export class _ActionContextImpl<
             return void(0);
         }
 
-        const typeError = this.#handler.output.error(result);
-        if (typeError !== void(0)) {
-            throw new Error(`Invalid action output: ${typeError}`);
-        }
-
+        this.#handler.output.assert(result, msg => new Error(`Invalid action output: ${msg}`));
         this.#output = result;
     }
 
@@ -119,16 +115,13 @@ export class _ActionContextImpl<
             throw new Error(`Cannot emit unknown event: ${key}`);
         }
 
-        const eventType = this.#events[key];
-        const typeError = eventType.error(arg);
-        if (typeError !== void(0)) {
-            throw new Error(`Invalid argument for event '${key}': ${typeError}`);
-        }
+        const eventType: Type = this.#events[key];
+        eventType.assert(arg, msg => new Error(`Invalid argument for event '${key}': ${msg}`));
 
-        const jsonArg = eventType.toJsonValue(arg);
-        if (jsonArg == void(0)) {
-            throw new Error(`Argument for event '${key}' could not be converted to json`);
-        }
+        const jsonArg = eventType.toJsonValue(
+            arg, 
+            msg => new Error(`Argument for event '${key}' could not be converted to json: ${msg}`)
+        );
 
         this.#emittedChanges.add(key);
         this.#emittedEvents.push({ key, arg: jsonArg });

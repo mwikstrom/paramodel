@@ -47,7 +47,7 @@
     "@typescript-eslint/parser": "^4.28.5",
     "eslint": "^7.31.0",
     "jest": "^27.0.6",
-    "paratype": "0.0.13",
+    "paratype": "^0.1.0",
     "rimraf": "^3.0.2",
     "rollup": "^2.55.1",
     "ts-jest": "^27.0.4",
