@@ -346,7 +346,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
     #getMaterialViews = (filter?: readonly string[]): string[] => Object
         .entries(this.#model.views)
-        .filter(([key,def]) => (filter === void(0) || filter.includes(key)) && _materialViewKindType.test(def))
+        .filter(([key,def]) => (filter === void(0) || filter.includes(key)) && _materialViewKindType.test(def.kind))
         .map(([key]) => key);
 
     #getMaterialViewDependencies = (...keys: string[]): string[] => {

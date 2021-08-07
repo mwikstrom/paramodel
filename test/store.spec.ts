@@ -41,6 +41,16 @@ describe("DomainStore", () => {
         expect(state).toBe(2);
     });
 
+    it("can read state after sync", async () => {
+        const store = await createAccountStore();
+        await store.do("register_account", { owner_id: "jane_doe" });
+        await store.sync();
+        const view = await store.view("next_account_id");
+        expect(view).toBeDefined();
+        const state = await view?.read();
+        expect(state).toBe(2);
+    });
+
     it("can register two accounts", async () => {
         const store = await createAccountStore();
         await store.do("register_account", { owner_id: "jane_doe" });
