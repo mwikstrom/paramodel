@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type DomainModel<Scope = unknown, Events = ChangeModel, Views = ReadModel, Actions = WriteModel> = {
+export declare type DomainModel<Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Actions extends WriteModel = WriteModel> = {
     readonly scope: Type<Scope>;
     readonly events: Events;
     readonly views: Views;

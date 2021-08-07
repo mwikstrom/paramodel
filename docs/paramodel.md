@@ -65,6 +65,7 @@ Run-time domain model for event-sourcing.
 |  --- | --- |
 |  [ActionFunc](./paramodel.actionfunc.md) |  |
 |  [ActionResultType](./paramodel.actionresulttype.md) |  |
+|  [AnyActionHandler](./paramodel.anyactionhandler.md) |  |
 |  [AnyProjection](./paramodel.anyprojection.md) |  |
 |  [ArrayAnyOperator](./paramodel.arrayanyoperator.md) |  |
 |  [ArrayOperator](./paramodel.arrayoperator.md) |  |

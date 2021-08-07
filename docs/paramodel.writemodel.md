@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-export declare type WriteModel<K extends string = string, T extends ActionHandler = ActionHandler> = Readonly<Record<K, T>>;
+export declare type WriteModel<K extends string = string, T extends ActionHandler = AnyActionHandler> = Readonly<Record<K, T>>;
 ```
-<b>References:</b> [ActionHandler](./paramodel.actionhandler.md)
+<b>References:</b> [ActionHandler](./paramodel.actionhandler.md)<!-- -->, [AnyActionHandler](./paramodel.anyactionhandler.md)
 

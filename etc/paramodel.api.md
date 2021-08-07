@@ -75,6 +75,9 @@ export interface ActionResult<Output = unknown> {
 export type ActionResultType<Model extends Pick<DomainModel, "actions" | "events">, Action extends string & keyof Model["actions"]> = (ActionResult<TypeOf<Model["actions"][Action]["output"]>>);
 
 // @public (undocumented)
+export type AnyActionHandler = ActionHandler<any, any, any, any, any>;
+
+// @public (undocumented)
 export type AnyProjection = (StateProjection<any, any, any, any> | QueryHandler<any, any, any, any> | EntityProjection<any, any, any, any, any>);
 
 // @public (undocumented)
@@ -156,7 +159,7 @@ export interface DomainDriver {
 }
 
 // @public (undocumented)
-export type DomainModel<Scope = unknown, Events = ChangeModel, Views = ReadModel, Actions = WriteModel> = {
+export type DomainModel<Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Actions extends WriteModel = WriteModel> = {
     readonly scope: Type<Scope>;
     readonly events: Events;
     readonly views: Views;
@@ -524,6 +527,6 @@ export interface ViewStatus {
 }
 
 // @public (undocumented)
-export type WriteModel<K extends string = string, T extends ActionHandler = ActionHandler> = Readonly<Record<K, T>>;
+export type WriteModel<K extends string = string, T extends ActionHandler = AnyActionHandler> = Readonly<Record<K, T>>;
 
 ```
