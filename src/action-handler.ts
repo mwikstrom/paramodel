@@ -15,6 +15,9 @@ export interface ActionHandler<
     readonly exec: ActionFunc<Events, Views, Scope, Input, Output>;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type AnyActionHandler = ActionHandler<any, any, any, any, any>;
+
 export type ActionFunc<
     Events extends ChangeModel = ChangeModel,
     Views extends ReadModel = ReadModel,
