@@ -2,14 +2,12 @@ import { JsonValue } from "paratype";
 import { _Comparison } from "./compile-comparison";
 
 /** @internal */
-export const _compareJson: _Comparison<JsonValue | undefined> = (a, b): -1 | 0 | 1 => {
+export const _compareJson: _Comparison<JsonValue | undefined> = (a, b): -1 | 0 | 1 | undefined => {
     const ka = scalarTypeSortKey(a);
     const kb = scalarTypeSortKey(b);
 
     if (ka === void(0) || kb === void(0)) {
-        // note: they're really not comparable - but returning zero is the
-        // least bad thing since it should at least preserve internal sort order
-        return 0;
+        return void(0);
     }
 
     if (ka < kb) {

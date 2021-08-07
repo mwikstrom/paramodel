@@ -3,7 +3,7 @@ import { _compareJson } from "./compare-json";
 import { _compileAccessor } from "./compile-accessor";
 
 /** @internal */
-export const _compileComparison = (spec: SortSpec): _Comparison<OutputRecord> => {
+export const _compileComparison = (spec: SortSpec): _SortableComparison<OutputRecord> => {
     const { path, direction } = spec;
     const accessor = _compileAccessor(path);
     const ascending: _Comparison<OutputRecord> = (ra, rb) => {
@@ -11,11 +11,15 @@ export const _compileComparison = (spec: SortSpec): _Comparison<OutputRecord> =>
         const vb = accessor(rb);
         return _compareJson(va, vb);
     };
-    return direction !== "descending" ? ascending : invertComparison(ascending);
+    const compiled = direction !== "descending" ? ascending : invertComparison(ascending);
+    return (a, b) => compiled(a, b) || 0;
 };
 
 /** @internal */
-export type _Comparison<T> = (a: T, b: T) => -1 | 0 | 1;
+export type _SortableComparison<T> = (a: T, b: T) => -1 | 0 | 1;
+
+/** @internal */
+export type _Comparison<T> = (a: T, b: T) => -1 | 0 | 1 | undefined;
 
 const invertComparison = <T>(original: _Comparison<T>): _Comparison<T> => (a, b) => {
     const inner = original(a, b);

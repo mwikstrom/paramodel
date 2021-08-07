@@ -18,8 +18,11 @@ export const _compileOperator = (
         return matchNone;
     }
 
-    const compiled = factories[operator](operand);
-    return inverted ? invertOperator(compiled) : compiled;
+    let compiled = factories[operator](operand);
+    if (inverted) {
+        compiled = invertOperator(compiled);
+    }
+    return value => compiled(value) === true;
 };
 
 const INVERTED_OPERATOR_PATTERN = /(^not-)|(-not)$/;
@@ -47,8 +50,17 @@ const includesAny: OpFactory = operand => {
 };
 
 const eq: OpFactory = operand => value => value === operand;
-const gt: OpFactory = operand => value => _compareJson(value, operand) > 0;
-const lt: OpFactory = operand => value => _compareJson(value, operand) < 0;
+
+const gt: OpFactory = operand => value => {
+    const cmp = _compareJson(value, operand);
+    return cmp === void(0) ? cmp : cmp > 0;
+};
+
+const lt: OpFactory = operand => value => {
+    const cmp = _compareJson(value, operand);
+    return cmp === void(0) ? cmp : cmp < 0;
+};
+
 
 const regexOperator = (pattern: RegExp): Predicate<JsonValue | undefined> => value => (
     typeof value === "string" && 
@@ -68,12 +80,16 @@ const endsWith: OpFactory = regexOperatorFactory(operand => `${operand}$`);
 const endsWithIgnoreCase: OpFactory = regexOperatorFactory(operand => `${operand}$`, "i");
 
 const invertOperator = (
-    inner: Predicate<JsonValue | undefined>
-): Predicate<JsonValue | undefined> => value => !inner(value);
+    inner: Op
+): Op => value => {
+    const v = inner(value);
+    return v === void(0) ? v : !v;
+};
 
 const invertFactory = (inner: OpFactory): OpFactory => operand => invertOperator(inner(operand));
 
-type OpFactory = (operand: JsonValue) => Predicate<JsonValue | undefined>;
+type Op = (value: JsonValue | undefined) => boolean | undefined;
+type OpFactory = (operand: JsonValue) => Op;
 
 const factories: Record<string, OpFactory> = {
     "==": eq,
