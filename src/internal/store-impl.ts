@@ -579,7 +579,11 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
         const innerPut: EntityCollection["put"] = async (props: Record<string, unknown>) => {
             const key = props[definition.key] as string;
-            const value = definition.type.toJsonValue(props, msg => new Error(`Could not serialize entity: ${msg}`));
+            const envelope: EntityEnvelope = {
+                start: commit.version,
+                end: INF_VERSION,
+                entity: props,
+            };
 
             let replace: string | null = null;
             if (written.has(key)) {
@@ -589,7 +593,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
             const newRecord: InputRecord = {
                 key: rk(key),
-                value,
+                value: envelopeType.toJsonValue(envelope, msg => new Error(`Could not serialize entity: ${msg}`)),
                 replace,
                 ttl: -1,
             };
@@ -632,10 +636,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 throw new Error("Entity metadata was not populated");
             }
 
+            if (baseVerison < meta.envelope.start) {
+                throw new Error("Attempt to write invalid entity envelope");
+            }
+
             const rewrittenEnvelope = {
                 start: meta.envelope.start,
-                entity: meta.envelope.entity,
                 end: baseVerison,
+                entity: meta.envelope.entity,
             };
 
             const rewrittenValue = envelopeType.toJsonValue(
@@ -909,6 +917,11 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
 
         const version = base + 1;
+
+        if (version >= MAX_VERSION) {
+            throw new Error("Commit version overflow");
+        }
+
         const snapshot = this.#createViewSnapshotFunc(base, handler.dependencies, []);
         const fromContext = await new _ActionContextImpl(
             version,
@@ -1129,9 +1142,11 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     }
 }
 
-const PURGE_TTL = 24 * 3600; // 1 day
+const PURGE_TTL = 3600; // 1 hour
+const INF_VERSION = 9000000000000000;
+const MAX_VERSION = 5000000000000000;
 
-type EntityEnvelope<T> = {
+type EntityEnvelope<T = Record<string, unknown>> = {
     start: number;
     end: number;
     entity: T;
@@ -1141,7 +1156,7 @@ const entityEnvelopeType = <T>(valueType: Type<T>): Type<EntityEnvelope<T>> => r
     start: positiveIntegerType,
     end: positiveIntegerType,
     entity: valueType,
-});
+}).restrict("Entity envelope start must be less or equal to end", e => e.start <= e.end);
 
 const defaultAuthError: ErrorFactory = () => new Error("Forbidden");
 
