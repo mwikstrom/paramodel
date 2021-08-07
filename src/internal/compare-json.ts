@@ -20,7 +20,7 @@ export const _compareJson: _Comparison<JsonValue | undefined> = (a, b): -1 | 0 |
 
     // type assertions are known since they have the same scalar sort key
     const va = a as string | number;
-    const vb = a as typeof va;
+    const vb = b as typeof va;
     
     if (va < vb) {
         return -1;
