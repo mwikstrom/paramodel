@@ -1,5 +1,4 @@
-import { JsonValue } from "paratype";
-import { OutputRecord } from "../driver";
+import { JsonObject, JsonValue } from "paratype";
 
 /** @internal */
 export const _compileAccessor = (path: readonly string[]): _Accessor => record => path.reduce(
@@ -10,4 +9,4 @@ export const _compileAccessor = (path: readonly string[]): _Accessor => record =
 );
 
 /** @internal */
-export type _Accessor = (record: OutputRecord) => JsonValue | undefined;
+export type _Accessor = (record: JsonObject) => JsonValue | undefined;
