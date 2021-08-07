@@ -20,7 +20,9 @@ describe("DomainStore.view-entities", () => {
         const before = await store.view("accounts");
         await store.sync();
         const after = await store.view("accounts");
+        expect(before?.version).toBe(0);
         expect(await before?.count()).toBe(0);
+        expect(after?.version).toBe(1);
         expect(await after?.count()).toBe(1);
     });
 });
