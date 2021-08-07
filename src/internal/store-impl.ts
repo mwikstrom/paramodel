@@ -168,6 +168,10 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         let fetched = false;
         let data: OutputRecord | undefined;
         const read: StateView<T>["read"] = async () => {
+            if (version === 0) {
+                return definition.initial;
+            }
+
             if (!fetched) {
                 data = await this.#driver.read(this.#id, partitionKey, rowKey);
                 fetched = true;
