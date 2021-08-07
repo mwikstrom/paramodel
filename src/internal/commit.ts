@@ -27,7 +27,6 @@ export const _commitType: Type<_Commit> = recordType({
     timestamp: timestampType,
     changes: arrayType(stringType),
     events: arrayType(recordType({
-        position: positiveIntegerType,
         key: stringType,
         arg: jsonValueType,
     })),
