@@ -25,7 +25,9 @@ export class _MemoryPartition {
             if (this.#hasExpired(stored)) {
                 purge.push(key);
             } else {
-                result.push({ ...stored, key });
+                const { json, ...common } = stored;
+                const value = JSON.parse(json);
+                result.push({ ...common, key, value });
             }
         }
 
@@ -48,7 +50,9 @@ export class _MemoryPartition {
             return void(0);
         }
         
-        return { ...stored, key };
+        const { json, ...common } = stored;
+        const value = JSON.parse(json);
+        return { ...common, key, value };
     }
 
     write = (input: InputRecord): OutputRecord | undefined => {
@@ -61,11 +65,12 @@ export class _MemoryPartition {
 
         const token = (++this.#tokenCounter).toString(10);
         const timestamp = this.#time.now();
-        const stored: StoredRecord = Object.freeze({ value, token, ttl, timestamp });
+        const json = JSON.stringify(value);
+        const stored: StoredRecord = Object.freeze({ json, token, ttl, timestamp });
         this.#records.set(key, stored);
         
-        return { ...stored, key };
+        return { ...stored, key, value };
     }
 }
 
-type StoredRecord = Omit<OutputRecord, "key">;
+type StoredRecord = Omit<OutputRecord, "key" | "value"> & { readonly json: string }
