@@ -49,17 +49,20 @@ export class _MemoryDriver implements DomainDriver {
             skip = parseInt(continuation, 10);
 
             if (!Number.isSafeInteger(skip) || skip > items.length) {
-                throw new RangeError("Invalid continuation token");
+                throw new RangeError(`Invalid continuation token: ${continuation}`);
             }
 
             items = items.slice(skip);
         }
 
-        if (typeof size !== "number") {
+        if (typeof size !== "number" || items.length <= size) {
             return { items };
         }
 
-        return { items: items.slice(0, size), continuation: (skip + size).toString(10) };
+        return {
+            items: items.slice(0, size),
+            continuation: (skip + size).toString(10)
+        };
     }
     
     read = async (

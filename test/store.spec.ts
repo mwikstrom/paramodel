@@ -7,6 +7,6 @@ describe("DomainStore", () => {
         const store = await createAccountStore();
         const result = await store.do("incorrect" as keyof AccountActions, {} as RegisterAccount);
         expect(result.status).toBe("rejected");
-        expect(result.message).toBe("???");
+        expect(result.message).toBe("Unknown action: incorrect");
     });
 });
