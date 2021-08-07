@@ -1072,7 +1072,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 }
             }
             
-            aborted ||= !!signal?.aborted;           
+            aborted = !aborted || !signal?.aborted;           
             if (aborted) {
                 break;
             }            
@@ -1080,7 +1080,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
         // Phase 2: Mark all state/entity records in the purged range with a TTL
         for (const [key, info] of infoMap) {
-            aborted ||= !await this.#expirePurgedViewData(key, info, signal) || !!signal?.aborted;
+            aborted = aborted || !await this.#expirePurgedViewData(key, info, signal) || !!signal?.aborted;
             if (aborted) {
                 break;
             }            
