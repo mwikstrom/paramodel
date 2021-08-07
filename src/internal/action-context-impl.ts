@@ -54,19 +54,19 @@ export class _ActionContextImpl<
         try {
             const symbol = await this.#handler.exec(this);
 
-            if (symbol === void(0) && this.#status === void(0)) {
-                this.#status = "success";
-                this.#message = void(0);
-            } else if (symbol === Forbidden) {
+            if (symbol === Forbidden) {
                 this.#status = "forbidden";
                 this.#message = void(0);
             } else if (symbol === Conflict) {
                 this.#status = "forbidden";
                 this.#message = void(0);
-            } else {
+            } else if (symbol !== void(0)) {
                 this.#status = "failed";
-                this.#message = "Action handled returned unknown symbol";
-            }            
+                this.#message = "Action handler returned unknown symbol";
+            } else if (this.#status === void(0)) {
+                this.#status = "success";
+                this.#message = void(0);
+            }
         } catch (e) {
             if (this.#status === void(0) || this.#status === "success") {
                 this.#status = "failed";
