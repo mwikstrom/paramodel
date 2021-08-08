@@ -2,7 +2,7 @@ import { positiveIntegerType, recordType, Type, TypeOf } from "paratype";
 import { ActionOptions, ActionResultType } from "../action";
 import { ChangeType } from "../change";
 import { DomainDriver, FilterSpec, InputRecord, OutputRecord } from "../driver";
-import { EntityCollection, EntityProjection } from "../entity-projection";
+import { EntityProjectionState, EntityProjection } from "../entity-projection";
 import { EntityView, ReadonlyEntityCollection } from "../entity-view";
 import { DomainModel, Forbidden } from "../model";
 import { AnyProjection, View, ViewOf, ViewSnapshotFunc } from "../projection";
@@ -552,7 +552,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         const snapshot = this.#createViewSnapshotFunc(commit.version, definition.dependencies, [viewKey]);
         const metaMap = new WeakMap<Record<string, unknown>, EntityMetadata>();
         const baseVerison = commit.version - 1;
-        const { get: baseGet, ...base } = await this.#createReadonlyEntityCollection(
+        const base = await this.#createReadonlyEntityCollection(
             viewKey,
             definition,
             baseVerison,
@@ -560,75 +560,53 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             undefined,
             metaMap,
         );
-        const written = new Set<string>();
-        const actions: Promise<unknown>[] = [];
+
         const pk = _partitionKeys.view(viewKey);
         const rk = (key: string): string => _rowKeys.entity(key, commit.version);
         const envelopeType = entityEnvelopeType(definition.type);
-
-        const get: EntityCollection["get"] = async (key: string) => {
-            if (written.has(key)) {
-                const record = await this.#driver.read(this.#id, pk, rk(key));
-                if (record) {
-                    return definition.type.fromJsonValue(record.value);
-                }
-            } else {
-                return await baseGet(key);
-            }
+        const written = new Map<string, Record<string, unknown> | null>();
+        const put: EntityProjectionState["put"] = props => void(written.set(props[definition.key] as string, props));
+        const del: EntityProjectionState["del"] = key => void(written.set(key as string, null));
+        const state: EntityProjectionState = {
+            base,
+            put,
+            del,            
         };
 
-        const innerPut: EntityCollection["put"] = async (props: Record<string, unknown>) => {
-            const key = props[definition.key] as string;
+        for (const change of changes) {
+            await definition.apply(change, state, snapshot);
+        }
+
+        // TODO: Delete any keys that may have been written before but not in this run
+        //       This will only occur in case the handler logic is indeterministic (or changed)
+
+        // Write the new entities (ignoring nulls - those are deletions)
+        for (const [key, props] of written) {
+            if (!props) {
+                continue; // entity was deleted
+            }
+
             const envelope: EntityEnvelope = {
                 start: commit.version,
                 end: INF_VERSION,
                 entity: props,
             };
-
-            let replace: string | null = null;
-            if (written.has(key)) {
-                const output = await this.#driver.read(this.#id, pk, rk(key));
-                replace = output ? output.token : null;
-            }
-
-            const newRecord: InputRecord = {
+            const value = envelopeType.toJsonValue(envelope, msg => new Error(`Could not serialize entity: ${msg}`));
+            const input: InputRecord = {
                 key: rk(key),
-                value: envelopeType.toJsonValue(envelope, msg => new Error(`Could not serialize entity: ${msg}`)),
-                replace,
+                value,
+                replace: null,
                 ttl: -1,
             };
 
-            await this.#writeSuccess(pk, newRecord);
+            await this.#writeSuccess(pk, input);
+        }
 
-            if (!written.has(key)) {
-                await replaceOld(key);
-            }
-        };
-
-        const innerDel: EntityCollection["del"] = async (key: string) => {
-            if (written.has(key)) {
-                const output = await this.#driver.read(this.#id, pk, rk(key));
-                if (!output) {
-                    return false; // already deleted
-                }                
-                const newRecord: InputRecord = {
-                    key: output.key,
-                    value: null,
-                    replace: output.token,
-                    ttl: 0,
-                };
-                await this.#writeSuccess(pk, newRecord);
-                return true;
-            } else {
-                return await replaceOld(key);
-            }
-        };
-
-        const replaceOld = async (key: string): Promise<boolean> => {
-            const entity = await baseGet(key);
+        // Set end marks of all written keys in the base version
+        for (const key of written.keys()) {
+            const entity = await base.get(key);
             if (!entity) {
-                written.add(key);
-                return false; // did not exist
+                continue; // did not exist before
             }
 
             const meta = metaMap.get(entity);
@@ -640,51 +618,26 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 throw new Error("Attempt to write invalid entity envelope");
             }
 
-            const rewrittenEnvelope = {
+            const envelope = {
                 start: meta.envelope.start,
                 end: baseVerison,
                 entity: meta.envelope.entity,
             };
 
-            const rewrittenValue = envelopeType.toJsonValue(
-                rewrittenEnvelope,
+            const value = envelopeType.toJsonValue(
+                envelope,
                 msg => new Error(`Could not rewrite entity envelope: ${msg}`)
             );
 
-            const oldRecord: InputRecord = {
+            const input: InputRecord = {
                 key: meta.key,
-                value: rewrittenValue,
+                value: value,
                 replace: meta.token,
                 ttl: meta.ttl,
             };
-            await this.#writeSuccess(pk, oldRecord);
-            written.add(key);
-            return true;
-        };
 
-        const wrap = <Args extends unknown[], Result>(
-            inner: (...args: Args) => Promise<Result>
-        ): ((...args: Args) => Promise<Result>) => (...args) => {
-                const promise = inner(...args);
-                actions.push(promise);
-                return promise;
-            };
-
-        const put = wrap(innerPut);
-        const del = wrap(innerDel);
-        const collection: EntityCollection = {
-            ...base,
-            get,
-            put,
-            del,            
-        };
-
-        for (const change of changes) {
-            await definition.apply(change, collection, snapshot);
+            await this.#writeSuccess(pk, input);
         }
-
-        // ensure all actions were successful
-        await Promise.all(actions);
 
         return written.size > 0;
     }

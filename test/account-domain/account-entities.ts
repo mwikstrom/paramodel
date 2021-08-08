@@ -24,48 +24,48 @@ const accountPropsType: Type<AccountProps> = recordType({
 
 const account_registered: EntityProjectionFunc<AccountProps, "account_id", Change<AccountRegistered>> = async (
     { arg: { account_id, owner_id } },
-    { get, put },
+    { base: { get }, put },
 ) => {
     const found = await get(account_id);
     if (!found) {
-        await put({ account_id, owner_id, balance: 0 });
+        put({ account_id, owner_id, balance: 0 });
     }
 };
 
 const account_deleted: EntityProjectionFunc<AccountProps, "account_id", Change<AccountDeleted>> = async (
     { arg: { account_id } },
     { del },
-) => void await del(account_id);
+) => del(account_id);
 
 const money_deposited: EntityProjectionFunc<AccountProps, "account_id", Change<MoneyDeposited>> = async (
     { arg: { account_id, amount } },
-    { get, put },
+    { base: { get }, put },
 ) => {
     const found = await get(account_id);
     if (found) {
-        await put({ ...found, balance: found.balance + amount});
+        put({ ...found, balance: found.balance + amount});
     }
 };
 
 const money_withdrawn: EntityProjectionFunc<AccountProps, "account_id", Change<MoneyWithdrawn>> = async (
     { arg: { account_id, amount } },
-    { get, put },
+    { base: { get }, put },
 ) => {
     const found = await get(account_id);
     if (found) {
-        await put({ ...found, balance: found.balance - amount});
+        put({ ...found, balance: found.balance - amount});
     }
 };
 
 const money_transferred: EntityProjectionFunc<AccountProps, "account_id", Change<MoneyTransferred>> = async (
     { arg: { from_account_id, to_account_id, amount } },
-    { get, put },
+    { base: { get }, put },
 ) => {
     const from = await get(from_account_id);
     const to = await get(to_account_id);
     if (from && to) {
-        await put({ ...from, balance: from.balance - amount});
-        await put({ ...to, balance: to.balance + amount});
+        put({ ...from, balance: from.balance - amount});
+        put({ ...to, balance: to.balance + amount});
     }
 };
 
