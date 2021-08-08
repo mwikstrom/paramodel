@@ -543,7 +543,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     #writeSuccess = async (partition: string, input: InputRecord): Promise<void> => {
         const output = await this.#driver.write(this.#id, partition, input);
         if (!output) {
-            throw new Error(`Optimistic write failed: ${this.#id}/${partition}/${input.key}`);
+            const existing = await this.#driver.read(this.#id, partition, input.key);
+            let message = `Optimistic write failed: ${this.#id}/${partition}: Input is ${JSON.stringify(input)} `;
+            if (existing) {
+                message += `but existing record is ${JSON.stringify(existing)}.`;
+            } else {
+                message += "but there's no existing record.";
+            }
+            throw new Error(message);
         }
     }
 
