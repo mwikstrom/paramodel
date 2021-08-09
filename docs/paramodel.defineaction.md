@@ -9,7 +9,7 @@ Creates an [ActionHandler](./paramodel.actionhandler.md)
 <b>Signature:</b>
 
 ```typescript
-export declare function defineAction<Input, Output, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(this: void, input: Type<Input>, exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>, dependencies?: Dependencies, output?: Type<Output>): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>;
+export declare function defineAction<Input, Output, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(this: void, definition: ActionDefinition<Input, Output, Scope, Events, Views, Dependencies>): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>;
 ```
 
 ## Parameters
@@ -17,10 +17,7 @@ export declare function defineAction<Input, Output, Scope = unknown, Events exte
 |  Parameter | Type | Description |
 |  --- | --- | --- |
 |  this | void | <i>(Ignored)</i> This function uses implicit <code>this</code> binding |
-|  input | Type&lt;Input&gt; | Type of action input |
-|  exec | [ActionFunc](./paramodel.actionfunc.md)<!-- -->&lt;Events, Pick&lt;Views, Dependencies\[number\]&gt;, Scope, Input, Output&gt; | The action handler executor |
-|  dependencies | Dependencies | <i>(Optional)</i> A set of view keys that the action depends upon during execution. These views will automatically be synced to the current version just before the action the executed and available via the [ActionContext.view()](./paramodel.actioncontext.view.md) function. |
-|  output | Type&lt;Output&gt; | <i>(Optional)</i> Type of action output |
+|  definition | [ActionDefinition](./paramodel.actiondefinition.md)<!-- -->&lt;Input, Output, Scope, Events, Views, Dependencies&gt; | Action definition |
 
 <b>Returns:</b>
 

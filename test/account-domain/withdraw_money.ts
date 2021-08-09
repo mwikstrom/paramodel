@@ -37,8 +37,8 @@ const exec: AccountAction<"accounts", WithdrawMoney> = async ({
     emit("money_withdrawn", { account_id, amount });
 };
 
-export const withdraw_money = defineAction(
-    inputType,
+export const withdraw_money = defineAction({
+    input: inputType,
     exec,
-    ["accounts"],
-);
+    dependencies: ["accounts"],
+});

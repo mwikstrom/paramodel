@@ -12,7 +12,7 @@ Run-time domain model for event-sourcing.
 |  --- | --- |
 |  [createDomainProvider(driver)](./paramodel.createdomainprovider.md) |  |
 |  [createMemoryDriver(this)](./paramodel.creatememorydriver.md) | Creates an in-memory [driver](./paramodel.domaindriver.md) that could be used to testing your domain |
-|  [defineAction(this, input, exec, dependencies, output)](./paramodel.defineaction.md) | Creates an [ActionHandler](./paramodel.actionhandler.md) |
+|  [defineAction(this, definition)](./paramodel.defineaction.md) | Creates an [ActionHandler](./paramodel.actionhandler.md) |
 |  [defineEntity(this, type, key, mutators, auth, dependencies)](./paramodel.defineentity.md) | Creates an [EntityProjection](./paramodel.entityprojection.md) |
 |  [defineQuery(this, type, params, dependencies, exec, auth)](./paramodel.definequery.md) | Creates a [QueryHandler](./paramodel.queryhandler.md) |
 |  [defineState(this, type, initial, mutators, auth, dependencies)](./paramodel.definestate.md) | Creates a [StateProjection](./paramodel.stateprojection.md) |
@@ -22,6 +22,7 @@ Run-time domain model for event-sourcing.
 |  Interface | Description |
 |  --- | --- |
 |  [ActionContext](./paramodel.actioncontext.md) | The context in which an action is executed |
+|  [ActionDefinition](./paramodel.actiondefinition.md) | Settings that define an action |
 |  [ActionHandler](./paramodel.actionhandler.md) | A domain action handler |
 |  [ActionOptions](./paramodel.actionoptions.md) | Options for executing an action |
 |  [ActionResult](./paramodel.actionresult.md) | The result of executing an action |

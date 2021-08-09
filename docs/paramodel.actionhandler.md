@@ -16,7 +16,7 @@ export interface ActionHandler<Events extends ChangeModel = ChangeModel, Views e
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [dependencies](./paramodel.actionhandler.dependencies.md) | ReadonlySet&lt;string &amp; keyof Views&gt; | A set of view keys that the action depend upon during execution. These views will automatically be synced to the current version just before the action the executed and available via the [ActionContext.view()](./paramodel.actioncontext.view.md) function. |
+|  [dependencies](./paramodel.actionhandler.dependencies.md) | ReadonlySet&lt;string &amp; keyof Views&gt; | A set of view keys that the action depend upon during execution. |
 |  [input](./paramodel.actionhandler.input.md) | Type&lt;Input&gt; | Type of input that the action requires |
 |  [output](./paramodel.actionhandler.output.md) | Type&lt;Output&gt; | Type of output that the action provides |
 

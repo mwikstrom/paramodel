@@ -22,6 +22,14 @@ export interface ActionContext<Events extends ChangeModel = ChangeModel, Views e
 }
 
 // @public
+export interface ActionDefinition<Input, Output, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []> {
+    dependencies?: Dependencies;
+    exec(this: void, context: ActionContext<Events, Views, Scope, Input, Output>): Promise<Forbidden | Conflict | void>;
+    input: Type<Input>;
+    output?: Type<Output>;
+}
+
+// @public
 export type ActionFunc<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Scope = unknown, Input = unknown, Output = unknown> = ActionHandler<Events, Views, Scope, Input, Output>["exec"];
 
 // @public
@@ -103,7 +111,7 @@ export function createDomainProvider(driver: DomainDriver): DomainProvider;
 export function createMemoryDriver(this: void): DomainDriver;
 
 // @public
-export function defineAction<Input, Output, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(this: void, input: Type<Input>, exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>, dependencies?: Dependencies, output?: Type<Output>): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>;
+export function defineAction<Input, Output, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(this: void, definition: ActionDefinition<Input, Output, Scope, Events, Views, Dependencies>): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>;
 
 // @public
 export function defineEntity<Props extends Record<string, unknown>, Key extends PossibleKeysOf<Props>, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(this: void, type: Type<Props>, key: Key, mutators: {

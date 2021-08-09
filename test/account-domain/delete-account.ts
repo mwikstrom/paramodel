@@ -28,8 +28,8 @@ const exec: AccountAction<"accounts", DeleteAccount> = async ({
     emit("account_deleted", { account_id });
 };
 
-export const delete_account = defineAction(
-    inputType,
+export const delete_account = defineAction({
+    input: inputType,
     exec,
-    ["accounts"],
-);
+    dependencies: ["accounts"],
+});

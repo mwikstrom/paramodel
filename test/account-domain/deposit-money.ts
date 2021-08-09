@@ -33,8 +33,8 @@ const exec: AccountAction<"accounts", DepositMoney> = async ({
     emit("money_deposited", { account_id, amount });
 };
 
-export const deposit_money = defineAction(
-    inputType,
+export const deposit_money = defineAction({
+    input: inputType,
     exec,
-    ["accounts"],
-);
+    dependencies: ["accounts"],
+});

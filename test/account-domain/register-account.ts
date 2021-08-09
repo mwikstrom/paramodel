@@ -26,9 +26,9 @@ const exec: AccountAction<"next_account_id", RegisterAccount, number> = async ({
     emit("account_registered", { account_id, owner_id });
 };
 
-export const register_account = defineAction(
-    inputType,
+export const register_account = defineAction({
+    input: inputType,
     exec,
-    ["next_account_id"],
-    positiveIntegerType,
-);
+    dependencies: ["next_account_id"],
+    output: positiveIntegerType,
+});

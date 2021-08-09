@@ -36,8 +36,8 @@ const exec: AccountAction<"accounts", TransferMoney> = async ({
     }
 };
 
-export const transfer_money = defineAction(
-    inputType,
+export const transfer_money = defineAction({
+    input: inputType,
     exec,
-    ["accounts"],
-);
+    dependencies: ["accounts"],
+});
