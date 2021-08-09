@@ -4,6 +4,8 @@
 
 ## ActionResult.base property
 
+Commit version at which the action was executed
+
 <b>Signature:</b>
 
 ```typescript

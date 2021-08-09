@@ -1,5 +1,6 @@
 import { TypeOf } from "paratype";
-import { ActionOptions, ActionResultType } from "./action";
+import { ActionResultType } from "./action-result";
+import { ActionOptions } from "./action-options";
 import { ChangeType } from "./change";
 import { DomainModel } from "./model";
 import { ViewOf } from "./projection";
@@ -9,7 +10,7 @@ export interface DomainStore<Model extends DomainModel> {
         this: void,
         key: K,
         input: TypeOf<Model["actions"][K]["input"]>,
-        options?: Partial<ActionOptions>,
+        options?: ActionOptions,
     ): Promise<ActionResultType<Model, K>>;
     read(
         this: void, 

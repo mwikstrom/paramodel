@@ -4,6 +4,8 @@
 
 ## ActionResult.committed property
 
+The version that was committed by the action, or `undefined` when the action wasn't successful or run with the [ActionOptions.dry](./paramodel.actionoptions.dry.md) option
+
 <b>Signature:</b>
 
 ```typescript

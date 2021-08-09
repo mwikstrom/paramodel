@@ -1,6 +1,7 @@
 import deepEqual from "deep-equal";
 import { JsonValue, jsonValueType, positiveIntegerType, recordType, Type, TypeOf } from "paratype";
-import { ActionOptions, ActionResultType } from "../action";
+import { ActionResultType } from "../action-result";
+import { ActionOptions } from "../action-options";
 import { ChangeType } from "../change";
 import { DomainDriver, FilterSpec, InputRecord, OutputRecord } from "../driver";
 import { EntityProjectionState, EntityProjection } from "../entity-projection";
@@ -995,7 +996,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         latest: _Commit | undefined,
         actionKey: K, 
         input: TypeOf<Model["actions"][K]["input"]>, 
-        options: Partial<ActionOptions> = {},
+        options: ActionOptions = {},
     ): Promise<ActionResultType<Model, K> | undefined> => {
         const { dry = false, signal } = options;
         const base = latest?.version || 0;
@@ -1109,7 +1110,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     do = async <K extends string & keyof Model["actions"]>(
         key: K, 
         input: TypeOf<Model["actions"][K]["input"]>, 
-        options: Partial<ActionOptions> = {},
+        options: ActionOptions = {},
     ): Promise<ActionResultType<Model, K>> => {
         let latest = await this.#getLatestCommit();
         for (;;) {

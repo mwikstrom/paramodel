@@ -4,8 +4,10 @@
 
 ## ActionOptions.signal property
 
+Optional. An abort signal that shall be observed while executing the action.
+
 <b>Signature:</b>
 
 ```typescript
-readonly signal: AbortSignal;
+signal?: AbortSignal;
 ```

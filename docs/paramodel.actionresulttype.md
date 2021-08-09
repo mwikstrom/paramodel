@@ -4,6 +4,8 @@
 
 ## ActionResultType type
 
+Type alias for the result type of an action
+
 <b>Signature:</b>
 
 ```typescript

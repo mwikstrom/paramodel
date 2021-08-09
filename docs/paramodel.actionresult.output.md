@@ -4,6 +4,8 @@
 
 ## ActionResult.output property
 
+Output from executing the action, or `undefined` when the action handler didn't provide a result
+
 <b>Signature:</b>
 
 ```typescript

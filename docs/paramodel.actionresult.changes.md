@@ -4,6 +4,8 @@
 
 ## ActionResult.changes property
 
+The number of change events that were emitted by the action handler, or `undefined` when the action wasn't successful
+
 <b>Signature:</b>
 
 ```typescript

@@ -7,7 +7,7 @@
 <b>Signature:</b>
 
 ```typescript
-do<K extends string & keyof Model["actions"]>(this: void, key: K, input: TypeOf<Model["actions"][K]["input"]>, options?: Partial<ActionOptions>): Promise<ActionResultType<Model, K>>;
+do<K extends string & keyof Model["actions"]>(this: void, key: K, input: TypeOf<Model["actions"][K]["input"]>, options?: ActionOptions): Promise<ActionResultType<Model, K>>;
 ```
 
 ## Parameters
@@ -17,7 +17,7 @@ do<K extends string & keyof Model["actions"]>(this: void, key: K, input: TypeOf<
 |  this | void |  |
 |  key | K |  |
 |  input | TypeOf&lt;Model\["actions"\]\[K\]\["input"\]&gt; |  |
-|  options | Partial&lt;[ActionOptions](./paramodel.actionoptions.md)<!-- -->&gt; |  |
+|  options | [ActionOptions](./paramodel.actionoptions.md) |  |
 
 <b>Returns:</b>
 

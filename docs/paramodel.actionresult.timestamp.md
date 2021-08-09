@@ -4,6 +4,8 @@
 
 ## ActionResult.timestamp property
 
+Timestamp when the action was executed
+
 <b>Signature:</b>
 
 ```typescript

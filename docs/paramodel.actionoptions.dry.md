@@ -4,8 +4,10 @@
 
 ## ActionOptions.dry property
 
+Optional. When `true` causes the action to be performed as normal but its effect is \*\*NOT\*\* committed.
+
 <b>Signature:</b>
 
 ```typescript
-readonly dry: boolean;
+dry?: boolean;
 ```

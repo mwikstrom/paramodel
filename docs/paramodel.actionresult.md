@@ -4,6 +4,8 @@
 
 ## ActionResult interface
 
+The result of executing an action
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,11 +16,11 @@ export interface ActionResult<Output = unknown>
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [base](./paramodel.actionresult.base.md) | number |  |
-|  [changes?](./paramodel.actionresult.changes.md) | number | <i>(Optional)</i> |
-|  [committed?](./paramodel.actionresult.committed.md) | number | <i>(Optional)</i> |
-|  [message?](./paramodel.actionresult.message.md) | string | <i>(Optional)</i> |
-|  [output?](./paramodel.actionresult.output.md) | Output | <i>(Optional)</i> |
-|  [status](./paramodel.actionresult.status.md) | "success" \| "conflict" \| "forbidden" \| "aborted" \| "rejected" \| "failed" |  |
-|  [timestamp](./paramodel.actionresult.timestamp.md) | Date |  |
+|  [base](./paramodel.actionresult.base.md) | number | Commit version at which the action was executed |
+|  [changes?](./paramodel.actionresult.changes.md) | number | <i>(Optional)</i> The number of change events that were emitted by the action handler, or <code>undefined</code> when the action wasn't successful |
+|  [committed?](./paramodel.actionresult.committed.md) | number | <i>(Optional)</i> The version that was committed by the action, or <code>undefined</code> when the action wasn't successful or run with the [ActionOptions.dry](./paramodel.actionoptions.dry.md) option |
+|  [message?](./paramodel.actionresult.message.md) | string | <i>(Optional)</i> A message emitted by the action, or <code>undefined</code> when the action handler didn't provide a result message |
+|  [output?](./paramodel.actionresult.output.md) | Output | <i>(Optional)</i> Output from executing the action, or <code>undefined</code> when the action handler didn't provide a result |
+|  [status](./paramodel.actionresult.status.md) | [ActionResultStatus](./paramodel.actionresultstatus.md) | Resulting status of the action |
+|  [timestamp](./paramodel.actionresult.timestamp.md) | Date | Timestamp when the action was executed |
 

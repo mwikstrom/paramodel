@@ -3,9 +3,10 @@
  * @packageDocumentation
  */
 
-export * from "./action";
 export * from "./action-context";
 export * from "./action-handler";
+export * from "./action-options";
+export * from "./action-result";
 export * from "./change";
 export * from "./define-action";
 export * from "./define-entity";

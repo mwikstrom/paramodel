@@ -1,5 +1,5 @@
 import { JsonValue, Type, TypeOf } from "paratype";
-import { ActionResult } from "../action";
+import { ActionResult } from "../action-result";
 import { ActionContext } from "../action-context";
 import { ActionHandler } from "../action-handler";
 import { Change } from "../change";

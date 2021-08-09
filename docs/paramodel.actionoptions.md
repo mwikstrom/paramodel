@@ -4,6 +4,8 @@
 
 ## ActionOptions interface
 
+Options for executing an action
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,6 +16,6 @@ export interface ActionOptions
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [dry](./paramodel.actionoptions.dry.md) | boolean |  |
-|  [signal](./paramodel.actionoptions.signal.md) | AbortSignal |  |
+|  [dry?](./paramodel.actionoptions.dry.md) | boolean | <i>(Optional)</i> Optional. When <code>true</code> causes the action to be performed as normal but its effect is \*\*NOT\*\* committed. |
+|  [signal?](./paramodel.actionoptions.signal.md) | AbortSignal | <i>(Optional)</i> Optional. An abort signal that shall be observed while executing the action. |
 

@@ -23,8 +23,8 @@ Run-time domain model for event-sourcing.
 |  --- | --- |
 |  [ActionContext](./paramodel.actioncontext.md) | The context in which an action is executed |
 |  [ActionHandler](./paramodel.actionhandler.md) | A domain action handler |
-|  [ActionOptions](./paramodel.actionoptions.md) |  |
-|  [ActionResult](./paramodel.actionresult.md) |  |
+|  [ActionOptions](./paramodel.actionoptions.md) | Options for executing an action |
+|  [ActionResult](./paramodel.actionresult.md) | The result of executing an action |
 |  [Change](./paramodel.change.md) |  |
 |  [DomainDriver](./paramodel.domaindriver.md) |  |
 |  [DomainProvider](./paramodel.domainprovider.md) |  |
@@ -64,7 +64,8 @@ Run-time domain model for event-sourcing.
 |  Type Alias | Description |
 |  --- | --- |
 |  [ActionFunc](./paramodel.actionfunc.md) | Type alias that matches the [ActionHandler.exec()](./paramodel.actionhandler.exec.md) function |
-|  [ActionResultType](./paramodel.actionresulttype.md) |  |
+|  [ActionResultStatus](./paramodel.actionresultstatus.md) | Defines the action result status codes:<!-- -->- <code>success</code>: The action completed successfully - <code>conflict</code>: A conflict prevented the action from completing successfully - <code>forbidden</code>: The active domain scope was not permitted to execute the action - <code>aborted</code>: The action was aborted - <code>rejected</code>: The action was rejected due to bad input - <code>failed</code>: The action failed to execute |
+|  [ActionResultType](./paramodel.actionresulttype.md) | Type alias for the result type of an action |
 |  [AnyActionHandler](./paramodel.anyactionhandler.md) | Type alias that matches any [ActionHandler](./paramodel.actionhandler.md) |
 |  [AnyProjection](./paramodel.anyprojection.md) |  |
 |  [ArrayAnyOperator](./paramodel.arrayanyoperator.md) |  |

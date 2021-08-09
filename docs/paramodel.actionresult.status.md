@@ -4,8 +4,10 @@
 
 ## ActionResult.status property
 
+Resulting status of the action
+
 <b>Signature:</b>
 
 ```typescript
-readonly status: "success" | "conflict" | "forbidden" | "aborted" | "rejected" | "failed";
+readonly status: ActionResultStatus;
 ```

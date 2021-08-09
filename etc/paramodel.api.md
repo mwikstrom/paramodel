@@ -32,33 +32,27 @@ export interface ActionHandler<Events extends ChangeModel = ChangeModel, Views e
     readonly output: Type<Output>;
 }
 
-// @public (undocumented)
+// @public
 export interface ActionOptions {
-    // (undocumented)
-    readonly dry: boolean;
-    // (undocumented)
-    readonly signal: AbortSignal;
+    dry?: boolean;
+    signal?: AbortSignal;
 }
 
-// @public (undocumented)
+// @public
 export interface ActionResult<Output = unknown> {
-    // (undocumented)
     readonly base: number;
-    // (undocumented)
     readonly changes?: number;
-    // (undocumented)
     readonly committed?: number;
-    // (undocumented)
     readonly message?: string;
-    // (undocumented)
     readonly output?: Output;
-    // (undocumented)
-    readonly status: "success" | "conflict" | "forbidden" | "aborted" | "rejected" | "failed";
-    // (undocumented)
+    readonly status: ActionResultStatus;
     readonly timestamp: Date;
 }
 
-// @public (undocumented)
+// @public
+export type ActionResultStatus = ("success" | "conflict" | "forbidden" | "aborted" | "rejected" | "failed");
+
+// @public
 export type ActionResultType<Model extends Pick<DomainModel, "actions" | "events">, Action extends string & keyof Model["actions"]> = (ActionResult<TypeOf<Model["actions"][Action]["output"]>>);
 
 // @public
@@ -162,7 +156,7 @@ export interface DomainProvider {
 // @public (undocumented)
 export interface DomainStore<Model extends DomainModel> {
     // (undocumented)
-    do<K extends string & keyof Model["actions"]>(this: void, key: K, input: TypeOf<Model["actions"][K]["input"]>, options?: Partial<ActionOptions>): Promise<ActionResultType<Model, K>>;
+    do<K extends string & keyof Model["actions"]>(this: void, key: K, input: TypeOf<Model["actions"][K]["input"]>, options?: ActionOptions): Promise<ActionResultType<Model, K>>;
     // (undocumented)
     purge(this: void, options?: Partial<PurgeOptions>): Promise<PurgeResult>;
     // (undocumented)

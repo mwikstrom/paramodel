@@ -4,6 +4,8 @@
 
 ## ActionResult.message property
 
+A message emitted by the action, or `undefined` when the action handler didn't provide a result message
+
 <b>Signature:</b>
 
 ```typescript
