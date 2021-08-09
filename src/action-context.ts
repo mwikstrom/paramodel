@@ -1,6 +1,6 @@
 import { TypeOf } from "paratype";
 import { ChangeModel, Conflict, Forbidden, ReadModel } from "./model";
-import { ViewOf, ViewSnapshotFunc } from "./projection";
+import { ViewOf } from "./projection";
 import { ViewOptions } from "./store";
 
 /**
