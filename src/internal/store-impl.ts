@@ -88,12 +88,12 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 operand: _rowKeys.viewHeader,
             },
             {
-                path: ["value", "start"],
+                path: ["value", "valid_from"],
                 operator: "<=",
                 operand: version,
             },
             {
-                path: ["value", "end"],
+                path: ["value", "valid_until"],
                 operator: ">=",
                 operand: version,
             }
@@ -599,8 +599,8 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             //       EXISTING LATER VERSIONS!
 
             const envelope: EntityEnvelope = {
-                start: commit.version,
-                end: INF_VERSION,
+                valid_from: commit.version,
+                valid_until: INF_VERSION,
                 entity: props,
             };
             const value = envelopeType.toJsonValue(envelope, msg => new Error(`Could not serialize entity: ${msg}`));
@@ -626,13 +626,13 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 throw new Error("Entity metadata was not populated");
             }
 
-            if (baseVerison < meta.envelope.start) {
+            if (baseVerison < meta.envelope.valid_from) {
                 throw new Error("Attempt to write invalid entity envelope");
             }
 
-            const envelope = {
-                start: meta.envelope.start,
-                end: baseVerison,
+            const envelope: EntityEnvelope = {
+                valid_from: meta.envelope.valid_from,
+                valid_until: baseVerison,
                 entity: meta.envelope.entity,
             };
 
@@ -1112,16 +1112,19 @@ const INF_VERSION = 9000000000000000;
 const MAX_VERSION = 5000000000000000;
 
 type EntityEnvelope<T = Record<string, unknown>> = {
-    start: number;
-    end: number;
+    valid_from: number;
+    valid_until: number;
     entity: T;
 };
 
 const entityEnvelopeType = <T>(valueType: Type<T>): Type<EntityEnvelope<T>> => recordType({
-    start: positiveIntegerType,
-    end: positiveIntegerType,
+    valid_from: positiveIntegerType,
+    valid_until: positiveIntegerType,
     entity: valueType,
-}).restrict("Entity envelope start must be less or equal to end", e => e.start <= e.end);
+}).restrict(
+    "Entity envelope \"valid_from\" must be less than or equal to \"valid_until\"", 
+    ({valid_from, valid_until}) => valid_from <= valid_until,
+);
 
 const defaultAuthError: ErrorFactory = () => new Error("Forbidden");
 
