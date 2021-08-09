@@ -486,6 +486,10 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             last = latest.version;
         }
 
+        if (last <= first) {
+            return last;
+        }
+
         const filter = Array.from(eventsToSync);
         let synced = 0;
         for await (const commit of this.#readCommits({ first, last, filter })) {
