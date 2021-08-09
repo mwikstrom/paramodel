@@ -4,6 +4,8 @@
 
 ## ActionContext.view property
 
+Gets a view snapshot that expose state as it were just before the current action was executed.
+
 <b>Signature:</b>
 
 ```typescript

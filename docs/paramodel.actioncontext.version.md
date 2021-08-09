@@ -4,6 +4,8 @@
 
 ## ActionContext.version property
 
+The version number that will be committed in case the action succeeds
+
 <b>Signature:</b>
 
 ```typescript

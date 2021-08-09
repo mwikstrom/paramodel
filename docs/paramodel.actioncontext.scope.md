@@ -4,6 +4,8 @@
 
 ## ActionContext.scope property
 
+The domain scope under which the action is being executed
+
 <b>Signature:</b>
 
 ```typescript

@@ -4,6 +4,8 @@
 
 ## ActionContext.timestamp property
 
+The current timestamp when the action is being executed
+
 <b>Signature:</b>
 
 ```typescript

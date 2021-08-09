@@ -4,6 +4,8 @@
 
 ## ActionContext.input property
 
+The action input data
+
 <b>Signature:</b>
 
 ```typescript

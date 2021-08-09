@@ -4,6 +4,8 @@
 
 ## ActionContext.forbidden() method
 
+Marks the current action as forbidden if it is not previosuly marked as unsuccessful.
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,8 +16,8 @@ forbidden(this: void, message?: string): Forbidden;
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  this | void |  |
-|  message | string |  |
+|  this | void | <i>(Ignored)</i> This method uses implicit <code>this</code> binding |
+|  message | string | <i>(Optional)</i> Message to be exposed in action's result |
 
 <b>Returns:</b>
 

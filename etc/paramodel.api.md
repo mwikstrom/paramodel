@@ -8,25 +8,16 @@ import { JsonValue } from 'paratype';
 import { Type } from 'paratype';
 import { TypeOf } from 'paratype';
 
-// @public (undocumented)
+// @public
 export interface ActionContext<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Scope = unknown, Input = unknown, Output = unknown> {
-    // (undocumented)
     conflict(this: void, message?: string): Conflict;
-    // (undocumented)
     emit<K extends string & keyof Events>(this: void, key: K, arg: TypeOf<Events[K]>): void;
-    // (undocumented)
     forbidden(this: void, message?: string): Forbidden;
-    // (undocumented)
     readonly input: Input;
-    // (undocumented)
     output(this: void, result: Output): void;
-    // (undocumented)
     readonly scope: Scope;
-    // (undocumented)
     readonly timestamp: Date;
-    // (undocumented)
     readonly version: number;
-    // (undocumented)
     view: ViewSnapshotFunc<Views>;
 }
 

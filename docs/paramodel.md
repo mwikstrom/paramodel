@@ -21,7 +21,7 @@ Run-time domain model for event-sourcing.
 
 |  Interface | Description |
 |  --- | --- |
-|  [ActionContext](./paramodel.actioncontext.md) |  |
+|  [ActionContext](./paramodel.actioncontext.md) | The context in which an action is executed |
 |  [ActionHandler](./paramodel.actionhandler.md) |  |
 |  [ActionOptions](./paramodel.actionoptions.md) |  |
 |  [ActionResult](./paramodel.actionresult.md) |  |

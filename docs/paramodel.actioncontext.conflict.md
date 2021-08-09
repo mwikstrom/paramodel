@@ -4,6 +4,8 @@
 
 ## ActionContext.conflict() method
 
+Marks the current action as conflicting if it is not previosuly marked as unsuccessful.
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,8 +16,8 @@ conflict(this: void, message?: string): Conflict;
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  this | void |  |
-|  message | string |  |
+|  this | void | <i>(Ignored)</i> This method uses implicit <code>this</code> binding |
+|  message | string | <i>(Optional)</i> Message to be exposed in action's result |
 
 <b>Returns:</b>
 

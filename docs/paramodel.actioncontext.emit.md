@@ -4,6 +4,8 @@
 
 ## ActionContext.emit() method
 
+Emits a change event from the current action.
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,9 +16,9 @@ emit<K extends string & keyof Events>(this: void, key: K, arg: TypeOf<Events[K]>
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  this | void |  |
-|  key | K |  |
-|  arg | TypeOf&lt;Events\[K\]&gt; |  |
+|  this | void | <i>(Ignored)</i> This method uses implicit <code>this</code> binding |
+|  key | K | Event key |
+|  arg | TypeOf&lt;Events\[K\]&gt; | Event arg |
 
 <b>Returns:</b>
 

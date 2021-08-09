@@ -4,6 +4,8 @@
 
 ## ActionContext.output() method
 
+Sets the ouput value of the current action
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,8 +16,8 @@ output(this: void, result: Output): void;
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  this | void |  |
-|  result | Output |  |
+|  this | void | <i>(Ignored)</i> This method uses implicit <code>this</code> binding |
+|  result | Output | The output value |
 
 <b>Returns:</b>
 
