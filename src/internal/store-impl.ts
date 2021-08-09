@@ -2,7 +2,7 @@ import deepEqual from "deep-equal";
 import { JsonValue, jsonValueType, positiveIntegerType, recordType, Type, TypeOf } from "paratype";
 import { ActionOptions, ActionResultType } from "../action";
 import { ChangeType } from "../change";
-import { DomainDriver, FilterSpec, InputRecord, OutputRecord, QuerySpec } from "../driver";
+import { DomainDriver, FilterSpec, InputRecord, OutputRecord } from "../driver";
 import { EntityProjectionState, EntityProjection } from "../entity-projection";
 import { EntityView, ReadonlyEntityCollection } from "../entity-view";
 import { DomainModel, Forbidden } from "../model";
@@ -937,7 +937,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             operator: "<=",
             operand: _rowKeys.viewState(purgeVersion),
         };
-        
+
         return this.#expireViewRecords(viewKey, condition, signal);
     }
 
