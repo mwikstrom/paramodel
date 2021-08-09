@@ -2,12 +2,25 @@
 
 [Home](./index.md) &gt; [paramodel](./paramodel.md) &gt; [ActionContext](./paramodel.actioncontext.md) &gt; [view](./paramodel.actioncontext.view.md)
 
-## ActionContext.view property
+## ActionContext.view() method
 
 Gets a view snapshot that expose state as it were just before the current action was executed.
 
 <b>Signature:</b>
 
 ```typescript
-view: ViewSnapshotFunc<Views>;
+view<K extends string & keyof Views>(this: void, key: K, options?: Partial<Pick<ViewOptions, "auth">>): Promise<ViewOf<Views[K]>>;
 ```
+
+## Parameters
+
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  this | void | <i>(Ignored)</i> This method uses implicit <code>this</code> binding |
+|  key | K | Identifies the view to get |
+|  options | Partial&lt;Pick&lt;[ViewOptions](./paramodel.viewoptions.md)<!-- -->, "auth"&gt;&gt; | <i>(Optional)</i> View options |
+
+<b>Returns:</b>
+
+Promise&lt;[ViewOf](./paramodel.viewof.md)<!-- -->&lt;Views\[K\]&gt;&gt;
+

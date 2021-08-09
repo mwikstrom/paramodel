@@ -18,7 +18,7 @@ export interface ActionContext<Events extends ChangeModel = ChangeModel, Views e
     readonly scope: Scope;
     readonly timestamp: Date;
     readonly version: number;
-    view: ViewSnapshotFunc<Views>;
+    view<K extends string & keyof Views>(this: void, key: K, options?: Partial<Pick<ViewOptions, "auth">>): Promise<ViewOf<Views[K]>>;
 }
 
 // @public (undocumented)

@@ -20,7 +20,6 @@ export interface ActionContext<Events extends ChangeModel = ChangeModel, Views e
 |  [scope](./paramodel.actioncontext.scope.md) | Scope | The domain scope under which the action is being executed |
 |  [timestamp](./paramodel.actioncontext.timestamp.md) | Date | The current timestamp when the action is being executed |
 |  [version](./paramodel.actioncontext.version.md) | number | The version number that will be committed in case the action succeeds |
-|  [view](./paramodel.actioncontext.view.md) | [ViewSnapshotFunc](./paramodel.viewsnapshotfunc.md)<!-- -->&lt;Views&gt; | Gets a view snapshot that expose state as it were just before the current action was executed. |
 
 ## Methods
 
@@ -30,4 +29,5 @@ export interface ActionContext<Events extends ChangeModel = ChangeModel, Views e
 |  [emit(this, key, arg)](./paramodel.actioncontext.emit.md) | Emits a change event from the current action. |
 |  [forbidden(this, message)](./paramodel.actioncontext.forbidden.md) | Marks the current action as forbidden if it is not previosuly marked as unsuccessful. |
 |  [output(this, result)](./paramodel.actioncontext.output.md) | Sets the ouput value of the current action |
+|  [view(this, key, options)](./paramodel.actioncontext.view.md) | Gets a view snapshot that expose state as it were just before the current action was executed. |
 

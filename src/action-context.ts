@@ -1,6 +1,7 @@
 import { TypeOf } from "paratype";
 import { ChangeModel, Conflict, Forbidden, ReadModel } from "./model";
-import { ViewSnapshotFunc } from "./projection";
+import { ViewOf, ViewSnapshotFunc } from "./projection";
+import { ViewOptions } from "./store";
 
 /**
  * The context in which an action is executed
@@ -68,5 +69,9 @@ export interface ActionContext<
      * @param key - Identifies the view to get
      * @param options - <i>(Optional)</i> View options
      */
-    view: ViewSnapshotFunc<Views>;
+    view<K extends string & keyof Views>(
+        this: void,
+        key: K,
+        options?: Partial<Pick<ViewOptions, "auth">>,
+    ): Promise<ViewOf<Views[K]>>;    
 }
