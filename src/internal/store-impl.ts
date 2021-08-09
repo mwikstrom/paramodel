@@ -795,6 +795,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         purgeVersion: number,
         signal?: AbortSignal,
     ): Promise<boolean> => {
+        // TODO: IMPORTANT! CANNOT PURGE THE LAST STATE BECAUSE IT MIGHT STILL BE IN USE!
         const condition: FilterSpec = {
             path: ["key"],
             operator: "<=",
