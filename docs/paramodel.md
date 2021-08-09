@@ -30,8 +30,8 @@ Run-time domain model for event-sourcing.
 |  [DomainProvider](./paramodel.domainprovider.md) |  |
 |  [DomainStore](./paramodel.domainstore.md) |  |
 |  [DomainStoreStatus](./paramodel.domainstorestatus.md) |  |
-|  [EntityCollection](./paramodel.entitycollection.md) |  |
 |  [EntityProjection](./paramodel.entityprojection.md) |  |
+|  [EntityProjectionState](./paramodel.entityprojectionstate.md) |  |
 |  [EntityView](./paramodel.entityview.md) |  |
 |  [FilterSpec](./paramodel.filterspec.md) |  |
 |  [InputRecord](./paramodel.inputrecord.md) |  |

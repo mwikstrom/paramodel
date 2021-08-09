@@ -209,14 +209,6 @@ export type EntityChangeHandlers<C extends ChangeModel, T, K extends PossibleKey
 }>;
 
 // @public (undocumented)
-export interface EntityCollection<T = Record<string, unknown>, K extends PossibleKeysOf<T> = PossibleKeysOf<T>> extends ReadonlyEntityCollection<T, K> {
-    // (undocumented)
-    del(this: void, key: T[K]): Promise<boolean>;
-    // (undocumented)
-    put(this: void, props: T): Promise<void>;
-}
-
-// @public (undocumented)
 export interface EntityProjection<T extends Record<string, unknown> = Record<string, unknown>, K extends PossibleKeysOf<T> = PossibleKeysOf<T>, C extends ChangeModel = ChangeModel, R extends ReadModel = ReadModel, Scope = unknown> {
     // (undocumented)
     readonly apply: EntityProjectionFunc<T, K, Change, R>;
@@ -235,7 +227,17 @@ export interface EntityProjection<T extends Record<string, unknown> = Record<str
 }
 
 // @public (undocumented)
-export type EntityProjectionFunc<T, K extends PossibleKeysOf<T>, C extends Change = Change, R extends ReadModel = ReadModel> = (change: C, state: EntityCollection<T, K>, view: ViewSnapshotFunc<R>) => Promise<void>;
+export type EntityProjectionFunc<T, K extends PossibleKeysOf<T>, C extends Change = Change, R extends ReadModel = ReadModel> = (change: C, state: EntityProjectionState<T, K>, view: ViewSnapshotFunc<R>) => Promise<void>;
+
+// @public (undocumented)
+export interface EntityProjectionState<T = Record<string, unknown>, K extends PossibleKeysOf<T> = PossibleKeysOf<T>> {
+    // (undocumented)
+    readonly base: ReadonlyEntityCollection<T, K>;
+    // (undocumented)
+    del(this: void, key: T[K]): void;
+    // (undocumented)
+    put(this: void, props: T): void;
+}
 
 // @public (undocumented)
 export interface EntityView<T extends Record<string, unknown> = Record<string, unknown>, K extends PossibleKeysOf<T> = PossibleKeysOf<T>> extends ReadonlyEntityCollection<T, K> {
