@@ -15,13 +15,13 @@ const account_deleted: StateApplyFunc<Change<AccountDeleted>, State> = async (
     before
 ) => before - 1;
 
-const on: StateChangeHandlers<AccountChanges, State> = {
+const mutators: StateChangeHandlers<AccountChanges, State> = {
     account_registered,
     account_deleted,
 };
 
-export const number_of_accounts = defineState<State, AccountChanges>(
-    nonNegativeIntegerType,
+export const number_of_accounts = defineState<State, AccountChanges>({
+    type: nonNegativeIntegerType,
     initial,
-    on,
-);
+    mutators,
+});

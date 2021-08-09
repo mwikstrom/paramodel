@@ -10,12 +10,12 @@ const account_registered: StateApplyFunc<Change<AccountRegistered>, State> = asy
     before
 ) => account_id >= before ? Math.ceil(account_id) + 1 : before;
 
-const on: StateChangeHandlers<AccountChanges, State> = {
+const mutators: StateChangeHandlers<AccountChanges, State> = {
     account_registered,
 };
 
-export const next_account_id = defineState<State, AccountChanges>(
-    positiveIntegerType,
+export const next_account_id = defineState<State, AccountChanges>({
+    type: positiveIntegerType,
     initial,
-    on,
-);
+    mutators,
+});

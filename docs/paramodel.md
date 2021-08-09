@@ -15,7 +15,7 @@ Run-time domain model for event-sourcing.
 |  [defineAction(this, definition)](./paramodel.defineaction.md) | Creates an [ActionHandler](./paramodel.actionhandler.md) |
 |  [defineEntity(this, definition)](./paramodel.defineentity.md) | Creates an [EntityProjection](./paramodel.entityprojection.md) |
 |  [defineQuery(this, definition)](./paramodel.definequery.md) | Creates a [QueryHandler](./paramodel.queryhandler.md) |
-|  [defineState(this, type, initial, mutators, auth, dependencies)](./paramodel.definestate.md) | Creates a [StateProjection](./paramodel.stateprojection.md) |
+|  [defineState(this, definition)](./paramodel.definestate.md) | Creates a [StateProjection](./paramodel.stateprojection.md) |
 
 ## Interfaces
 
@@ -49,6 +49,7 @@ Run-time domain model for event-sourcing.
 |  [ReadonlyEntityCollection](./paramodel.readonlyentitycollection.md) |  |
 |  [ReadOptions](./paramodel.readoptions.md) |  |
 |  [SortSpec](./paramodel.sortspec.md) | Specifies how data records shall be sorted |
+|  [StateDefinition](./paramodel.statedefinition.md) | Settings that define a state projection |
 |  [StateProjection](./paramodel.stateprojection.md) |  |
 |  [StateView](./paramodel.stateview.md) |  |
 |  [SyncOptions](./paramodel.syncoptions.md) |  |

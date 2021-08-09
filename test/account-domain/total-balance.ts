@@ -15,13 +15,13 @@ const money_withdrawn: StateApplyFunc<Change<MoneyWithdrawn>, State> = async (
     before
 ) => before - amount;
 
-const on: StateChangeHandlers<AccountChanges, State> = {
+const mutators: StateChangeHandlers<AccountChanges, State> = {
     money_deposited,
     money_withdrawn,
 };
 
-export const total_balance = defineState<State, AccountChanges>(
-    numberType,
+export const total_balance = defineState<State, AccountChanges>({
+    type: numberType,
     initial,
-    on,
-);
+    mutators,
+});

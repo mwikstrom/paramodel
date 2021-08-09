@@ -120,9 +120,7 @@ export function defineEntity<Props extends Record<string, unknown>, Key extends 
 export function defineQuery<Views extends ReadModel, Result, Params extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, Dependencies extends (string & keyof Views)[] = []>(this: void, definition: QueryDefinition<Views, Result, Params, Scope, Dependencies>): QueryHandler<Params, Result, Pick<Views, Dependencies[number]>, Scope>;
 
 // @public
-export function defineState<State, Events extends ChangeModel = ChangeModel, Scope = unknown, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(this: void, type: Type<State>, initial: State, mutators: {
-    [K in Mutators[number]]: StateApplyFunc<Change<Events[K], K>, State, Pick<Views, Dependencies[number]>>;
-}, auth?: StateAuthFunc<Scope, State, Pick<Views, Dependencies[number]>>, dependencies?: Dependencies): StateProjection<State, Events, Views, Scope>;
+export function defineState<State, Events extends ChangeModel = ChangeModel, Scope = unknown, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(this: void, definition: StateDefinition<State, Events, Scope, Views, Mutators, Dependencies>): StateProjection<State, Events, Views, Scope>;
 
 // @public
 export interface DomainDriver {
@@ -432,6 +430,17 @@ export type StateAuthFunc<Scope = unknown, T = unknown, R extends ReadModel = Re
 export type StateChangeHandlers<C extends ChangeModel, T, R extends ReadModel = ReadModel> = Partial<{
     [K in keyof C]: StateApplyFunc<Change<TypeOf<C[K]>>, T, R>;
 }>;
+
+// @public
+export interface StateDefinition<State, Events extends ChangeModel = ChangeModel, Scope = unknown, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []> {
+    auth?: StateAuthFunc<Scope, State, Pick<Views, Dependencies[number]>>;
+    dependencies?: Dependencies;
+    initial: State;
+    mutators: {
+        [K in Mutators[number]]: StateApplyFunc<Change<Events[K], K>, State, Pick<Views, Dependencies[number]>>;
+    };
+    type: Type<State>;
+}
 
 // @public (undocumented)
 export interface StateProjection<T = unknown, C extends ChangeModel = ChangeModel, R extends ReadModel = ReadModel, Scope = unknown> {
