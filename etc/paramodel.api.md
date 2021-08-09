@@ -517,9 +517,9 @@ export interface ViewStatus {
     // (undocumented)
     readonly last_change_version: number;
     // (undocumented)
-    readonly purge_end_version: number;
+    readonly purged_from_version: number;
     // (undocumented)
-    readonly purge_start_version: number;
+    readonly purged_until_version: number;
     // (undocumented)
     readonly sync_position: number;
     // (undocumented)

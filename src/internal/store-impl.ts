@@ -539,12 +539,12 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         const viewsToSync = new Set<string>();
         for (const [key, info] of infoMap) {
             const notSynced = info.sync_version < first;
-            const purged = info.purge_start_version <= first && info.purge_end_version >= first;
+            const purged = info.purged_from_version <= first && info.purged_until_version >= first;
             if (notSynced || purged) {
                 viewsToSync.add(key);
             }
-            if (purged && (last === void(0) || last > info.purge_end_version)) {
-                last = info.purge_end_version;
+            if (purged && (last === void(0) || last > info.purged_until_version)) {
+                last = info.purged_until_version;
             }
         }
 
@@ -876,11 +876,11 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         info: SyncViewInfo,
         signal?: AbortSignal
     ): Promise<boolean> => {
-        if (info.purge_start_version !== 0) {
+        if (info.purged_from_version !== 0) {
             return false;
         }
 
-        if (info.purge_end_version === 0) {
+        if (info.purged_until_version === 0) {
             return true;
         }
 
@@ -895,9 +895,9 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
 
         if (kind === "entities") {
-            return await this.#expirePurgedEntities(key, info.purge_end_version, signal);
+            return await this.#expirePurgedEntities(key, info.purged_until_version, signal);
         } else if (kind === "state") {
-            return await this.#expirePurgedState(key, info.purge_end_version, signal);
+            return await this.#expirePurgedState(key, info.purged_until_version, signal);
         } else {
             return false;
         }
@@ -1161,8 +1161,8 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 sync_timestamp: header?.sync_timestamp,
                 last_change_version: header?.last_change_version || 0,
                 last_change_timestamp: header?.last_change_timestamp,
-                purge_start_version: header?.purge_start_version || 0,
-                purge_end_version: header?.purge_end_version || 0,
+                purged_from_version: header?.purged_from_version || 0,
+                purged_until_version: header?.purged_until_version || 0,
             };
             return [key, viewStatus];
         }));
@@ -1232,7 +1232,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
         const done = !aborted && viewKeys.every(key => {
             const info = infoMap.get(key);
-            return info && info.purge_start_version === 0 && info.purge_end_version >= purgeVersion;
+            return info && info.purged_from_version === 0 && info.purged_until_version >= purgeVersion;
         });
         
         return { done };
@@ -1304,8 +1304,8 @@ type SyncViewInfo = {
     readonly sync_timestamp?: Date;
     readonly last_change_version: number;
     readonly last_change_timestamp?: Date;
-    readonly purge_start_version: number;
-    readonly purge_end_version: number;
+    readonly purged_from_version: number;
+    readonly purged_until_version: number;
 }
 
 const getSyncInfoFromRecord = (record: OutputRecord | undefined): SyncViewInfo => {
@@ -1315,8 +1315,8 @@ const getSyncInfoFromRecord = (record: OutputRecord | undefined): SyncViewInfo =
     let sync_timestamp: Date | undefined = void(0);
     let last_change_version = 0;
     let last_change_timestamp: Date | undefined = void(0);
-    let purge_start_version = 0;
-    let purge_end_version = 0;
+    let purged_from_version = 0;
+    let purged_until_version = 0;
 
     if (record) {
         const header = _viewHeader.fromJsonValue(record.value);
@@ -1326,8 +1326,8 @@ const getSyncInfoFromRecord = (record: OutputRecord | undefined): SyncViewInfo =
         sync_timestamp = header.sync_timestamp;
         last_change_version = header.last_change_version;
         last_change_timestamp = header.last_change_timestamp;
-        purge_start_version = header.purge_start_version;
-        purge_end_version = header.purge_end_version;
+        purged_from_version = header.purged_from_version;
+        purged_until_version = header.purged_until_version;
     }
 
     return Object.freeze({
@@ -1337,8 +1337,8 @@ const getSyncInfoFromRecord = (record: OutputRecord | undefined): SyncViewInfo =
         sync_timestamp,
         last_change_version,
         last_change_timestamp,
-        purge_start_version, 
-        purge_end_version, 
+        purged_from_version, 
+        purged_until_version, 
     });
 };
 
@@ -1396,8 +1396,8 @@ const getViewHeaderForPurge = (
         sync_timestamp: prev.sync_timestamp,
         last_change_version: prev.last_change_version,
         last_change_timestamp: prev.last_change_timestamp,
-        purge_start_version: 0,
-        purge_end_version: Math.max(prev.purge_end_version, purgeVersion),
+        purged_from_version: 0,
+        purged_until_version: Math.max(prev.purged_until_version, purgeVersion),
     });
 
     return header;
@@ -1427,17 +1427,17 @@ const getViewHeaderForCommit = (
             sync_timestamp: commit.timestamp,
             last_change_version: modified ? commit.version : prev.last_change_version,
             last_change_timestamp,
-            purge_start_version: prev.purge_start_version,
-            purge_end_version: prev.purge_end_version,
+            purged_from_version: prev.purged_from_version,
+            purged_until_version: prev.purged_until_version,
         });
 
         return header;
-    } else if (prev.purge_start_version <= commit.version && prev.purge_end_version >= commit.version) {
-        let purge_start_version = commit.version + 1;
-        let purge_end_version = prev.purge_end_version;
+    } else if (prev.purged_from_version <= commit.version && prev.purged_until_version >= commit.version) {
+        let purged_from_version = commit.version + 1;
+        let purged_until_version = prev.purged_until_version;
 
-        if (purge_start_version > purge_end_version) {
-            purge_start_version = purge_end_version = 0;
+        if (purged_from_version > purged_until_version) {
+            purged_from_version = purged_until_version = 0;
         }
 
         if (!prev.sync_timestamp || !prev.last_change_timestamp) {
@@ -1451,8 +1451,8 @@ const getViewHeaderForCommit = (
             sync_timestamp: prev.sync_timestamp,
             last_change_version: prev.last_change_version,
             last_change_timestamp: prev.last_change_timestamp,
-            purge_start_version,
-            purge_end_version,
+            purged_from_version,
+            purged_until_version,
         });
 
         return header;

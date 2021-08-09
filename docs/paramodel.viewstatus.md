@@ -16,8 +16,8 @@ export interface ViewStatus
 |  --- | --- | --- |
 |  [last\_change\_timestamp?](./paramodel.viewstatus.last_change_timestamp.md) | Date | <i>(Optional)</i> |
 |  [last\_change\_version](./paramodel.viewstatus.last_change_version.md) | number |  |
-|  [purge\_end\_version](./paramodel.viewstatus.purge_end_version.md) | number |  |
-|  [purge\_start\_version](./paramodel.viewstatus.purge_start_version.md) | number |  |
+|  [purged\_from\_version](./paramodel.viewstatus.purged_from_version.md) | number |  |
+|  [purged\_until\_version](./paramodel.viewstatus.purged_until_version.md) | number |  |
 |  [sync\_position](./paramodel.viewstatus.sync_position.md) | number |  |
 |  [sync\_timestamp?](./paramodel.viewstatus.sync_timestamp.md) | Date | <i>(Optional)</i> |
 |  [sync\_version](./paramodel.viewstatus.sync_version.md) | number |  |

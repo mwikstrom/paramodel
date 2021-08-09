@@ -49,8 +49,8 @@ export interface ViewStatus {
     readonly sync_timestamp?: Date;
     readonly last_change_version: number;
     readonly last_change_timestamp?: Date;
-    readonly purge_start_version: number;
-    readonly purge_end_version: number;
+    readonly purged_from_version: number;
+    readonly purged_until_version: number;
 }
 
 export interface ViewOptions {
