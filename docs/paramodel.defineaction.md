@@ -16,10 +16,10 @@ export declare function defineAction<Input, Output, Scope = unknown, Events exte
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  this | void | <i>(Ignored)</i> This method uses implicit <code>this</code> binding |
+|  this | void | <i>(Ignored)</i> This function uses implicit <code>this</code> binding |
 |  input | Type&lt;Input&gt; | Type of action input |
 |  exec | [ActionFunc](./paramodel.actionfunc.md)<!-- -->&lt;Events, Pick&lt;Views, Dependencies\[number\]&gt;, Scope, Input, Output&gt; | The action handler executor |
-|  dependencies | Dependencies | A set of view keys that the action depend upon during execution. These views will automatically be synced to the current version just before the action the executed and available via the [ActionContext.view()](./paramodel.actioncontext.view.md) function. |
+|  dependencies | Dependencies | <i>(Optional)</i> A set of view keys that the action depend upon during execution. These views will automatically be synced to the current version just before the action the executed and available via the [ActionContext.view()](./paramodel.actioncontext.view.md) function. |
 |  output | Type&lt;Output&gt; | <i>(Optional)</i> Type of action output |
 
 <b>Returns:</b>

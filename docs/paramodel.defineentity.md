@@ -4,10 +4,12 @@
 
 ## defineEntity() function
 
+Creates an [EntityProjection](./paramodel.entityprojection.md)
+
 <b>Signature:</b>
 
 ```typescript
-export declare function defineEntity<Props extends Record<string, unknown>, Key extends PossibleKeysOf<Props>, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(type: Type<Props>, key: Key, on: {
+export declare function defineEntity<Props extends Record<string, unknown>, Key extends PossibleKeysOf<Props>, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(this: void, type: Type<Props>, key: Key, mutators: {
     [K in Mutators[number]]: (EntityProjectionFunc<Props, Key, Change<TypeOf<Events[K]>, K>, Pick<Views, Dependencies[number]>>);
 }, auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number]>>, dependencies?: Dependencies): EntityProjection<Props, Key, Events, Views, Scope>;
 ```
@@ -16,11 +18,12 @@ export declare function defineEntity<Props extends Record<string, unknown>, Key 
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  type | Type&lt;Props&gt; |  |
-|  key | Key |  |
-|  on | { \[K in Mutators\[number\]\]: ([EntityProjectionFunc](./paramodel.entityprojectionfunc.md)<!-- -->&lt;Props, Key, [Change](./paramodel.change.md)<!-- -->&lt;TypeOf&lt;Events\[K\]&gt;, K&gt;, Pick&lt;Views, Dependencies\[number\]&gt;&gt;); } |  |
-|  auth | [EntityAuthFunc](./paramodel.entityauthfunc.md)<!-- -->&lt;Scope, Props, Pick&lt;Views, Dependencies\[number\]&gt;&gt; |  |
-|  dependencies | Dependencies |  |
+|  this | void | <i>(Ignored)</i> This function uses implicit <code>this</code> binding |
+|  type | Type&lt;Props&gt; | Type of entity |
+|  key | Key | Name of the entity key property |
+|  mutators | { \[K in Mutators\[number\]\]: ([EntityProjectionFunc](./paramodel.entityprojectionfunc.md)<!-- -->&lt;Props, Key, [Change](./paramodel.change.md)<!-- -->&lt;TypeOf&lt;Events\[K\]&gt;, K&gt;, Pick&lt;Views, Dependencies\[number\]&gt;&gt;); } | An object that define how change events affect entities. Each property name must be the name of a change event and each property value must be a function that shall be invoked to apply the effect that the corresponding event. |
+|  auth | [EntityAuthFunc](./paramodel.entityauthfunc.md)<!-- -->&lt;Scope, Props, Pick&lt;Views, Dependencies\[number\]&gt;&gt; | <i>(Optional)</i> A function that provides authorization for entities. |
+|  dependencies | Dependencies | <i>(Optional)</i> A set of view keys that the entity projection depend upon. |
 
 <b>Returns:</b>
 

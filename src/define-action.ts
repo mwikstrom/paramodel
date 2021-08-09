@@ -4,10 +4,10 @@ import { ChangeModel, ReadModel } from "./model";
 
 /**
  * Creates an {@link ActionHandler}
- * @param this - <i>(Ignored)</i> This method uses implicit `this` binding
+ * @param this - <i>(Ignored)</i> This function uses implicit `this` binding
  * @param input - Type of action input
  * @param exec - The action handler executor
- * @param dependencies - A set of view keys that the action depend upon during execution.
+ * @param dependencies - <i>(Optional)</i> A set of view keys that the action depend upon during execution.
  * These views will automatically be synced to the current version just before the
  * action the executed and available via the {@link ActionContext.view} function.
  * @param output - <i>(Optional)</i> Type of action output
