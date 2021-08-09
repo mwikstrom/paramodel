@@ -86,11 +86,6 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 path: ["key"],
                 operator: "!=",
                 operand: _rowKeys.viewHeader,
-            },
-            {
-                path: ["value", "valid_until"],
-                operator: ">=",
-                operand: version,
             }
         ];
 
