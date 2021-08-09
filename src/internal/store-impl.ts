@@ -1,5 +1,5 @@
 import deepEqual from "deep-equal";
-import { positiveIntegerType, recordType, Type, TypeOf } from "paratype";
+import { JsonValue, jsonValueType, positiveIntegerType, recordType, Type, TypeOf } from "paratype";
 import { ActionOptions, ActionResultType } from "../action";
 import { ChangeType } from "../change";
 import { DomainDriver, FilterSpec, InputRecord, OutputRecord } from "../driver";
@@ -53,6 +53,44 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             _partitionKeys.commits,
             record => _commitType.fromJsonValue(record.value)
         );
+    }
+
+    #getEntityValidUntilToBeWritten = async (
+        viewKey: string,
+        entityKeyProp: string,
+        entityKeyValue: string,
+        validFrom: number,        
+    ): Promise<number> => {
+        const envelopeType = entityEnvelopeType(jsonValueType);
+        const transform = (record: OutputRecord): EntityEnvelope<JsonValue> => {
+            const { value } = record;
+            return envelopeType.fromJsonValue(value);
+        };
+        const partitionKey = _partitionKeys.view(viewKey);
+        const source = new _DriverQuerySource(
+            this.#driver,
+            this.#id,
+            partitionKey,
+            transform,
+        );
+        const where: FilterSpec[] =[
+            {
+                path: ["key"],
+                operator: "!=",
+                operand: _rowKeys.viewHeader,
+            },
+            {
+                path: ["value", "entity", entityKeyProp],
+                operator: "==",
+                operand: entityKeyValue,
+            },
+        ];
+        const first = await new _QueryImpl(source, ["value"], Object.freeze(where))
+            .by("valid_from")
+            .where("valid_from", ">", validFrom)
+            .first();
+        
+        return first ? first.valid_from - 1 : INF_VERSION;
     }
 
     #createEntityQueryable = <T extends Record<string, unknown>>(
@@ -663,13 +701,15 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 continue; // entity was deleted
             }
 
-            // TODO: IMPORTANT: CANNOT ALWAYS WRITE INF_VERSION AS END
-            //       WHEN RECOVERING AFTER PURGE WE MUST NOT INTERFERE WITH
-            //       EXISTING LATER VERSIONS!
-
+            const valid_until = await this.#getEntityValidUntilToBeWritten(
+                viewKey, 
+                definition.key, 
+                key, 
+                commit.version
+            );
             const envelope: EntityEnvelope = {
                 valid_from: commit.version,
-                valid_until: INF_VERSION,
+                valid_until: valid_until,
                 entity: props,
             };
             const value = envelopeType.toJsonValue(envelope, msg => new Error(`Could not serialize entity: ${msg}`));
