@@ -25,6 +25,7 @@ import {
 import { _ActionContextImpl } from "./action-context-impl";
 import { _Commit, _commitType, _getChangesFromCommit } from "./commit";
 import { _partitionKeys, _rowKeys } from "./data-keys";
+import { _logInfo } from "./log";
 import { _QueryImpl } from "./query-impl";
 import { _DriverQuerySource, _QuerySource } from "./query-source";
 import { _getMinSyncVersion, _MaterialViewKind, _materialViewKindType, _viewHeader, _ViewHeader } from "./view-header";
@@ -916,6 +917,13 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             if (!await this.#tryCommit(commit)) {
                 return void(0);
             }
+
+            _logInfo(
+                "Committed version %d in \"%s\": %s", 
+                version, 
+                this.#id, 
+                changes.join(", ")
+            );
         }
 
         const result: ActionResultType<Model, K> = {
