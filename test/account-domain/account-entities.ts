@@ -69,7 +69,7 @@ const money_transferred: EntityProjectionFunc<AccountProps, "account_id", Change
     }
 };
 
-const on: EntityChangeHandlers<AccountChanges, AccountProps, "account_id"> = {
+const mutators: EntityChangeHandlers<AccountChanges, AccountProps, "account_id"> = {
     account_registered,
     account_deleted,
     money_deposited,
@@ -82,9 +82,9 @@ const auth: EntityAuthFunc<AccessScope, AccountProps> = async (
     { user_id },
 ) => where("owner_id", "==", user_id);
 
-export const accounts = defineEntity(
-    accountPropsType,
-    "account_id",
-    on,
+export const accounts = defineEntity({
+    type: accountPropsType,
+    key: "account_id",
+    mutators,
     auth,
-);
+});

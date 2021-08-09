@@ -114,9 +114,7 @@ export function createMemoryDriver(this: void): DomainDriver;
 export function defineAction<Input, Output, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(this: void, definition: ActionDefinition<Input, Output, Scope, Events, Views, Dependencies>): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>;
 
 // @public
-export function defineEntity<Props extends Record<string, unknown>, Key extends PossibleKeysOf<Props>, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(this: void, type: Type<Props>, key: Key, mutators: {
-    [K in Mutators[number]]: (EntityProjectionFunc<Props, Key, Change<TypeOf<Events[K]>, K>, Pick<Views, Dependencies[number]>>);
-}, auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number]>>, dependencies?: Dependencies): EntityProjection<Props, Key, Events, Views, Scope>;
+export function defineEntity<Props extends Record<string, unknown>, Key extends PossibleKeysOf<Props>, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(this: void, definition: EntityDefinition<Props, Key, Scope, Events, Views, Mutators, Dependencies>): EntityProjection<Props, Key, Events, Views, Scope>;
 
 // @public
 export function defineQuery<Views extends ReadModel, Result, Params extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, Dependencies extends (string & keyof Views)[] = []>(this: void, type: Type<Result>, params: Type<Params>, dependencies: Dependencies, exec: QueryExecFunc<Pick<Views, Dependencies[number]>, Params, Scope, Result>, auth?: QueryAuthFunc<Pick<Views, Dependencies[number]>, Params, Scope, Result>): QueryHandler<Params, Result, Pick<Views, Dependencies[number]>, Scope>;
@@ -185,6 +183,17 @@ export type EntityAuthFunc<Scope, T, R extends ReadModel = ReadModel> = (query: 
 export type EntityChangeHandlers<C extends ChangeModel, T, K extends PossibleKeysOf<T>, R extends ReadModel = ReadModel> = Partial<{
     [E in keyof C]: EntityProjectionFunc<T, K, Change<TypeOf<C[E]>>, R>;
 }>;
+
+// @public
+export interface EntityDefinition<Props extends Record<string, unknown>, Key extends PossibleKeysOf<Props>, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []> {
+    auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number]>>;
+    dependencies?: Dependencies;
+    key: Key;
+    mutators: {
+        [K in Mutators[number]]: (EntityProjectionFunc<Props, Key, Change<TypeOf<Events[K]>, K>, Pick<Views, Dependencies[number]>>);
+    };
+    type: Type<Props>;
+}
 
 // @public (undocumented)
 export interface EntityProjection<T extends Record<string, unknown> = Record<string, unknown>, K extends PossibleKeysOf<T> = PossibleKeysOf<T>, C extends ChangeModel = ChangeModel, R extends ReadModel = ReadModel, Scope = unknown> {

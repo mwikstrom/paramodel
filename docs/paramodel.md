@@ -13,7 +13,7 @@ Run-time domain model for event-sourcing.
 |  [createDomainProvider(driver)](./paramodel.createdomainprovider.md) |  |
 |  [createMemoryDriver(this)](./paramodel.creatememorydriver.md) | Creates an in-memory [driver](./paramodel.domaindriver.md) that could be used to testing your domain |
 |  [defineAction(this, definition)](./paramodel.defineaction.md) | Creates an [ActionHandler](./paramodel.actionhandler.md) |
-|  [defineEntity(this, type, key, mutators, auth, dependencies)](./paramodel.defineentity.md) | Creates an [EntityProjection](./paramodel.entityprojection.md) |
+|  [defineEntity(this, definition)](./paramodel.defineentity.md) | Creates an [EntityProjection](./paramodel.entityprojection.md) |
 |  [defineQuery(this, type, params, dependencies, exec, auth)](./paramodel.definequery.md) | Creates a [QueryHandler](./paramodel.queryhandler.md) |
 |  [defineState(this, type, initial, mutators, auth, dependencies)](./paramodel.definestate.md) | Creates a [StateProjection](./paramodel.stateprojection.md) |
 
@@ -31,6 +31,7 @@ Run-time domain model for event-sourcing.
 |  [DomainProvider](./paramodel.domainprovider.md) |  |
 |  [DomainStore](./paramodel.domainstore.md) |  |
 |  [DomainStoreStatus](./paramodel.domainstorestatus.md) |  |
+|  [EntityDefinition](./paramodel.entitydefinition.md) | Settings that define an entity projection |
 |  [EntityProjection](./paramodel.entityprojection.md) |  |
 |  [EntityProjectionState](./paramodel.entityprojectionstate.md) |  |
 |  [EntityView](./paramodel.entityview.md) |  |
