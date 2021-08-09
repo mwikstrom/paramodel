@@ -12,8 +12,10 @@ import { ChangeModel, ReadModel } from "./model";
  * @param mutators - An object that define how change events affect entities. 
  * Each property name must be the name of a change event and each property value must be
  * a function that shall be invoked to apply the effect that the corresponding event.
- * @param auth - <i>(Optional)</i> A function that provides authorization for entities.
- * @param dependencies - <i>(Optional)</i> A set of view keys that the entity projection depend upon.
+ * @param auth - <i>(Optional)</i> A function that provides authorization to entities.
+ * @param dependencies - <i>(Optional)</i> A set of view keys that the entity projection depends upon.
+ * 
+ * @public
  */
 export function defineEntity<
     Props extends Record<string, unknown>,

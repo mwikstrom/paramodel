@@ -14,7 +14,7 @@ Run-time domain model for event-sourcing.
 |  [createMemoryDriver()](./paramodel.creatememorydriver.md) |  |
 |  [defineAction(this, input, exec, dependencies, output)](./paramodel.defineaction.md) | Creates an [ActionHandler](./paramodel.actionhandler.md) |
 |  [defineEntity(this, type, key, mutators, auth, dependencies)](./paramodel.defineentity.md) | Creates an [EntityProjection](./paramodel.entityprojection.md) |
-|  [defineQuery(type, params, dependencies, exec, auth)](./paramodel.definequery.md) |  |
+|  [defineQuery(this, type, params, dependencies, exec, auth)](./paramodel.definequery.md) | Creates a [QueryHandler](./paramodel.queryhandler.md) |
 |  [defineState(type, initial, on, dependencies, auth)](./paramodel.definestate.md) |  |
 
 ## Interfaces
