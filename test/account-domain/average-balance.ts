@@ -8,9 +8,9 @@ const exec: QueryExecFunc<Pick<BaseAccountViews, "number_of_accounts" | "total_b
     return numberOfAccounts > 0 ? totalBalance / numberOfAccounts : 0;
 };
 
-export const average_balance = defineQuery(
-    numberType,
-    recordType({}),
-    ["number_of_accounts", "total_balance"],
+export const average_balance = defineQuery({
+    type: numberType,
+    params: recordType({}),
+    dependencies: ["number_of_accounts", "total_balance"],
     exec,
-);
+});

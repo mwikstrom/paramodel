@@ -9,7 +9,7 @@ Creates a [QueryHandler](./paramodel.queryhandler.md)
 <b>Signature:</b>
 
 ```typescript
-export declare function defineQuery<Views extends ReadModel, Result, Params extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, Dependencies extends (string & keyof Views)[] = []>(this: void, type: Type<Result>, params: Type<Params>, dependencies: Dependencies, exec: QueryExecFunc<Pick<Views, Dependencies[number]>, Params, Scope, Result>, auth?: QueryAuthFunc<Pick<Views, Dependencies[number]>, Params, Scope, Result>): QueryHandler<Params, Result, Pick<Views, Dependencies[number]>, Scope>;
+export declare function defineQuery<Views extends ReadModel, Result, Params extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, Dependencies extends (string & keyof Views)[] = []>(this: void, definition: QueryDefinition<Views, Result, Params, Scope, Dependencies>): QueryHandler<Params, Result, Pick<Views, Dependencies[number]>, Scope>;
 ```
 
 ## Parameters
@@ -17,11 +17,7 @@ export declare function defineQuery<Views extends ReadModel, Result, Params exte
 |  Parameter | Type | Description |
 |  --- | --- | --- |
 |  this | void | <i>(Ignored)</i> This function uses implicit <code>this</code> binding |
-|  type | Type&lt;Result&gt; | Type of query result |
-|  params | Type&lt;Params&gt; | Type of query params |
-|  dependencies | Dependencies | A set of view keys that the query depends upon. |
-|  exec | [QueryExecFunc](./paramodel.queryexecfunc.md)<!-- -->&lt;Pick&lt;Views, Dependencies\[number\]&gt;, Params, Scope, Result&gt; | The query executor function |
-|  auth | [QueryAuthFunc](./paramodel.queryauthfunc.md)<!-- -->&lt;Pick&lt;Views, Dependencies\[number\]&gt;, Params, Scope, Result&gt; | <i>(Optional)</i> A function that provides authorization to query results. |
+|  definition | [QueryDefinition](./paramodel.querydefinition.md)<!-- -->&lt;Views, Result, Params, Scope, Dependencies&gt; | Query definition |
 
 <b>Returns:</b>
 

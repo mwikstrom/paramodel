@@ -14,7 +14,7 @@ Run-time domain model for event-sourcing.
 |  [createMemoryDriver(this)](./paramodel.creatememorydriver.md) | Creates an in-memory [driver](./paramodel.domaindriver.md) that could be used to testing your domain |
 |  [defineAction(this, definition)](./paramodel.defineaction.md) | Creates an [ActionHandler](./paramodel.actionhandler.md) |
 |  [defineEntity(this, definition)](./paramodel.defineentity.md) | Creates an [EntityProjection](./paramodel.entityprojection.md) |
-|  [defineQuery(this, type, params, dependencies, exec, auth)](./paramodel.definequery.md) | Creates a [QueryHandler](./paramodel.queryhandler.md) |
+|  [defineQuery(this, definition)](./paramodel.definequery.md) | Creates a [QueryHandler](./paramodel.queryhandler.md) |
 |  [defineState(this, type, initial, mutators, auth, dependencies)](./paramodel.definestate.md) | Creates a [StateProjection](./paramodel.stateprojection.md) |
 
 ## Interfaces
@@ -42,6 +42,7 @@ Run-time domain model for event-sourcing.
 |  [PurgeOptions](./paramodel.purgeoptions.md) |  |
 |  [PurgeResult](./paramodel.purgeresult.md) |  |
 |  [Queryable](./paramodel.queryable.md) |  |
+|  [QueryDefinition](./paramodel.querydefinition.md) | Settings that define a query handler |
 |  [QueryHandler](./paramodel.queryhandler.md) |  |
 |  [QuerySpec](./paramodel.queryspec.md) | A data record query specification |
 |  [QueryView](./paramodel.queryview.md) |  |

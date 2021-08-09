@@ -3,14 +3,41 @@ import { ReadModel } from "./model";
 import { QueryAuthFunc, QueryExecFunc, QueryHandler } from "./query-handler";
 
 /**
+ * Settings that define a query handler
+ * @public
+ */
+export interface QueryDefinition<
+    Views extends ReadModel,
+    Result,
+    Params extends Record<string, unknown> = Record<string, unknown>,
+    Scope = unknown,
+    Dependencies extends (string & keyof Views)[] = [],
+>{
+    /** Query result type */
+    type: Type<Result>;
+
+    /** Query parameter type */
+    params: Type<Params>;
+
+    /**
+     * Optional array of vies keys that the query handler depends upon.
+     * 
+     * These views will automatically be synced to the current version just before the query handler
+     * is executed and are made available via the `view` function (second argument of {@link QueryExecFunc}).
+     */
+    dependencies: Dependencies;
+    
+    /** Query executor function */
+    exec: QueryExecFunc<Pick<Views, Dependencies[number]>, Params, Scope, Result>;
+
+    /** Optional function that provide authorization */
+    auth?: QueryAuthFunc<Pick<Views, Dependencies[number]>, Params, Scope, Result>;
+}
+
+/**
  * Creates a {@link QueryHandler}
  * @param this - <i>(Ignored)</i> This function uses implicit `this` binding
- * @param type - Type of query result
- * @param params - Type of query params
- * @param dependencies - A set of view keys that the query depends upon.
- * @param exec - The query executor function
- * @param auth - <i>(Optional)</i> A function that provides authorization to query results.
- * 
+ * @param definition - Query definition
  * @public
  */
 export function defineQuery<
@@ -21,12 +48,15 @@ export function defineQuery<
     Dependencies extends (string & keyof Views)[] = [],
 >(
     this: void,
-    type: Type<Result>,
-    params: Type<Params>,
-    dependencies: Dependencies,
-    exec: QueryExecFunc<Pick<Views, Dependencies[number]>, Params, Scope, Result>,
-    auth?: QueryAuthFunc<Pick<Views, Dependencies[number]>, Params, Scope, Result>,
+    definition: QueryDefinition<Views, Result, Params, Scope, Dependencies>,
 ): QueryHandler<Params, Result, Pick<Views, Dependencies[number]>, Scope> {
+    const {
+        type,
+        params,
+        dependencies,
+        exec,
+        auth,
+    } = definition;
     return Object.freeze({
         kind: "query",
         type,
