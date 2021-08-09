@@ -33,15 +33,12 @@ describe("DomainStore.view-entities", () => {
         expect([a1.status, a1.message].filter(x => x).join(": ")).toBe("success");
         const { output: account_id } = a1;
         positiveIntegerType.assert(account_id);        
-        console.log("Getting view #1");
         const view1 = await store.view("accounts", { sync: 1 });        
         const a2 = await store.do("deposit_money", { account_id, amount: 100 });
         expect([a2.status, a2.message].filter(x => x).join(": ")).toBe("success");
-        console.log("Getting view #2");
         const view2 = await store.view("accounts", { sync: 2 });
         const a3 = await store.do("withdraw_money", { account_id, amount: 25 });
         expect([a3.status, a3.message].filter(x => x).join(": ")).toBe("success");
-        console.log("Getting view #3");
         const view3 = await store.view("accounts", { sync: 3 });
         expect(view1?.version).toBe(1);
         expect(view2?.version).toBe(2);
