@@ -1,4 +1,4 @@
-import { Type, TypeOf } from "paratype";
+import { Type } from "paratype";
 import { Change } from "./change";
 import { PossibleKeysOf, ReadonlyEntityCollection } from "./entity-view";
 import { ChangeModel, Forbidden, ReadModel } from "./model";
