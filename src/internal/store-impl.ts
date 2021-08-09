@@ -169,14 +169,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
     #createReadonlyEntityCollection = async <T extends Record<string, unknown>>(
         viewKey: string,
-        definition: EntityProjection<T>,
+        projection: EntityProjection<T>,
         version: number,
         circular: readonly string[],
         authError?: ErrorFactory,
         metaMap?: WeakMap<T, EntityMetadata>,
     ): Promise<ReadonlyEntityCollection<T>> => {        
-        const { auth, dependencies } = definition;
-        let query = this.#createEntityQueryable(viewKey, definition.type, version, "valid_range", metaMap);
+        const { auth, dependencies } = projection;
+        let query = this.#createEntityQueryable(viewKey, projection.type, version, "valid_range", metaMap);
 
         if (authError && auth) {
             const snapshot = this.#createViewSnapshotFunc(version, dependencies, circular);
@@ -189,7 +189,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             query = authed;
         }
 
-        const get: EntityView<T>["get"] = key => query.where(definition.key, "==", key).first();
+        const get: EntityView<T>["get"] = key => query.where(projection.key, "==", key).first();
         const collection: ReadonlyEntityCollection<T> = {
             ...query,
             get,
@@ -200,15 +200,15 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
     #createEntityView = async <T extends Record<string, unknown>>(
         viewKey: string,
-        definition: EntityProjection<T>,
+        projection: EntityProjection<T>,
         version: number,
         circular: readonly string[],
         authError?: ErrorFactory,
     ): Promise<EntityView> => {        
-        const { kind,  } = definition;
+        const { kind,  } = projection;
         const collection = await this.#createReadonlyEntityCollection(
             viewKey, 
-            definition, 
+            projection, 
             version, 
             circular, 
             authError
@@ -224,12 +224,12 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
     #createStateView = <T>(
         viewKey: string,
-        definition: StateProjection<T>,
+        projection: StateProjection<T>,
         version: number,
         circular: readonly string[],
         authError?: ErrorFactory,
     ): StateView<T> => {
-        const { kind, dependencies, auth } = definition;       
+        const { kind, dependencies, auth } = projection;       
         const snapshot = this.#createViewSnapshotFunc(version, dependencies, circular);
         const authMapper = async (state: T): Promise<T> => {
             if (!authError || !auth) {
@@ -246,10 +246,10 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
         const read: StateView<T>["read"] = async () => {
             if (version === 0) {
-                return await authMapper(definition.initial);
+                return await authMapper(projection.initial);
             }
 
-            const mapped = await this.#fetchStateSnapshot(viewKey, definition.type, version);
+            const mapped = await this.#fetchStateSnapshot(viewKey, projection.type, version);
             const authed = await authMapper(mapped);
 
             return authed;
@@ -292,12 +292,12 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     }
 
     #createQueryView = <P extends Record<string, unknown>, T>(
-        definition: QueryHandler<P, T>,
+        handler: QueryHandler<P, T>,
         version: number,
         circular: readonly string[],
         authError?: ErrorFactory,
     ): QueryView<P, T> => {
-        const { kind, exec, auth, dependencies } = definition;
+        const { kind, exec, auth, dependencies } = handler;
         const snapshot = this.#createViewSnapshotFunc(version, dependencies, circular);
 
         const query: QueryView<P, T>["query"] = (
@@ -320,13 +320,13 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         circular: readonly string[],
         authError?: ErrorFactory,
     ): Promise<View> => {
-        const definition = this.#model.views[viewKey];
+        const projection = this.#model.views[viewKey];
         
-        if (!definition) {
+        if (!projection) {
             throw new Error(`Cannot access unknown view: ${viewKey}`);
         }
 
-        const view = await this.#createViewFromDefinition(definition, viewKey, version, circular, authError);
+        const view = await this.#createViewFromProjection(projection, viewKey, version, circular, authError);
         if (!view) {
             throw new Error(`Unable to create view accessor: ${viewKey}`);
         }   
@@ -334,18 +334,18 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return view;
     }
 
-    #createViewFromDefinition = async <Definition extends AnyProjection>(
-        definition: Definition,
+    #createViewFromProjection = async <Definition extends AnyProjection>(
+        projection: Definition,
         viewKey: string,
         version: number,
         circular: readonly string[],
         authError?: ErrorFactory,
     ): Promise<ViewOf<Definition> | undefined> => {
-        switch (definition.kind) {
+        switch (projection.kind) {
             case "entities":
                 return await this.#createEntityView(
                     viewKey, 
-                    definition, 
+                    projection, 
                     version, 
                     circular,
                     authError,
@@ -353,14 +353,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             case "state":
                 return this.#createStateView(
                     viewKey, 
-                    definition, 
+                    projection, 
                     version, 
                     circular,
                     authError,
                 ) as ViewOf<Definition>;
             case "query":
                 return this.#createQueryView(
-                    definition,
+                    projection,
                     version,
                     circular,
                     authError,
@@ -462,16 +462,16 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
             processed.add(next);
             
-            const definition = this.#model.views[next];
-            if (!definition) {
+            const projection = this.#model.views[next];
+            if (!projection) {
                 continue;
             }
 
-            if (_materialViewKindType.test(definition.kind)) {
+            if (_materialViewKindType.test(projection.kind)) {
                 result.push(next);
             }
 
-            for (const dependency of definition.dependencies) {
+            for (const dependency of projection.dependencies) {
                 queue.push(dependency);
             }
         }
@@ -562,9 +562,9 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         // determine which events that needs to be synced
         const eventsToSync = new Set<string>();
         for (const key of viewsToSync) {
-            const definition = this.#model.views[key];
-            if (definition?.kind === "state" || definition?.kind === "entities") {
-                definition.mutators.forEach(e => eventsToSync.add(e));
+            const projection = this.#model.views[key];
+            if (projection?.kind === "state" || projection?.kind === "entities") {
+                projection.mutators.forEach(e => eventsToSync.add(e));
             } else {
                 throw new Error(`Don't know how to sync view: ${key}`);
             }
@@ -614,7 +614,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     #syncCommit = async (commit: _Commit, infoMap: Map<string, _SyncViewInfo>, keys: Set<string>): Promise<boolean> => {
         for (const key of keys) {
             const info = infoMap.get(key);
-            const definition = this.#model.views[key];
+            const projection = this.#model.views[key];
             
             if (!info) {
                 throw new Error("Invalid view info map");
@@ -622,15 +622,15 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             
             let modified: boolean;
 
-            if (definition?.kind === "entities") {
-                modified = await this.#syncEntities(commit, definition, key);
-            } else if (definition?.kind === "state") {
-                modified = await this.#syncState(commit, definition, key);
+            if (projection?.kind === "entities") {
+                modified = await this.#syncEntities(commit, projection, key);
+            } else if (projection?.kind === "state") {
+                modified = await this.#syncState(commit, projection, key);
             } else {
                 throw new Error(`Don't know how to sync view: ${key}`);
             }
 
-            const newInfo = await this.#storeViewHeaderForCommit(commit, key, definition.kind, info, modified);
+            const newInfo = await this.#storeViewHeaderForCommit(commit, key, projection.kind, info, modified);
             if (!newInfo) {
                 return false;
             }
@@ -655,14 +655,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
     }
 
-    #syncEntities = async (commit: _Commit, definition: EntityProjection, viewKey: string): Promise<boolean> => {
-        const changes = _getChangesFromCommit(commit, this.#model.events, definition.mutators);
-        const snapshot = this.#createViewSnapshotFunc(commit.version, definition.dependencies, [viewKey]);
+    #syncEntities = async (commit: _Commit, projection: EntityProjection, viewKey: string): Promise<boolean> => {
+        const changes = _getChangesFromCommit(commit, this.#model.events, projection.mutators);
+        const snapshot = this.#createViewSnapshotFunc(commit.version, projection.dependencies, [viewKey]);
         const metaMap = new WeakMap<Record<string, unknown>, EntityMetadata>();
         const baseVerison = commit.version - 1;
         const base = await this.#createReadonlyEntityCollection(
             viewKey,
-            definition,
+            projection,
             baseVerison,
             [viewKey],
             undefined,
@@ -671,9 +671,9 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
         const pk = _partitionKeys.view(viewKey);
         const rk = (key: string): string => _rowKeys.entity(key, commit.version);
-        const envelopeType = entityEnvelopeType(definition.type);
+        const envelopeType = entityEnvelopeType(projection.type);
         const written = new Map<string, Record<string, unknown> | null>();
-        const put: EntityProjectionState["put"] = props => void(written.set(props[definition.key] as string, props));
+        const put: EntityProjectionState["put"] = props => void(written.set(props[projection.key] as string, props));
         const del: EntityProjectionState["del"] = key => void(written.set(key as string, null));
         const state: EntityProjectionState = {
             base,
@@ -682,13 +682,13 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         };
 
         for (const change of changes) {
-            await definition.apply(change, state, snapshot);
+            await projection.apply(change, state, snapshot);
         }
 
-        const validUntilBase = this.#createEntityQueryable(viewKey, definition.type, baseVerison, "valid_until");
+        const validUntilBase = this.#createEntityQueryable(viewKey, projection.type, baseVerison, "valid_until");
         const alreadyMarkedWithValidUntil = new Set<string>();
         for await (const entity of validUntilBase.all()) {
-            const key = entity[definition.key] as string;
+            const key = entity[projection.key] as string;
             if (!written.has(key)) {
                 throw new Error(
                     `Detected non-deterministic entity projection of view "${viewKey}". ` + 
@@ -699,10 +699,10 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             alreadyMarkedWithValidUntil.add(key);
         }
 
-        const validFromCommit = this.#createEntityQueryable(viewKey, definition.type, commit.version, "valid_from");
+        const validFromCommit = this.#createEntityQueryable(viewKey, projection.type, commit.version, "valid_from");
         const alreadyWritten = new Set<string>();
         for await (const entity of validFromCommit.all()) {
-            const key = entity[definition.key] as string;
+            const key = entity[projection.key] as string;
             const expected = written.get(key);
             if (expected === void(0)) {
                 throw new Error(
@@ -732,7 +732,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
             const valid_until = await this.#getEntityValidUntilToBeWritten(
                 viewKey, 
-                definition.key, 
+                projection.key, 
                 key, 
                 commit.version
             );
@@ -797,18 +797,18 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return written.size > 0;
     }
 
-    #syncState = async (commit: _Commit, definition: StateProjection, key: string): Promise<boolean> => {
-        const changes = _getChangesFromCommit(commit, this.#model.events, definition.mutators);
-        const snapshot = this.#createViewSnapshotFunc(commit.version, definition.dependencies, [key]);
+    #syncState = async (commit: _Commit, projection: StateProjection, key: string): Promise<boolean> => {
+        const changes = _getChangesFromCommit(commit, this.#model.events, projection.mutators);
+        const snapshot = this.#createViewSnapshotFunc(commit.version, projection.dependencies, [key]);
         const before = commit.version === 1 ?
-            definition.initial :
-            await this.#createStateView(key, definition, commit.version - 1, [key]).read();
+            projection.initial :
+            await this.#createStateView(key, projection, commit.version - 1, [key]).read();
         let after = before;      
         for (const change of changes) {
-            after = await definition.apply(change, after, snapshot);
+            after = await projection.apply(change, after, snapshot);
         }
         
-        const jsonState = definition.type.toJsonValue(
+        const jsonState = projection.type.toJsonValue(
             after,
             msg => new Error(`Could not serialize view state to json: ${msg}`)
         );
@@ -841,12 +841,12 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         purgeVersion: number,
         prev: _SyncViewInfo,
     ): Promise<_SyncViewInfo | undefined> => {
-        const definition = this.#model.views[key];
-        if (!definition) {
+        const projection = this.#model.views[key];
+        if (!projection) {
             return void(0);
         }
 
-        const { kind } = definition;
+        const { kind } = projection;
         if (!_materialViewKindType.test(kind)) {
             return void(0);
         }
@@ -895,12 +895,12 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             return true;
         }
 
-        const definition = this.#model.views[key];
-        if (!definition) {
+        const projection = this.#model.views[key];
+        if (!projection) {
             return false;
         }
 
-        const { kind } = definition;
+        const { kind } = projection;
         if (!_materialViewKindType.test(kind)) {
             return false;
         }
@@ -1254,8 +1254,8 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         options: Partial<ViewOptions> = {}
     ): Promise<ViewOf<Model["views"][K]> | undefined> => {
         const { sync = 0, signal } = options;
-        const definition = this.#model.views[key];
-        let version = await this.#getViewSyncVersion(key, definition);
+        const projection = this.#model.views[key];
+        let version = await this.#getViewSyncVersion(key, projection);
         
         if (version === void(0)) {
             return void(0);
@@ -1270,7 +1270,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
 
         const authError = authErrorFromOptions(options);
-        const view = await this.#createViewFromDefinition(definition, key, version, [key], authError);
+        const view = await this.#createViewFromProjection(projection, key, version, [key], authError);
         return view as ViewOf<Model["views"][K]>;
     }
 }
