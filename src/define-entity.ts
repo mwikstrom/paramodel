@@ -10,6 +10,7 @@ import { ChangeModel, ReadModel } from "./model";
  * @param type - Type of entity
  * @param key - Name of the entity key property
  * @param mutators - An object that define how change events affect entities. 
+ * 
  * Each property name must be the name of a change event and each property value must be
  * a function that shall be invoked to apply the effect that the corresponding event.
  * @param auth - <i>(Optional)</i> A function that provides authorization to entities.

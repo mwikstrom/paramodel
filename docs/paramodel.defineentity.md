@@ -21,7 +21,7 @@ export declare function defineEntity<Props extends Record<string, unknown>, Key 
 |  this | void | <i>(Ignored)</i> This function uses implicit <code>this</code> binding |
 |  type | Type&lt;Props&gt; | Type of entity |
 |  key | Key | Name of the entity key property |
-|  mutators | { \[K in Mutators\[number\]\]: ([EntityProjectionFunc](./paramodel.entityprojectionfunc.md)<!-- -->&lt;Props, Key, [Change](./paramodel.change.md)<!-- -->&lt;TypeOf&lt;Events\[K\]&gt;, K&gt;, Pick&lt;Views, Dependencies\[number\]&gt;&gt;); } | An object that define how change events affect entities. Each property name must be the name of a change event and each property value must be a function that shall be invoked to apply the effect that the corresponding event. |
+|  mutators | { \[K in Mutators\[number\]\]: ([EntityProjectionFunc](./paramodel.entityprojectionfunc.md)<!-- -->&lt;Props, Key, [Change](./paramodel.change.md)<!-- -->&lt;TypeOf&lt;Events\[K\]&gt;, K&gt;, Pick&lt;Views, Dependencies\[number\]&gt;&gt;); } | An object that define how change events affect entities.<!-- -->Each property name must be the name of a change event and each property value must be a function that shall be invoked to apply the effect that the corresponding event. |
 |  auth | [EntityAuthFunc](./paramodel.entityauthfunc.md)<!-- -->&lt;Scope, Props, Pick&lt;Views, Dependencies\[number\]&gt;&gt; | <i>(Optional)</i> A function that provides authorization to entities. |
 |  dependencies | Dependencies | <i>(Optional)</i> A set of view keys that the entity projection depends upon. |
 

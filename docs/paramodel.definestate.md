@@ -4,23 +4,26 @@
 
 ## defineState() function
 
+Creates a [StateProjection](./paramodel.stateprojection.md)
+
 <b>Signature:</b>
 
 ```typescript
-export declare function defineState<State, Events extends ChangeModel = ChangeModel, Scope = unknown, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(type: Type<State>, initial: State, on: {
+export declare function defineState<State, Events extends ChangeModel = ChangeModel, Scope = unknown, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(this: void, type: Type<State>, initial: State, mutators: {
     [K in Mutators[number]]: StateApplyFunc<Change<Events[K], K>, State, Pick<Views, Dependencies[number]>>;
-}, dependencies?: Dependencies, auth?: StateAuthFunc<Scope, State, Pick<Views, Dependencies[number]>>): StateProjection<State, Events, Views, Scope>;
+}, auth?: StateAuthFunc<Scope, State, Pick<Views, Dependencies[number]>>, dependencies?: Dependencies): StateProjection<State, Events, Views, Scope>;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  type | Type&lt;State&gt; |  |
-|  initial | State |  |
-|  on | { \[K in Mutators\[number\]\]: [StateApplyFunc](./paramodel.stateapplyfunc.md)<!-- -->&lt;[Change](./paramodel.change.md)<!-- -->&lt;Events\[K\], K&gt;, State, Pick&lt;Views, Dependencies\[number\]&gt;&gt;; } |  |
-|  dependencies | Dependencies |  |
-|  auth | [StateAuthFunc](./paramodel.stateauthfunc.md)<!-- -->&lt;Scope, State, Pick&lt;Views, Dependencies\[number\]&gt;&gt; |  |
+|  this | void | <i>(Ignored)</i> This function uses implicit <code>this</code> binding |
+|  type | Type&lt;State&gt; | Type of state |
+|  initial | State | The initial state |
+|  mutators | { \[K in Mutators\[number\]\]: [StateApplyFunc](./paramodel.stateapplyfunc.md)<!-- -->&lt;[Change](./paramodel.change.md)<!-- -->&lt;Events\[K\], K&gt;, State, Pick&lt;Views, Dependencies\[number\]&gt;&gt;; } | An object that define how change events affects the projected state.<!-- -->Each property name must be the name of a change event and each property value must be a function that shall be invoked to apply the effect that the corresponding event. |
+|  auth | [StateAuthFunc](./paramodel.stateauthfunc.md)<!-- -->&lt;Scope, State, Pick&lt;Views, Dependencies\[number\]&gt;&gt; | <i>(Optional)</i> A function that provides authorization to the projected state. |
+|  dependencies | Dependencies | <i>(Optional)</i> A set of view keys that the state projection depends upon. |
 
 <b>Returns:</b>
 
