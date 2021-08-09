@@ -2,7 +2,7 @@ import deepEqual from "deep-equal";
 import { JsonValue, jsonValueType, positiveIntegerType, recordType, Type, TypeOf } from "paratype";
 import { ActionOptions, ActionResultType } from "../action";
 import { ChangeType } from "../change";
-import { DomainDriver, FilterSpec, InputRecord, OutputRecord } from "../driver";
+import { DomainDriver, FilterSpec, InputRecord, OutputRecord, QuerySpec } from "../driver";
 import { EntityProjectionState, EntityProjection } from "../entity-projection";
 import { EntityView, ReadonlyEntityCollection } from "../entity-view";
 import { DomainModel, Forbidden } from "../model";
@@ -218,10 +218,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         circular: readonly string[],
         authError?: ErrorFactory,
     ): StateView<T> => {
-        const { kind, dependencies, auth } = definition;
-        const partitionKey = _partitionKeys.view(viewKey);
-        const rowKey = _rowKeys.viewState(version);
-        
+        const { kind, dependencies, auth } = definition;       
         const snapshot = this.#createViewSnapshotFunc(version, dependencies, circular);
         const authMapper = async (state: T): Promise<T> => {
             if (!authError || !auth) {
@@ -236,30 +233,43 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             return authed;
         };
 
-        let fetched = false;
-        let data: OutputRecord | undefined;
         const read: StateView<T>["read"] = async () => {
             if (version === 0) {
-                return definition.initial;
+                return await authMapper(definition.initial);
             }
 
-            if (!fetched) {
-                // TODO: MUST SUPPORT READING OLDER SNAPSHOT BECAUSE NOT ALL COMMITS GENERATE SNAPSHOTS!
-                data = await this.#driver.read(this.#id, partitionKey, rowKey);
-                fetched = true;
-            }
-
-            if (!data) {
-                throw new Error(`State not found: ${this.#id}/${partitionKey}/${rowKey}`);
-            }
-
-            const mapped = definition.type.fromJsonValue(data.value);
+            const mapped = await this.#fetchStateSnapshot(viewKey, definition.type, version);
             const authed = await authMapper(mapped);
 
             return authed;
         };
         const view: StateView<T> = Object.freeze({ kind, version, read });
         return view;
+    }
+
+    #fetchStateSnapshot = async <T>(
+        viewKey: string,
+        stateType: Type<T>,
+        version: number,
+    ): Promise<T> => {
+        const partitionKey = _partitionKeys.view(viewKey);
+        const source = new _DriverQuerySource(
+            this.#driver,
+            this.#id,
+            partitionKey,
+            record => record,
+        );
+        const output = await new _QueryImpl(source, [], [])
+            .by("key", "descending")
+            .where("key", "!=", _rowKeys.viewHeader)
+            .where("key", "<=", _rowKeys.viewState(version))
+            .first();
+
+        if (!output) {
+            throw new Error(`State not found for view "${viewKey}" in "${this.#id}" version ${version}`);
+        }
+
+        return stateType.fromJsonValue(output.value);
     }
 
     #createQueryView = <P extends Record<string, unknown>, T>(
