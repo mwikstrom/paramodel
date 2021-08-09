@@ -178,6 +178,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             }
 
             if (!fetched) {
+                // TODO: MUST SUPPORT READING OLDER SNAPSHOT BECAUSE NOT ALL COMMITS GENERATE SNAPSHOTS!
                 data = await this.#driver.read(this.#id, partitionKey, rowKey);
                 fetched = true;
             }
@@ -592,6 +593,10 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             if (!props) {
                 continue; // entity was deleted
             }
+
+            // TODO: IMPORTANT: CANNOT ALWAYS WRITE INF_VERSION AS END
+            //       WHEN RECOVERING AFTER PURGE WE MUST NOT INTERFERE WITH
+            //       EXISTING LATER VERSIONS!
 
             const envelope: EntityEnvelope = {
                 start: commit.version,
