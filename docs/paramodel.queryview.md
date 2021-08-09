@@ -4,6 +4,8 @@
 
 ## QueryView interface
 
+A query snapshot
+
 <b>Signature:</b>
 
 ```typescript

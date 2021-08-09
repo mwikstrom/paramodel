@@ -4,6 +4,8 @@
 
 ## EntityProjectionState.base property
 
+Provides access to entities as they were in previous commit
+
 <b>Signature:</b>
 
 ```typescript

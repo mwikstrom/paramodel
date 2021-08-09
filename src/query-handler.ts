@@ -2,6 +2,10 @@ import { Type } from "paratype";
 import { Forbidden, ReadModel } from "./model";
 import { ViewSnapshotFunc } from "./projection";
 
+/**
+ * A query handler - which is a stateless view projection
+ * @public
+ */
 export interface QueryHandler<
     P extends Record<string, unknown> = Record<string, unknown>,
     T = unknown,
@@ -16,6 +20,10 @@ export interface QueryHandler<
     readonly auth?: QueryAuthFunc<R, P, Scope, T>;
 }
 
+/**
+ * The query executor function
+ * @public
+ */
 export type QueryExecFunc<
     R extends ReadModel = ReadModel,
     P extends Record<string, unknown> = Record<string, unknown>,
@@ -28,6 +36,10 @@ export type QueryExecFunc<
     scope: Scope
 ) => Promise<T>;
 
+/**
+ * The query authorization function
+ * @public
+ */
 export type QueryAuthFunc<
     R extends ReadModel = ReadModel,
     P extends Record<string, unknown> = Record<string, unknown>,

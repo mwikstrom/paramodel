@@ -4,17 +4,20 @@
 
 ## createDomainProvider() function
 
+Creates a [DomainProvider](./paramodel.domainprovider.md) for the specified driver
+
 <b>Signature:</b>
 
 ```typescript
-export declare function createDomainProvider(driver: DomainDriver): DomainProvider;
+export declare function createDomainProvider(this: void, driver: DomainDriver): DomainProvider;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  driver | [DomainDriver](./paramodel.domaindriver.md) |  |
+|  this | void | <i>(Ignored)</i> This function uses implicit <code>this</code> binding |
+|  driver | [DomainDriver](./paramodel.domaindriver.md) | The driver that shall be used by the new provider |
 
 <b>Returns:</b>
 

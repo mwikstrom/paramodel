@@ -4,6 +4,7 @@
 
 ## Queryable interface
 
+A queryable collection
 
 <b>Signature:</b>
 

@@ -4,11 +4,15 @@
 
 ## EntityChangeHandlers type
 
+An object that define the change event handlers that may mutate entity states.
+
+Each key in this object is the name of a change event and the corresponding value is an [EntityProjectionFunc](./paramodel.entityprojectionfunc.md) that shall be invoked to apply the effect of that change.
+
 <b>Signature:</b>
 
 ```typescript
-export declare type EntityChangeHandlers<C extends ChangeModel, T, K extends PossibleKeysOf<T>, R extends ReadModel = ReadModel> = Partial<{
-    [E in keyof C]: EntityProjectionFunc<T, K, Change<TypeOf<C[E]>>, R>;
+export declare type EntityChangeHandlers<Events extends ChangeModel, Props, Key extends PossibleKeysOf<Props>, Views extends ReadModel = ReadModel> = Partial<{
+    [E in keyof Events]: EntityProjectionFunc<Props, Key, Change<TypeOf<Events[E]>>, Views>;
 }>;
 ```
 <b>References:</b> [ChangeModel](./paramodel.changemodel.md)<!-- -->, [PossibleKeysOf](./paramodel.possiblekeysof.md)<!-- -->, [ReadModel](./paramodel.readmodel.md)<!-- -->, [EntityProjectionFunc](./paramodel.entityprojectionfunc.md)<!-- -->, [Change](./paramodel.change.md)

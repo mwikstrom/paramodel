@@ -4,6 +4,8 @@
 
 ## EntityProjection interface
 
+Entity state projection
+
 <b>Signature:</b>
 
 ```typescript

@@ -4,6 +4,7 @@
 
 ## FilterOperator type
 
+A type alias that represents a filter operator for a given property type
 
 <b>Signature:</b>
 

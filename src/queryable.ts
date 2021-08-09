@@ -1,4 +1,5 @@
 /**
+ * A queryable collection
  * @public
  */
 export interface Queryable<T> {
@@ -23,25 +24,53 @@ export interface Queryable<T> {
     ): Queryable<T>;
 }
 
+/**
+ * Sort direction
+ * @public
+ */
 export type SortDirection = "ascending" | "descending";
 
 /**
+ * Options for getting a page
  * @public
  */
 export interface PageOptions {
+    /**
+     * The desired number of items to be returned.
+     * 
+     * This is only a hint, more or fewer (even zero) items may be returned.
+     * You must be prepared to handle continuation tokens to iterate over all
+     * items.
+     */
     size?: number;
+
+    /** Optional continuation token as returned in the previous page */
     continuation?: string;
 }
 
 /**
+ * A page of items
  * @public
  */
 export interface Page<T> {
+    /**
+     * Items returned on the current page.
+     * 
+     * Notice that this may be an empty array even though there are more
+     * items. You must be prepared to handle continuation tokens to iterate over
+     * all items.
+     */
     readonly items: readonly T[];
+
+    /**
+     * An opaque continuation token that provides access to the next page,
+     * or `undefined` when there are no more items.
+     */
     readonly continuation?: string;
 }
 
 /**
+ * A type alias that represents a filter operator for a given property type
  * @public
  */
 export type FilterOperator<T> = (
@@ -53,6 +82,7 @@ export type FilterOperator<T> = (
 );
 
 /**
+ * A type alias that represents a filter operand for a given property type and operator
  * @public
  */
 export type FilterOperand<T, O> = (
@@ -63,18 +93,21 @@ export type FilterOperand<T, O> = (
     O extends ArrayOperator ? T extends unknown[infer E] ? E : never :
     O extends StringOperator ? string : never
 );
+
 /**
+ * Represents equatable property types
  * @public
  */
-
 export type Equatable = null | boolean | Comparable;
 
 /**
+ * Represents comparable property types
  * @public
  */
 export type Comparable = number | string | Date;
 
 /**
+ * Extracts sortable properties
  * @public
  */
 export type SortableProps<T> = {
@@ -82,21 +115,25 @@ export type SortableProps<T> = {
 }
 
 /**
+ * Defines the type checking operators
  * @public
  */
 export type IsOperator = "is" | "is-not";
 
 /**
+ * Defines the equality operators
  * @public
  */
 export type EqualityOperator = "==" | "!=" | "in" | "not-in";
 
 /**
+ * Defines the comparison operators
  * @public
  */
 export type ComparisonOperator = ">" | ">=" | "<" | "<=";
 
 /**
+ * Defines the array operators
  * @public
  */
 export type ArrayOperator = (
@@ -106,6 +143,7 @@ export type ArrayOperator = (
 );
 
 /**
+ * Defines array operators that require an array operand
  * @public
  */
 export type ArrayAnyOperator = (
@@ -114,6 +152,7 @@ export type ArrayAnyOperator = (
 );
 
 /**
+ * Defines the string operators
  * @public
  */
 export type StringOperator = (
@@ -134,6 +173,7 @@ export type StringOperator = (
 );
 
 /**
+ * Defines the type checking operands
  * @public
  */
 export type IsOperand<T> = (

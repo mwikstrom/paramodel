@@ -4,6 +4,8 @@
 
 ## EntityProjectionState.del() method
 
+Removes an entity
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,8 +16,8 @@ del(this: void, key: T[K]): void;
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  this | void |  |
-|  key | T\[K\] |  |
+|  this | void | <i>(Ignored)</i> This function uses implicit <code>this</code> binding |
+|  key | T\[K\] | Key of the entity to remove |
 
 <b>Returns:</b>
 

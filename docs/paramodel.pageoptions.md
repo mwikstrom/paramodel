@@ -4,6 +4,7 @@
 
 ## PageOptions interface
 
+Options for getting a page
 
 <b>Signature:</b>
 
@@ -15,6 +16,6 @@ export interface PageOptions
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [continuation?](./paramodel.pageoptions.continuation.md) | string | <i>(Optional)</i> |
-|  [size?](./paramodel.pageoptions.size.md) | number | <i>(Optional)</i> |
+|  [continuation?](./paramodel.pageoptions.continuation.md) | string | <i>(Optional)</i> Optional continuation token as returned in the previous page |
+|  [size?](./paramodel.pageoptions.size.md) | number | <i>(Optional)</i> The desired number of items to be returned.<!-- -->This is only a hint, more or fewer (even zero) items may be returned. You must be prepared to handle continuation tokens to iterate over all items. |
 

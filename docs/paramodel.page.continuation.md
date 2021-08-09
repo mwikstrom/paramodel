@@ -4,6 +4,8 @@
 
 ## Page.continuation property
 
+An opaque continuation token that provides access to the next page, or `undefined` when there are no more items.
+
 <b>Signature:</b>
 
 ```typescript

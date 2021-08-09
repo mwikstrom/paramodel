@@ -4,6 +4,8 @@
 
 ## ViewOf type
 
+Extracts the view type of a projection
+
 <b>Signature:</b>
 
 ```typescript

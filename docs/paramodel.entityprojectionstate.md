@@ -4,6 +4,8 @@
 
 ## EntityProjectionState interface
 
+The mutable state object provided as the second argument of [EntityProjectionFunc](./paramodel.entityprojectionfunc.md)
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,12 +16,12 @@ export interface EntityProjectionState<T = Record<string, unknown>, K extends Po
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [base](./paramodel.entityprojectionstate.base.md) | [ReadonlyEntityCollection](./paramodel.readonlyentitycollection.md)<!-- -->&lt;T, K&gt; |  |
+|  [base](./paramodel.entityprojectionstate.base.md) | [ReadonlyEntityCollection](./paramodel.readonlyentitycollection.md)<!-- -->&lt;T, K&gt; | Provides access to entities as they were in previous commit |
 
 ## Methods
 
 |  Method | Description |
 |  --- | --- |
-|  [del(this, key)](./paramodel.entityprojectionstate.del.md) |  |
-|  [put(this, props)](./paramodel.entityprojectionstate.put.md) |  |
+|  [del(this, key)](./paramodel.entityprojectionstate.del.md) | Removes an entity |
+|  [put(this, props)](./paramodel.entityprojectionstate.put.md) | Writes an entity |
 

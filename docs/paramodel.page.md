@@ -4,6 +4,7 @@
 
 ## Page interface
 
+A page of items
 
 <b>Signature:</b>
 
@@ -15,6 +16,6 @@ export interface Page<T>
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [continuation?](./paramodel.page.continuation.md) | string | <i>(Optional)</i> |
-|  [items](./paramodel.page.items.md) | readonly T\[\] |  |
+|  [continuation?](./paramodel.page.continuation.md) | string | <i>(Optional)</i> An opaque continuation token that provides access to the next page, or <code>undefined</code> when there are no more items. |
+|  [items](./paramodel.page.items.md) | readonly T\[\] | Items returned on the current page.<!-- -->Notice that this may be an empty array even though there are more items. You must be prepared to handle continuation tokens to iterate over all items. |
 

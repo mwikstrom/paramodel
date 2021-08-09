@@ -4,6 +4,10 @@
 
 ## Page.items property
 
+Items returned on the current page.
+
+Notice that this may be an empty array even though there are more items. You must be prepared to handle continuation tokens to iterate over all items.
+
 <b>Signature:</b>
 
 ```typescript

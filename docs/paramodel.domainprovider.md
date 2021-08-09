@@ -4,6 +4,8 @@
 
 ## DomainProvider interface
 
+Provides access to [domain stores](./paramodel.domainstore.md)<!-- -->.
+
 <b>Signature:</b>
 
 ```typescript

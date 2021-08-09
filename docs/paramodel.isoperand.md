@@ -4,6 +4,7 @@
 
 ## IsOperand type
 
+Defines the type checking operands
 
 <b>Signature:</b>
 

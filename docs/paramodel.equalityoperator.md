@@ -4,6 +4,7 @@
 
 ## EqualityOperator type
 
+Defines the equality operators
 
 <b>Signature:</b>
 

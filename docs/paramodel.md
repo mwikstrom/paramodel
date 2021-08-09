@@ -10,7 +10,7 @@ Run-time domain model for event-sourcing.
 
 |  Function | Description |
 |  --- | --- |
-|  [createDomainProvider(driver)](./paramodel.createdomainprovider.md) |  |
+|  [createDomainProvider(this, driver)](./paramodel.createdomainprovider.md) | Creates a [DomainProvider](./paramodel.domainprovider.md) for the specified driver |
 |  [createMemoryDriver(this)](./paramodel.creatememorydriver.md) | Creates an in-memory [driver](./paramodel.domaindriver.md) that could be used to testing your domain |
 |  [defineAction(this, definition)](./paramodel.defineaction.md) | Creates an [ActionHandler](./paramodel.actionhandler.md) |
 |  [defineEntity(this, definition)](./paramodel.defineentity.md) | Creates an [EntityProjection](./paramodel.entityprojection.md) |
@@ -28,25 +28,25 @@ Run-time domain model for event-sourcing.
 |  [ActionResult](./paramodel.actionresult.md) | The result of executing an action |
 |  [Change](./paramodel.change.md) | Data for a change event that has occurred |
 |  [DomainDriver](./paramodel.domaindriver.md) | An underlying driver for a domain model |
-|  [DomainProvider](./paramodel.domainprovider.md) |  |
+|  [DomainProvider](./paramodel.domainprovider.md) | Provides access to [domain stores](./paramodel.domainstore.md)<!-- -->. |
 |  [DomainStore](./paramodel.domainstore.md) |  |
 |  [DomainStoreStatus](./paramodel.domainstorestatus.md) |  |
 |  [EntityDefinition](./paramodel.entitydefinition.md) | Settings that define an entity projection |
-|  [EntityProjection](./paramodel.entityprojection.md) |  |
-|  [EntityProjectionState](./paramodel.entityprojectionstate.md) |  |
-|  [EntityView](./paramodel.entityview.md) |  |
+|  [EntityProjection](./paramodel.entityprojection.md) | Entity state projection |
+|  [EntityProjectionState](./paramodel.entityprojectionstate.md) | The mutable state object provided as the second argument of [EntityProjectionFunc](./paramodel.entityprojectionfunc.md) |
+|  [EntityView](./paramodel.entityview.md) | A snapshot of entities |
 |  [FilterSpec](./paramodel.filterspec.md) | Specifies a data record filter condition |
 |  [InputRecord](./paramodel.inputrecord.md) | A data record to be written |
-|  [Page](./paramodel.page.md) |  |
-|  [PageOptions](./paramodel.pageoptions.md) |  |
+|  [Page](./paramodel.page.md) | A page of items |
+|  [PageOptions](./paramodel.pageoptions.md) | Options for getting a page |
 |  [PurgeOptions](./paramodel.purgeoptions.md) |  |
 |  [PurgeResult](./paramodel.purgeresult.md) |  |
-|  [Queryable](./paramodel.queryable.md) |  |
+|  [Queryable](./paramodel.queryable.md) | A queryable collection |
 |  [QueryDefinition](./paramodel.querydefinition.md) | Settings that define a query handler |
-|  [QueryHandler](./paramodel.queryhandler.md) |  |
+|  [QueryHandler](./paramodel.queryhandler.md) | A query handler - which is a stateless view projection |
 |  [QuerySpec](./paramodel.queryspec.md) | A data record query specification |
-|  [QueryView](./paramodel.queryview.md) |  |
-|  [ReadonlyEntityCollection](./paramodel.readonlyentitycollection.md) |  |
+|  [QueryView](./paramodel.queryview.md) | A query snapshot |
+|  [ReadonlyEntityCollection](./paramodel.readonlyentitycollection.md) | A readonly collection of entities |
 |  [ReadOptions](./paramodel.readoptions.md) |  |
 |  [SortSpec](./paramodel.sortspec.md) | Specifies how data records shall be sorted |
 |  [StateDefinition](./paramodel.statedefinition.md) | Settings that define a state projection |
@@ -60,8 +60,8 @@ Run-time domain model for event-sourcing.
 
 |  Variable | Description |
 |  --- | --- |
-|  [Conflict](./paramodel.conflict.md) |  |
-|  [Forbidden](./paramodel.forbidden.md) |  |
+|  [Conflict](./paramodel.conflict.md) | A well-known symbol that can be used to indicate that an action failed due to a conflict |
+|  [Forbidden](./paramodel.forbidden.md) | A well-known symbol that can be used to indicate that an action failed because the domain access scope is not permitted to execute it |
 
 ## Type Aliases
 
@@ -71,39 +71,39 @@ Run-time domain model for event-sourcing.
 |  [ActionResultStatus](./paramodel.actionresultstatus.md) | Defines the action result status codes:<!-- -->- <code>success</code>: The action completed successfully<!-- -->- <code>conflict</code>: A conflict prevented the action from completing successfully<!-- -->- <code>forbidden</code>: The active domain scope was not permitted to execute the action<!-- -->- <code>aborted</code>: The action was aborted<!-- -->- <code>rejected</code>: The action was rejected due to bad input<!-- -->- <code>failed</code>: The action failed to execute |
 |  [ActionResultType](./paramodel.actionresulttype.md) | Type alias for the result type of an action |
 |  [AnyActionHandler](./paramodel.anyactionhandler.md) | Type alias that matches any [ActionHandler](./paramodel.actionhandler.md) |
-|  [AnyProjection](./paramodel.anyprojection.md) |  |
-|  [ArrayAnyOperator](./paramodel.arrayanyoperator.md) |  |
-|  [ArrayOperator](./paramodel.arrayoperator.md) |  |
-|  [ChangeModel](./paramodel.changemodel.md) |  |
+|  [AnyProjection](./paramodel.anyprojection.md) | A type alias that represents any projection (state, query or entities) |
+|  [ArrayAnyOperator](./paramodel.arrayanyoperator.md) | Defines array operators that require an array operand |
+|  [ArrayOperator](./paramodel.arrayoperator.md) | Defines the array operators |
+|  [ChangeModel](./paramodel.changemodel.md) | Alias for an unknown change model |
 |  [ChangeType](./paramodel.changetype.md) | Type alias for [changes](./paramodel.change.md) in a given change model |
-|  [Comparable](./paramodel.comparable.md) |  |
-|  [ComparisonOperator](./paramodel.comparisonoperator.md) |  |
-|  [Conflict](./paramodel.conflict.md) |  |
-|  [DomainModel](./paramodel.domainmodel.md) |  |
-|  [EntityAuthFunc](./paramodel.entityauthfunc.md) |  |
-|  [EntityChangeHandlers](./paramodel.entitychangehandlers.md) |  |
-|  [EntityProjectionFunc](./paramodel.entityprojectionfunc.md) |  |
-|  [EqualityOperator](./paramodel.equalityoperator.md) |  |
-|  [Equatable](./paramodel.equatable.md) |  |
+|  [Comparable](./paramodel.comparable.md) | Represents comparable property types |
+|  [ComparisonOperator](./paramodel.comparisonoperator.md) | Defines the comparison operators |
+|  [Conflict](./paramodel.conflict.md) | Type of the well-known conflict symbol |
+|  [DomainModel](./paramodel.domainmodel.md) | Alias for a domain model |
+|  [EntityAuthFunc](./paramodel.entityauthfunc.md) | A function that authorizes access to entities |
+|  [EntityChangeHandlers](./paramodel.entitychangehandlers.md) | An object that define the change event handlers that may mutate entity states.<!-- -->Each key in this object is the name of a change event and the corresponding value is an [EntityProjectionFunc](./paramodel.entityprojectionfunc.md) that shall be invoked to apply the effect of that change. |
+|  [EntityProjectionFunc](./paramodel.entityprojectionfunc.md) | A function that mutate entity states |
+|  [EqualityOperator](./paramodel.equalityoperator.md) | Defines the equality operators |
+|  [Equatable](./paramodel.equatable.md) | Represents equatable property types |
 |  [ErrorFactory](./paramodel.errorfactory.md) |  |
-|  [FilterOperand](./paramodel.filteroperand.md) |  |
-|  [FilterOperator](./paramodel.filteroperator.md) |  |
-|  [Forbidden](./paramodel.forbidden.md) |  |
-|  [IsOperand](./paramodel.isoperand.md) |  |
-|  [IsOperator](./paramodel.isoperator.md) |  |
+|  [FilterOperand](./paramodel.filteroperand.md) | A type alias that represents a filter operand for a given property type and operator |
+|  [FilterOperator](./paramodel.filteroperator.md) | A type alias that represents a filter operator for a given property type |
+|  [Forbidden](./paramodel.forbidden.md) | Type of the well-known forbidden symbol |
+|  [IsOperand](./paramodel.isoperand.md) | Defines the type checking operands |
+|  [IsOperator](./paramodel.isoperator.md) | Defines the type checking operators |
 |  [OutputRecord](./paramodel.outputrecord.md) | A data record as returned from a [driver](./paramodel.domaindriver.md) |
-|  [PossibleKeysOf](./paramodel.possiblekeysof.md) |  |
-|  [QueryAuthFunc](./paramodel.queryauthfunc.md) |  |
-|  [QueryExecFunc](./paramodel.queryexecfunc.md) |  |
-|  [ReadModel](./paramodel.readmodel.md) |  |
-|  [SortableProps](./paramodel.sortableprops.md) |  |
-|  [SortDirection](./paramodel.sortdirection.md) |  |
+|  [PossibleKeysOf](./paramodel.possiblekeysof.md) | Extracts the possible keys of an entity type |
+|  [QueryAuthFunc](./paramodel.queryauthfunc.md) | The query authorization function |
+|  [QueryExecFunc](./paramodel.queryexecfunc.md) | The query executor function |
+|  [ReadModel](./paramodel.readmodel.md) | Alias for an unknown read model |
+|  [SortableProps](./paramodel.sortableprops.md) | Extracts sortable properties |
+|  [SortDirection](./paramodel.sortdirection.md) | Sort direction |
 |  [StateApplyFunc](./paramodel.stateapplyfunc.md) |  |
 |  [StateAuthFunc](./paramodel.stateauthfunc.md) |  |
 |  [StateChangeHandlers](./paramodel.statechangehandlers.md) |  |
-|  [StringOperator](./paramodel.stringoperator.md) |  |
-|  [View](./paramodel.view.md) |  |
-|  [ViewOf](./paramodel.viewof.md) |  |
-|  [ViewSnapshotFunc](./paramodel.viewsnapshotfunc.md) |  |
-|  [WriteModel](./paramodel.writemodel.md) |  |
+|  [StringOperator](./paramodel.stringoperator.md) | Defines the string operators |
+|  [View](./paramodel.view.md) | A type alias that represents a view |
+|  [ViewOf](./paramodel.viewof.md) | Extracts the view type of a projection |
+|  [ViewSnapshotFunc](./paramodel.viewsnapshotfunc.md) | The view snapshot function |
+|  [WriteModel](./paramodel.writemodel.md) | Alias for an unknown write model |
 

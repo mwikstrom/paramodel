@@ -4,6 +4,8 @@
 
 ## PageOptions.continuation property
 
+Optional continuation token as returned in the previous page
+
 <b>Signature:</b>
 
 ```typescript

@@ -4,6 +4,8 @@
 
 ## SortDirection type
 
+Sort direction
+
 <b>Signature:</b>
 
 ```typescript

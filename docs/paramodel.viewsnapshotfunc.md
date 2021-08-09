@@ -4,6 +4,8 @@
 
 ## ViewSnapshotFunc type
 
+The view snapshot function
+
 <b>Signature:</b>
 
 ```typescript

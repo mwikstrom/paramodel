@@ -4,6 +4,8 @@
 
 ## EntityAuthFunc type
 
+A function that authorizes access to entities
+
 <b>Signature:</b>
 
 ```typescript

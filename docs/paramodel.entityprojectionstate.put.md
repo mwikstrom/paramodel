@@ -4,6 +4,8 @@
 
 ## EntityProjectionState.put() method
 
+Writes an entity
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,8 +16,8 @@ put(this: void, props: T): void;
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  this | void |  |
-|  props | T |  |
+|  this | void | <i>(Ignored)</i> This function uses implicit <code>this</code> binding |
+|  props | T | Entity props to write |
 
 <b>Returns:</b>
 

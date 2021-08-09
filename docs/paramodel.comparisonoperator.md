@@ -4,6 +4,7 @@
 
 ## ComparisonOperator type
 
+Defines the comparison operators
 
 <b>Signature:</b>
 

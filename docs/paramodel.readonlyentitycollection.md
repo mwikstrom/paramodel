@@ -4,6 +4,8 @@
 
 ## ReadonlyEntityCollection interface
 
+A readonly collection of entities
+
 <b>Signature:</b>
 
 ```typescript

@@ -4,6 +4,7 @@
 
 ## StringOperator type
 
+Defines the string operators
 
 <b>Signature:</b>
 

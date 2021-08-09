@@ -4,6 +4,7 @@
 
 ## Comparable type
 
+Represents comparable property types
 
 <b>Signature:</b>
 

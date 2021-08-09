@@ -4,6 +4,8 @@
 
 ## QueryHandler interface
 
+A query handler - which is a stateless view projection
+
 <b>Signature:</b>
 
 ```typescript

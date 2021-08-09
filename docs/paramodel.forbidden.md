@@ -4,6 +4,8 @@
 
 ## Forbidden variable
 
+A well-known symbol that can be used to indicate that an action failed because the domain access scope is not permitted to execute it
+
 <b>Signature:</b>
 
 ```typescript

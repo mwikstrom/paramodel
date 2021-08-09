@@ -4,6 +4,8 @@
 
 ## DomainModel type
 
+Alias for a domain model
+
 <b>Signature:</b>
 
 ```typescript

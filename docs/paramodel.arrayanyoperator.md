@@ -4,6 +4,7 @@
 
 ## ArrayAnyOperator type
 
+Defines array operators that require an array operand
 
 <b>Signature:</b>
 

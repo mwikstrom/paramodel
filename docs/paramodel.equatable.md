@@ -4,6 +4,7 @@
 
 ## Equatable type
 
+Represents equatable property types
 
 <b>Signature:</b>
 

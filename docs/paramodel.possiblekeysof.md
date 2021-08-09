@@ -4,6 +4,8 @@
 
 ## PossibleKeysOf type
 
+Extracts the possible keys of an entity type
+
 <b>Signature:</b>
 
 ```typescript

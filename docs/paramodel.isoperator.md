@@ -4,6 +4,7 @@
 
 ## IsOperator type
 
+Defines the type checking operators
 
 <b>Signature:</b>
 

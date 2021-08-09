@@ -4,6 +4,8 @@
 
 ## EntityProjectionFunc type
 
+A function that mutate entity states
+
 <b>Signature:</b>
 
 ```typescript

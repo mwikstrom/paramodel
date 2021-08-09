@@ -4,6 +4,8 @@
 
 ## QueryExecFunc type
 
+The query executor function
+
 <b>Signature:</b>
 
 ```typescript

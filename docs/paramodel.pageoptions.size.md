@@ -4,6 +4,10 @@
 
 ## PageOptions.size property
 
+The desired number of items to be returned.
+
+This is only a hint, more or fewer (even zero) items may be returned. You must be prepared to handle continuation tokens to iterate over all items.
+
 <b>Signature:</b>
 
 ```typescript

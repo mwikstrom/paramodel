@@ -30,11 +30,7 @@ export interface EntityDefinition<
      * is an {@link EntityProjectionFunc} that shall be invoked to apply the effect of that
      * change.
      */
-    mutators: {
-        [K in Mutators[number]]: (
-            EntityProjectionFunc<Props, Key, Change<TypeOf<Events[K]>, K>, Pick<Views, Dependencies[number]>>
-        );
-    };
+    mutators: EntityChangeHandlers<Pick<Events, Mutators[number]>, Props, Key, Pick<Views, Dependencies[number]>>;
 
     /** An optional {@link EntityAuthFunc} that authorizes access to entities */
     auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number]>>;
@@ -99,3 +95,19 @@ export function defineEntity<
         auth,
     });
 }
+
+/**
+ * An object that define the change event handlers that may mutate entity states.
+ * 
+ * Each key in this object is the name of a change event and the corresponding value
+ * is an {@link EntityProjectionFunc} that shall be invoked to apply the effect of that
+ * change.
+ */
+export type EntityChangeHandlers<
+    Events extends ChangeModel, 
+    Props, 
+    Key extends PossibleKeysOf<Props>, 
+    Views extends ReadModel = ReadModel
+> = Partial<{
+    [E in keyof Events]: EntityProjectionFunc<Props, Key, Change<TypeOf<Events[E]>>, Views>;
+}>;

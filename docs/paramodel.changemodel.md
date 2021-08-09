@@ -4,6 +4,8 @@
 
 ## ChangeModel type
 
+Alias for an unknown change model
+
 <b>Signature:</b>
 
 ```typescript

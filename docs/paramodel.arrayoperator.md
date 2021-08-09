@@ -4,6 +4,7 @@
 
 ## ArrayOperator type
 
+Defines the array operators
 
 <b>Signature:</b>
 

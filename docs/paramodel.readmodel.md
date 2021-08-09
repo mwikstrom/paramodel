@@ -4,6 +4,8 @@
 
 ## ReadModel type
 
+Alias for an unknown read model
+
 <b>Signature:</b>
 
 ```typescript

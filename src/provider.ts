@@ -4,6 +4,10 @@ import { _ProviderImpl } from "./internal/provider-impl";
 import { DomainModel } from "./model";
 import { DomainStore } from "./store";
 
+/**
+ * Provides access to {@link DomainStore|domain stores}.
+ * @public
+ */
 export interface DomainProvider {
     get<Model extends DomainModel>(
         this: void,
@@ -13,6 +17,11 @@ export interface DomainProvider {
     ): Promise<DomainStore<Model>>;
 }
 
-export function createDomainProvider(driver: DomainDriver): DomainProvider {
+/**
+ * Creates a {@link DomainProvider} for the specified driver
+ * @param this - <i>(Ignored)</i> This function uses implicit `this` binding
+ * @param driver - The driver that shall be used by the new provider
+ */
+export function createDomainProvider(this: void, driver: DomainDriver): DomainProvider {
     return new _ProviderImpl(driver);
 }

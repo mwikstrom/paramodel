@@ -4,6 +4,8 @@
 
 ## View type
 
+A type alias that represents a view
+
 <b>Signature:</b>
 
 ```typescript

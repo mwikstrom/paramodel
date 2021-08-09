@@ -4,6 +4,8 @@
 
 ## Conflict variable
 
+A well-known symbol that can be used to indicate that an action failed due to a conflict
+
 <b>Signature:</b>
 
 ```typescript

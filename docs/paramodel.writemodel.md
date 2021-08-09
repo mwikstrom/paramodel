@@ -4,6 +4,8 @@
 
 ## WriteModel type
 
+Alias for an unknown write model
+
 <b>Signature:</b>
 
 ```typescript

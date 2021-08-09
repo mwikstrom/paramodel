@@ -4,6 +4,8 @@
 
 ## EntityView interface
 
+A snapshot of entities
+
 <b>Signature:</b>
 
 ```typescript

@@ -4,6 +4,8 @@
 
 ## QueryAuthFunc type
 
+The query authorization function
+
 <b>Signature:</b>
 
 ```typescript

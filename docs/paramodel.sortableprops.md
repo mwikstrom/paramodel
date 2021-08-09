@@ -4,6 +4,7 @@
 
 ## SortableProps type
 
+Extracts sortable properties
 
 <b>Signature:</b>
 

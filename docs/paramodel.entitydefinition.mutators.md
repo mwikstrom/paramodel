@@ -11,7 +11,5 @@ Each key in this object is the name of a change event and the corresponding valu
 <b>Signature:</b>
 
 ```typescript
-mutators: {
-        [K in Mutators[number]]: (EntityProjectionFunc<Props, Key, Change<TypeOf<Events[K]>, K>, Pick<Views, Dependencies[number]>>);
-    };
+mutators: EntityChangeHandlers<Pick<Events, Mutators[number]>, Props, Key, Pick<Views, Dependencies[number]>>;
 ```

@@ -4,6 +4,8 @@
 
 ## AnyProjection type
 
+A type alias that represents any projection (state, query or entities)
+
 <b>Signature:</b>
 
 ```typescript
