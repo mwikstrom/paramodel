@@ -4,6 +4,8 @@
 
 ## Change interface
 
+Data for a change event that has occurred
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,9 +16,9 @@ export interface Change<T = unknown, K extends string = string>
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [arg](./paramodel.change.arg.md) | T |  |
-|  [key](./paramodel.change.key.md) | K |  |
-|  [position](./paramodel.change.position.md) | number |  |
-|  [timestamp](./paramodel.change.timestamp.md) | Date |  |
-|  [version](./paramodel.change.version.md) | number |  |
+|  [arg](./paramodel.change.arg.md) | T | The change event argument |
+|  [key](./paramodel.change.key.md) | K | The change event key |
+|  [position](./paramodel.change.position.md) | number | Position of the change event among all committed events |
+|  [timestamp](./paramodel.change.timestamp.md) | Date | Timestamp when the change event was comitted |
+|  [version](./paramodel.change.version.md) | number | The commit version in which the change occurred |
 

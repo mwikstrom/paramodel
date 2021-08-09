@@ -4,6 +4,8 @@
 
 ## Change.version property
 
+The commit version in which the change occurred
+
 <b>Signature:</b>
 
 ```typescript

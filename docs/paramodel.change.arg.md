@@ -4,6 +4,8 @@
 
 ## Change.arg property
 
+The change event argument
+
 <b>Signature:</b>
 
 ```typescript

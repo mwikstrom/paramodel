@@ -67,24 +67,19 @@ export type ArrayAnyOperator = ("includes-any" | "not-includes-any");
 // @public (undocumented)
 export type ArrayOperator = ("includes" | "not-includes" | ArrayAnyOperator);
 
-// @public (undocumented)
+// @public
 export interface Change<T = unknown, K extends string = string> {
-    // (undocumented)
     readonly arg: T;
-    // (undocumented)
     readonly key: K;
-    // (undocumented)
     readonly position: number;
-    // (undocumented)
     readonly timestamp: Date;
-    // (undocumented)
     readonly version: number;
 }
 
 // @public (undocumented)
 export type ChangeModel<K extends string = string, T = unknown> = Readonly<Record<K, Type<T>>>;
 
-// @public (undocumented)
+// @public
 export type ChangeType<Model extends ChangeModel> = {
     [K in keyof Model]: K extends string ? Change<TypeOf<Model[K]>, K> : never;
 }[keyof Model];

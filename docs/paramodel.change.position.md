@@ -4,6 +4,8 @@
 
 ## Change.position property
 
+Position of the change event among all committed events
+
 <b>Signature:</b>
 
 ```typescript

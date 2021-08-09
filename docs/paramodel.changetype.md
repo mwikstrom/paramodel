@@ -4,6 +4,8 @@
 
 ## ChangeType type
 
+Type alias for [changes](./paramodel.change.md) in a given change model
+
 <b>Signature:</b>
 
 ```typescript

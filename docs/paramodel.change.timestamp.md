@@ -4,6 +4,8 @@
 
 ## Change.timestamp property
 
+Timestamp when the change event was comitted
+
 <b>Signature:</b>
 
 ```typescript

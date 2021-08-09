@@ -25,7 +25,7 @@ Run-time domain model for event-sourcing.
 |  [ActionHandler](./paramodel.actionhandler.md) | A domain action handler |
 |  [ActionOptions](./paramodel.actionoptions.md) | Options for executing an action |
 |  [ActionResult](./paramodel.actionresult.md) | The result of executing an action |
-|  [Change](./paramodel.change.md) |  |
+|  [Change](./paramodel.change.md) | Data for a change event that has occurred |
 |  [DomainDriver](./paramodel.domaindriver.md) |  |
 |  [DomainProvider](./paramodel.domainprovider.md) |  |
 |  [DomainStore](./paramodel.domainstore.md) |  |
@@ -71,7 +71,7 @@ Run-time domain model for event-sourcing.
 |  [ArrayAnyOperator](./paramodel.arrayanyoperator.md) |  |
 |  [ArrayOperator](./paramodel.arrayoperator.md) |  |
 |  [ChangeModel](./paramodel.changemodel.md) |  |
-|  [ChangeType](./paramodel.changetype.md) |  |
+|  [ChangeType](./paramodel.changetype.md) | Type alias for [changes](./paramodel.change.md) in a given change model |
 |  [Comparable](./paramodel.comparable.md) |  |
 |  [ComparisonOperator](./paramodel.comparisonoperator.md) |  |
 |  [Conflict](./paramodel.conflict.md) |  |
