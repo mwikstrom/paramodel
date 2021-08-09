@@ -21,12 +21,19 @@ const exec: AccountAction<"accounts", WithdrawMoney> = async ({
     view,
 }) => {
     const found = await (await view("accounts")).get(account_id);
-    if (!found || found.owner_id !== user_id) {
-        return forbidden();
+
+    if (!found) {
+        return conflict("Account does not exist");
     }
+
+    if (found.owner_id !== user_id) {
+        return forbidden("Only account owner is allowed to withdraw money");
+    }
+
     if (found.balance < amount) {
-        return conflict();
+        return conflict("Insufficient funds");
     }
+
     emit("money_withdrawn", { account_id, amount });
 };
 

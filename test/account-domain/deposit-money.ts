@@ -15,14 +15,21 @@ const inputType = recordType<DepositMoney>({
 const exec: AccountAction<"accounts", DepositMoney> = async ({
     scope: { user_id }, 
     input: { account_id, amount },
+    conflict,
     forbidden,
     emit,
     view,
 }) => {
     const found = await (await view("accounts")).get(account_id);
-    if (!found || found.owner_id !== user_id) {
-        forbidden();
+
+    if (!found) {
+        return conflict("Account does not exist");
     }
+
+    if (found.owner_id !== user_id) {
+        return forbidden("Only account owner is allowed to deposit money");
+    }
+
     emit("money_deposited", { account_id, amount });
 };
 
