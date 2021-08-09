@@ -29,7 +29,17 @@ import { _parseVersionFromViewStateRowKey, _partitionKeys, _rowKeys } from "./da
 import { _logInfo } from "./log";
 import { _QueryImpl } from "./query-impl";
 import { _DriverQuerySource, _QuerySource } from "./query-source";
-import { _getMinSyncVersion, _MaterialViewKind, _materialViewKindType, _viewHeader, _ViewHeader } from "./view-header";
+import { 
+    _getMinSyncVersion, 
+    _getSyncInfoFromRecord, 
+    _getViewHeaderRecordForCommit, 
+    _getViewHeaderRecordForPurge, 
+    _MaterialViewKind, 
+    _materialViewKindType, 
+    _SyncViewInfo, 
+    _viewHeader, 
+    _ViewHeader 
+} from "./view-header";
 
 // TODO: Continuation tokens must include version and timestamp and shall expire when too old
 //       (older than purge ttl) - or be renewed in case version is still not purged!
@@ -390,10 +400,10 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
     #getSyncInfoMap = async (
         viewKeys: readonly string[]
-    ): Promise<Map<string, SyncViewInfo>> => new Map<string, SyncViewInfo>(
+    ): Promise<Map<string, _SyncViewInfo>> => new Map<string, _SyncViewInfo>(
         (await Promise.all(viewKeys.map(this.#getViewHeaderRecord))).map((record, index) => ([
             viewKeys[index],
-            getSyncInfoFromRecord(record),
+            _getSyncInfoFromRecord(record),
         ]))    
     );    
 
@@ -518,7 +528,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     }
 
     #syncNext = async (
-        infoMap: Map<string, SyncViewInfo>,
+        infoMap: Map<string, _SyncViewInfo>,
         last?: number,
         signal?: AbortSignal,
     ): Promise<number> => {
@@ -600,7 +610,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return synced;
     }
 
-    #syncCommit = async (commit: _Commit, infoMap: Map<string, SyncViewInfo>, keys: Set<string>): Promise<boolean> => {
+    #syncCommit = async (commit: _Commit, infoMap: Map<string, _SyncViewInfo>, keys: Set<string>): Promise<boolean> => {
         for (const key of keys) {
             const info = infoMap.get(key);
             const definition = this.#model.views[key];
@@ -817,19 +827,19 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         commit: _Commit,
         key: string,
         kind: _MaterialViewKind,
-        prev: SyncViewInfo,
+        prev: _SyncViewInfo,
         modified: boolean
-    ): Promise<SyncViewInfo | undefined> => this.#storeViewHeader(
+    ): Promise<_SyncViewInfo | undefined> => this.#storeViewHeader(
         key, 
         prev, 
-        info => getViewHeaderRecordForCommit(commit, info, kind, modified)
+        info => _getViewHeaderRecordForCommit(commit, info, kind, modified)
     );
 
     #storeViewHeaderForPurge = async (
         key: string,
         purgeVersion: number,
-        prev: SyncViewInfo,
-    ): Promise<SyncViewInfo | undefined> => {
+        prev: _SyncViewInfo,
+    ): Promise<_SyncViewInfo | undefined> => {
         const definition = this.#model.views[key];
         if (!definition) {
             return void(0);
@@ -843,15 +853,15 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return await this.#storeViewHeader(
             key, 
             prev, 
-            info => getViewHeaderRecordForPurge(purgeVersion, info, kind)
+            info => _getViewHeaderRecordForPurge(purgeVersion, info, kind)
         );
     }
 
     #storeViewHeader = async (
         key: string, 
-        prev: SyncViewInfo, 
-        update: (info: SyncViewInfo) => InputRecord | undefined
-    ): Promise<SyncViewInfo | undefined> => {
+        prev: _SyncViewInfo, 
+        update: (info: _SyncViewInfo) => InputRecord | undefined
+    ): Promise<_SyncViewInfo | undefined> => {
         const pk = _partitionKeys.view(key);
         for (;;) {
             const input = update(prev);
@@ -862,18 +872,18 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             let output = await this.#driver.write(this.#id, pk, input);
 
             if (output) {
-                return getSyncInfoFromRecord(output);
+                return _getSyncInfoFromRecord(output);
             }
 
             // Update token mismatch. Read current header and try again (loop continues)
             output = await this.#driver.read(this.#id, pk, input.key);
-            prev = getSyncInfoFromRecord(output);
+            prev = _getSyncInfoFromRecord(output);
         }
     }
 
     #expirePurgedViewData = async (
         key: string,
-        info: SyncViewInfo,
+        info: _SyncViewInfo,
         signal?: AbortSignal
     ): Promise<boolean> => {
         if (info.purged_from_version !== 0) {
@@ -1293,169 +1303,6 @@ const authErrorFromOptions = (options: Partial<Pick<ViewOptions, "auth">>): Erro
         return defaultAuthError;
     } else {
         return void(0);
-    }
-};
-
-// TODO: Declare using Omit<ViewHeader, "kind"> + update token
-type SyncViewInfo = {
-    readonly update_token: string | null;
-    readonly sync_version: number;
-    readonly sync_position: number;
-    readonly sync_timestamp?: Date;
-    readonly last_change_version: number;
-    readonly last_change_timestamp?: Date;
-    readonly purged_from_version: number;
-    readonly purged_until_version: number;
-}
-
-const getSyncInfoFromRecord = (record: OutputRecord | undefined): SyncViewInfo => {
-    let update_token: string | null = null;
-    let sync_version = 0;
-    let sync_position = 0;
-    let sync_timestamp: Date | undefined = void(0);
-    let last_change_version = 0;
-    let last_change_timestamp: Date | undefined = void(0);
-    let purged_from_version = 0;
-    let purged_until_version = 0;
-
-    if (record) {
-        const header = _viewHeader.fromJsonValue(record.value);
-        update_token = record.token;
-        sync_version = header.sync_version;
-        sync_position = header.sync_position;
-        sync_timestamp = header.sync_timestamp;
-        last_change_version = header.last_change_version;
-        last_change_timestamp = header.last_change_timestamp;
-        purged_from_version = header.purged_from_version;
-        purged_until_version = header.purged_until_version;
-    }
-
-    return Object.freeze({
-        update_token,
-        sync_version, 
-        sync_position,
-        sync_timestamp,
-        last_change_version,
-        last_change_timestamp,
-        purged_from_version, 
-        purged_until_version, 
-    });
-};
-
-const getViewHeaderRecordForPurge = (
-    purgeVersion: number,
-    prev: SyncViewInfo,
-    kind: _MaterialViewKind,
-): InputRecord | undefined => {
-    const header = getViewHeaderForPurge(purgeVersion, prev, kind);
-    return getViewHeaderRecord(header, prev.update_token);
-};
-
-const getViewHeaderRecordForCommit = (
-    commit: _Commit,
-    prev: SyncViewInfo,
-    kind: _MaterialViewKind,
-    modified: boolean,
-): InputRecord | undefined => {
-    const header = getViewHeaderForCommit(commit, prev, kind, modified);
-    return getViewHeaderRecord(header, prev.update_token);
-};
-
-const getViewHeaderRecord = (
-    header: _ViewHeader | undefined,
-    token: string | null,
-): InputRecord | undefined => {
-    if(!header) {
-        return void(0);
-    }
-
-    const jsonHeader = _viewHeader.toJsonValue(header, msg => new Error(`Failed to serialize view header: ${msg}`));
-    const input: InputRecord = {
-        key: _rowKeys.viewHeader,
-        value: jsonHeader,
-        replace: token,
-        ttl: -1,
-    };
-
-    return input;
-};
-
-const getViewHeaderForPurge = (
-    purgeVersion: number,
-    prev: SyncViewInfo,
-    kind: _MaterialViewKind,
-): _ViewHeader | undefined => {
-    if (prev.sync_version <= purgeVersion || !prev.sync_timestamp || !prev.last_change_timestamp) {
-        return void(0);
-    }
-
-    const header: _ViewHeader = Object.freeze({
-        kind,
-        sync_version: prev.sync_version,
-        sync_position: prev.sync_position,
-        sync_timestamp: prev.sync_timestamp,
-        last_change_version: prev.last_change_version,
-        last_change_timestamp: prev.last_change_timestamp,
-        purged_from_version: 0,
-        purged_until_version: Math.max(prev.purged_until_version, purgeVersion),
-    });
-
-    return header;
-};
-
-const getViewHeaderForCommit = (
-    commit: _Commit,
-    prev: SyncViewInfo,
-    kind: _MaterialViewKind,
-    modified: boolean,
-): _ViewHeader | undefined => {
-    if (prev.sync_version < commit.version) {
-        let last_change_timestamp: Date;
-
-        if (modified) {
-            last_change_timestamp = commit.timestamp;
-        } else if (!prev.last_change_timestamp) {
-            throw new Error("Unmodified change must have previous timestamp");
-        } else {
-            last_change_timestamp = prev.last_change_timestamp;
-        }
-
-        const header: _ViewHeader = Object.freeze({
-            kind,
-            sync_version: commit.version,
-            sync_position: commit.position + commit.changes.length,
-            sync_timestamp: commit.timestamp,
-            last_change_version: modified ? commit.version : prev.last_change_version,
-            last_change_timestamp,
-            purged_from_version: prev.purged_from_version,
-            purged_until_version: prev.purged_until_version,
-        });
-
-        return header;
-    } else if (prev.purged_from_version <= commit.version && prev.purged_until_version >= commit.version) {
-        let purged_from_version = commit.version + 1;
-        let purged_until_version = prev.purged_until_version;
-
-        if (purged_from_version > purged_until_version) {
-            purged_from_version = purged_until_version = 0;
-        }
-
-        if (!prev.sync_timestamp || !prev.last_change_timestamp) {
-            throw new Error("Non-latest change must have previous timestamp");
-        }
-
-        const header: _ViewHeader = Object.freeze({
-            kind,
-            sync_version: prev.sync_version,
-            sync_position: prev.sync_position,
-            sync_timestamp: prev.sync_timestamp,
-            last_change_version: prev.last_change_version,
-            last_change_timestamp: prev.last_change_timestamp,
-            purged_from_version,
-            purged_until_version,
-        });
-
-        return header;
     }
 };
 
