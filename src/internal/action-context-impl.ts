@@ -55,11 +55,15 @@ export class _ActionContextImpl<
             const symbol = await this.#handler.exec(this);
 
             if (symbol === Forbidden) {
-                this.#status = "forbidden";
-                this.#message = void(0);
+                if (this.#status !== "forbidden") {
+                    this.#status = "forbidden";
+                    this.#message = void(0);
+                }
             } else if (symbol === Conflict) {
-                this.#status = "forbidden";
-                this.#message = void(0);
+                if (this.#status !== "conflict") {
+                    this.#status = "conflict";
+                    this.#message = void(0);
+                }
             } else if (symbol !== void(0)) {
                 this.#status = "failed";
                 this.#message = "Action handler returned unknown symbol";
