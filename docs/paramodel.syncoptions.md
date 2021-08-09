@@ -4,6 +4,8 @@
 
 ## SyncOptions interface
 
+Options for synchronizing views
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,7 +16,7 @@ export interface SyncOptions<K extends string = string>
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [signal](./paramodel.syncoptions.signal.md) | AbortSignal |  |
-|  [target](./paramodel.syncoptions.target.md) | number |  |
-|  [views](./paramodel.syncoptions.views.md) | readonly K\[\] |  |
+|  [signal](./paramodel.syncoptions.signal.md) | AbortSignal | An abort signal that shall be observed while views are synchronized |
+|  [target](./paramodel.syncoptions.target.md) | number | The minimum commit version that shall be synchronized |
+|  [views](./paramodel.syncoptions.views.md) | readonly K\[\] | An array of view keys that shall be synchronized.<!-- -->Omit this property to synchronize all views. |
 

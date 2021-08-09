@@ -4,6 +4,8 @@
 
 ## SyncOptions.target property
 
+The minimum commit version that shall be synchronized
+
 <b>Signature:</b>
 
 ```typescript

@@ -4,6 +4,8 @@
 
 ## ViewStatus.last\_change\_version property
 
+Version number of the latest commit that mutated the view
+
 <b>Signature:</b>
 
 ```typescript

@@ -4,6 +4,8 @@
 
 ## PurgeOptions interface
 
+Options for purging views
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,5 +16,5 @@ export interface PurgeOptions
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [signal](./paramodel.purgeoptions.signal.md) | AbortSignal |  |
+|  [signal](./paramodel.purgeoptions.signal.md) | AbortSignal | An abort signal that shall be observed while views are purged |
 

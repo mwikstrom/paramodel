@@ -4,6 +4,8 @@
 
 ## DomainStore.stat() method
 
+Returns status of the current store
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,7 +16,7 @@ stat(this: void): Promise<DomainStoreStatus>;
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  this | void |  |
+|  this | void | <i>(Ignored)</i> This function uses implicit <code>this</code> binding |
 
 <b>Returns:</b>
 

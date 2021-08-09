@@ -4,6 +4,8 @@
 
 ## ViewStatus interface
 
+Status for a view
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,11 +16,11 @@ export interface ViewStatus
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [last\_change\_timestamp?](./paramodel.viewstatus.last_change_timestamp.md) | Date | <i>(Optional)</i> |
-|  [last\_change\_version](./paramodel.viewstatus.last_change_version.md) | number |  |
-|  [purged\_from\_version](./paramodel.viewstatus.purged_from_version.md) | number |  |
-|  [purged\_until\_version](./paramodel.viewstatus.purged_until_version.md) | number |  |
-|  [sync\_position](./paramodel.viewstatus.sync_position.md) | number |  |
-|  [sync\_timestamp?](./paramodel.viewstatus.sync_timestamp.md) | Date | <i>(Optional)</i> |
-|  [sync\_version](./paramodel.viewstatus.sync_version.md) | number |  |
+|  [last\_change\_timestamp?](./paramodel.viewstatus.last_change_timestamp.md) | Date | <i>(Optional)</i> Timestamp of the latest commit that mutated the view, or <code>undefined</code> when no commit has mutated the view. |
+|  [last\_change\_version](./paramodel.viewstatus.last_change_version.md) | number | Version number of the latest commit that mutated the view |
+|  [purged\_from\_version](./paramodel.viewstatus.purged_from_version.md) | number | The first version number that is purged |
+|  [purged\_until\_version](./paramodel.viewstatus.purged_until_version.md) | number | The last version number that is purged |
+|  [sync\_position](./paramodel.viewstatus.sync_position.md) | number | The total number of change events that the view is synchronized with |
+|  [sync\_timestamp?](./paramodel.viewstatus.sync_timestamp.md) | Date | <i>(Optional)</i> The timestamp of the latest commit that the view is syncrhonzied with, or <code>undefined</code> when the view is not synchronized. |
+|  [sync\_version](./paramodel.viewstatus.sync_version.md) | number | The commit version number that the view is synchronized with |
 

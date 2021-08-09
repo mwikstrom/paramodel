@@ -204,6 +204,7 @@ export type OutputRecord = {
 /**
  * Creates an in-memory {@link DomainDriver|driver} that could be used to testing your domain
  * @param this - <i>(Ignored)</i> This method uses implicit `this` binding
+ * @public
  */
 export function createMemoryDriver(this: void): DomainDriver {
     return new _MemoryDriver(_defaultTimeSource);

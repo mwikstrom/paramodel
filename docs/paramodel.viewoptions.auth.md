@@ -4,6 +4,12 @@
 
 ## ViewOptions.auth property
 
+Specifies whether the view shall use authorization.
+
+Authorization is skipped by default. To enable authorization set this property to `true` or an [ErrorFactory](./paramodel.errorfactory.md) callback function.
+
+The callback function is invoked to create the error that shall be thrown when view access is forbidden.
+
 <b>Signature:</b>
 
 ```typescript

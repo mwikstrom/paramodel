@@ -4,6 +4,8 @@
 
 ## DomainStore interface
 
+A domain store
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,10 +16,10 @@ export interface DomainStore<Model extends DomainModel>
 
 |  Method | Description |
 |  --- | --- |
-|  [do(this, key, input, options)](./paramodel.domainstore.do.md) |  |
-|  [purge(this, options)](./paramodel.domainstore.purge.md) |  |
-|  [read(this, options)](./paramodel.domainstore.read.md) |  |
-|  [stat(this)](./paramodel.domainstore.stat.md) |  |
-|  [sync(this, options)](./paramodel.domainstore.sync.md) |  |
-|  [view(this, key, options)](./paramodel.domainstore.view.md) |  |
+|  [do(this, key, input, options)](./paramodel.domainstore.do.md) | Executes an action |
+|  [purge(this, options)](./paramodel.domainstore.purge.md) | Purges the views of the current store |
+|  [read(this, options)](./paramodel.domainstore.read.md) | Reads change history |
+|  [stat(this)](./paramodel.domainstore.stat.md) | Returns status of the current store |
+|  [sync(this, options)](./paramodel.domainstore.sync.md) | Synchronizes the views of the current store |
+|  [view(this, key, options)](./paramodel.domainstore.view.md) | Gets a view snapshot |
 

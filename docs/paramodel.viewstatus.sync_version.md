@@ -4,6 +4,8 @@
 
 ## ViewStatus.sync\_version property
 
+The commit version number that the view is synchronized with
+
 <b>Signature:</b>
 
 ```typescript

@@ -4,6 +4,8 @@
 
 ## ReadOptions interface
 
+Options for reading change history
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,9 +16,9 @@ export interface ReadOptions<K extends string>
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [excludeFirst](./paramodel.readoptions.excludefirst.md) | boolean |  |
-|  [excludeLast](./paramodel.readoptions.excludelast.md) | boolean |  |
-|  [filter](./paramodel.readoptions.filter.md) | readonly K\[\] |  |
-|  [first](./paramodel.readoptions.first.md) | number |  |
-|  [last](./paramodel.readoptions.last.md) | number |  |
+|  [excludeFirst](./paramodel.readoptions.excludefirst.md) | boolean | When <code>true</code>, reading starts after the specified first version number |
+|  [excludeLast](./paramodel.readoptions.excludelast.md) | boolean | When <code>false</code>, reading stops before the last version number |
+|  [filter](./paramodel.readoptions.filter.md) | readonly K\[\] | An optional array of change event keys that shall be read |
+|  [first](./paramodel.readoptions.first.md) | number | The first version number to read |
+|  [last](./paramodel.readoptions.last.md) | number | The last version number to read |
 

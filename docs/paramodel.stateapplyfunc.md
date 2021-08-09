@@ -4,6 +4,8 @@
 
 ## StateApplyFunc type
 
+A function that mutates projected state
+
 <b>Signature:</b>
 
 ```typescript

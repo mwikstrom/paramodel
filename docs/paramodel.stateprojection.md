@@ -4,6 +4,8 @@
 
 ## StateProjection interface
 
+Simple state projection
+
 <b>Signature:</b>
 
 ```typescript

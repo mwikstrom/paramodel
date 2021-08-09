@@ -11,7 +11,5 @@ Each key in this object is the name of a change event and the corresponding valu
 <b>Signature:</b>
 
 ```typescript
-mutators: {
-        [K in Mutators[number]]: StateApplyFunc<Change<Events[K], K>, State, Pick<Views, Dependencies[number]>>;
-    };
+mutators: StateChangeHandlers<Pick<Events, Mutators[number]>, State, Pick<Views, Dependencies[number]>>;
 ```

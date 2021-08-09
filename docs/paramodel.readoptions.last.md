@@ -4,6 +4,8 @@
 
 ## ReadOptions.last property
 
+The last version number to read
+
 <b>Signature:</b>
 
 ```typescript

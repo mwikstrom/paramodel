@@ -1,4 +1,4 @@
-import { Type } from "paratype";
+import { Type, TypeOf } from "paratype";
 import { Change } from "./change";
 import { ChangeModel, ReadModel } from "./model";
 import { StateApplyFunc, StateAuthFunc, StateProjection } from "./state-projection";
@@ -28,9 +28,7 @@ export interface StateDefinition<
      * is an {@link StateApplyFunc} that shall be invoked to apply the effect of that
      * change.
      */
-     mutators: {
-        [K in Mutators[number]]: StateApplyFunc<Change<Events[K], K>, State, Pick<Views, Dependencies[number]>>;
-    };
+    mutators: StateChangeHandlers<Pick<Events, Mutators[number]>, State, Pick<Views, Dependencies[number]>>;
 
     /** An optional {@link StateAuthFunc} that authorizes access to the defined state */
     auth?: StateAuthFunc<Scope, State, Pick<Views, Dependencies[number]>>;
@@ -43,6 +41,23 @@ export interface StateDefinition<
      */
     dependencies?: Dependencies;
 }
+
+/**
+ * An object that define the change event handlers that may mutate the defined state.
+ * 
+ * Each key in this object is the name of a change event and the corresponding value
+ * is an {@link StateApplyFunc} that shall be invoked to apply the effect of that
+ * change.
+ * 
+ * @public
+ */
+export type StateChangeHandlers<
+    Events extends ChangeModel,
+    State,
+    Views extends ReadModel = ReadModel
+> = Partial<{
+    [K in keyof Events]: StateApplyFunc<Change<TypeOf<Events[K]>>, State, Views>;
+}>;
 
 /**
  * Creates a {@link StateProjection}

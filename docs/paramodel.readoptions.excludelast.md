@@ -4,6 +4,8 @@
 
 ## ReadOptions.excludeLast property
 
+When `false`<!-- -->, reading stops before the last version number
+
 <b>Signature:</b>
 
 ```typescript

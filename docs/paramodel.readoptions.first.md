@@ -4,6 +4,8 @@
 
 ## ReadOptions.first property
 
+The first version number to read
+
 <b>Signature:</b>
 
 ```typescript

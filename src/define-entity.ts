@@ -45,6 +45,24 @@ export interface EntityDefinition<
 }
 
 /**
+ * An object that define the change event handlers that may mutate entity states.
+ * 
+ * Each key in this object is the name of a change event and the corresponding value
+ * is an {@link EntityProjectionFunc} that shall be invoked to apply the effect of that
+ * change.
+ * 
+ * @public
+ */
+export type EntityChangeHandlers<
+    Events extends ChangeModel, 
+    Props, 
+    Key extends PossibleKeysOf<Props>, 
+    Views extends ReadModel = ReadModel
+> = Partial<{
+    [E in keyof Events]: EntityProjectionFunc<Props, Key, Change<TypeOf<Events[E]>>, Views>;
+}>;
+
+/**
  * Creates an {@link EntityProjection}
  * @param this - <i>(Ignored)</i> This function uses implicit `this` binding
  * @param definition - Entity definition
@@ -95,19 +113,3 @@ export function defineEntity<
         auth,
     });
 }
-
-/**
- * An object that define the change event handlers that may mutate entity states.
- * 
- * Each key in this object is the name of a change event and the corresponding value
- * is an {@link EntityProjectionFunc} that shall be invoked to apply the effect of that
- * change.
- */
-export type EntityChangeHandlers<
-    Events extends ChangeModel, 
-    Props, 
-    Key extends PossibleKeysOf<Props>, 
-    Views extends ReadModel = ReadModel
-> = Partial<{
-    [E in keyof Events]: EntityProjectionFunc<Props, Key, Change<TypeOf<Events[E]>>, Views>;
-}>;

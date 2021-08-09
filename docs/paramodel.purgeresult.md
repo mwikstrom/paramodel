@@ -4,6 +4,8 @@
 
 ## PurgeResult interface
 
+The result of running a purge operation
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,5 +16,5 @@ export interface PurgeResult
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [done](./paramodel.purgeresult.done.md) | boolean |  |
+|  [done](./paramodel.purgeresult.done.md) | boolean | Specifies whether the purge operation ran to completion, or whether another call is required. |
 

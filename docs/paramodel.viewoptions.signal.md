@@ -4,6 +4,8 @@
 
 ## ViewOptions.signal property
 
+An abort signal that shall be observed while the snapshot is prepared
+
 <b>Signature:</b>
 
 ```typescript

@@ -21,6 +21,7 @@ export interface DomainProvider {
  * Creates a {@link DomainProvider} for the specified driver
  * @param this - <i>(Ignored)</i> This function uses implicit `this` binding
  * @param driver - The driver that shall be used by the new provider
+ * @public
  */
 export function createDomainProvider(this: void, driver: DomainDriver): DomainProvider {
     return new _ProviderImpl(driver);

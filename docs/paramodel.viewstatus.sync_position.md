@@ -4,6 +4,8 @@
 
 ## ViewStatus.sync\_position property
 
+The total number of change events that the view is synchronized with
+
 <b>Signature:</b>
 
 ```typescript

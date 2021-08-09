@@ -4,6 +4,8 @@
 
 ## ViewStatus.sync\_timestamp property
 
+The timestamp of the latest commit that the view is syncrhonzied with, or `undefined` when the view is not synchronized.
+
 <b>Signature:</b>
 
 ```typescript

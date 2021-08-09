@@ -4,6 +4,8 @@
 
 ## DomainStoreStatus.timestamp property
 
+Timestamp of the latest commit, or `undefined` when change history is empty
+
 <b>Signature:</b>
 
 ```typescript

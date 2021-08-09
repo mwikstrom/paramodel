@@ -4,6 +4,8 @@
 
 ## DomainStoreStatus.views property
 
+Status for each defined view
+
 <b>Signature:</b>
 
 ```typescript

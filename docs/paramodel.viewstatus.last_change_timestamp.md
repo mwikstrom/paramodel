@@ -4,6 +4,8 @@
 
 ## ViewStatus.last\_change\_timestamp property
 
+Timestamp of the latest commit that mutated the view, or `undefined` when no commit has mutated the view.
+
 <b>Signature:</b>
 
 ```typescript

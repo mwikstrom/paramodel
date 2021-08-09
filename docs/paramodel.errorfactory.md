@@ -4,6 +4,8 @@
 
 ## ErrorFactory type
 
+A function that creates an error to be thrown
+
 <b>Signature:</b>
 
 ```typescript

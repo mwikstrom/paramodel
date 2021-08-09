@@ -4,6 +4,8 @@
 
 ## DomainStoreStatus.version property
 
+The latest comitted version number
+
 <b>Signature:</b>
 
 ```typescript

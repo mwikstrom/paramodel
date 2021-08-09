@@ -146,31 +146,21 @@ export interface DomainProvider {
     get<Model extends DomainModel>(this: void, id: string, model: Model, scope: TypeOf<Model["scope"]>): Promise<DomainStore<Model>>;
 }
 
-// @public (undocumented)
+// @public
 export interface DomainStore<Model extends DomainModel> {
-    // (undocumented)
     do<K extends string & keyof Model["actions"]>(this: void, key: K, input: TypeOf<Model["actions"][K]["input"]>, options?: ActionOptions): Promise<ActionResultType<Model, K>>;
-    // (undocumented)
     purge(this: void, options?: Partial<PurgeOptions>): Promise<PurgeResult>;
-    // (undocumented)
     read(this: void, options?: Partial<ReadOptions<string & keyof Model["events"]>>): AsyncIterable<ChangeType<Model["events"]>>;
-    // (undocumented)
     stat(this: void): Promise<DomainStoreStatus>;
-    // (undocumented)
     sync<K extends string & keyof Model["views"]>(this: void, options?: Partial<SyncOptions<K>>): Promise<number>;
-    // (undocumented)
     view<K extends string & keyof Model["views"]>(this: void, key: K, options?: Partial<ViewOptions>): Promise<ViewOf<Model["views"][K]> | undefined>;
 }
 
-// @public (undocumented)
+// @public
 export interface DomainStoreStatus {
-    // (undocumented)
     readonly position: number;
-    // (undocumented)
     readonly timestamp?: Date;
-    // (undocumented)
     readonly version: number;
-    // (undocumented)
     readonly views: Readonly<Record<string, ViewStatus>>;
 }
 
@@ -233,7 +223,7 @@ export type EqualityOperator = "==" | "!=" | "in" | "not-in";
 // @public
 export type Equatable = null | boolean | Comparable;
 
-// @public (undocumented)
+// @public
 export type ErrorFactory = () => Error;
 
 // @public
@@ -295,15 +285,13 @@ export type PossibleKeysOf<T> = {
     [P in keyof T]: T[P] extends (string | number | unknown) ? P extends string ? P : never : never;
 }[keyof T];
 
-// @public (undocumented)
+// @public
 export interface PurgeOptions {
-    // (undocumented)
     readonly signal: AbortSignal;
 }
 
-// @public (undocumented)
+// @public
 export interface PurgeResult {
-    // (undocumented)
     readonly done: boolean;
 }
 
@@ -383,17 +371,12 @@ export interface ReadonlyEntityCollection<T, K extends PossibleKeysOf<T> = Possi
     get(this: void, key: T[K]): Promise<T | undefined>;
 }
 
-// @public (undocumented)
+// @public
 export interface ReadOptions<K extends string> {
-    // (undocumented)
     readonly excludeFirst: boolean;
-    // (undocumented)
     readonly excludeLast: boolean;
-    // (undocumented)
     readonly filter: readonly K[];
-    // (undocumented)
     readonly first: number;
-    // (undocumented)
     readonly last: number;
 }
 
@@ -411,15 +394,15 @@ export interface SortSpec {
     readonly path: readonly string[];
 }
 
-// @public (undocumented)
+// @public
 export type StateApplyFunc<C extends Change = Change, T = unknown, R extends ReadModel = ReadModel> = (this: void, change: C, before: T, view: ViewSnapshotFunc<R>) => Promise<T>;
 
-// @public (undocumented)
+// @public
 export type StateAuthFunc<Scope = unknown, T = unknown, R extends ReadModel = ReadModel> = (this: void, scope: Scope, state: T, view: ViewSnapshotFunc<R>) => Promise<T | Forbidden>;
 
-// @public (undocumented)
-export type StateChangeHandlers<C extends ChangeModel, T, R extends ReadModel = ReadModel> = Partial<{
-    [K in keyof C]: StateApplyFunc<Change<TypeOf<C[K]>>, T, R>;
+// @public
+export type StateChangeHandlers<Events extends ChangeModel, State, Views extends ReadModel = ReadModel> = Partial<{
+    [K in keyof Events]: StateApplyFunc<Change<TypeOf<Events[K]>>, State, Views>;
 }>;
 
 // @public
@@ -427,13 +410,11 @@ export interface StateDefinition<State, Events extends ChangeModel = ChangeModel
     auth?: StateAuthFunc<Scope, State, Pick<Views, Dependencies[number]>>;
     dependencies?: Dependencies;
     initial: State;
-    mutators: {
-        [K in Mutators[number]]: StateApplyFunc<Change<Events[K], K>, State, Pick<Views, Dependencies[number]>>;
-    };
+    mutators: StateChangeHandlers<Pick<Events, Mutators[number]>, State, Pick<Views, Dependencies[number]>>;
     type: Type<State>;
 }
 
-// @public (undocumented)
+// @public
 export interface StateProjection<T = unknown, C extends ChangeModel = ChangeModel, R extends ReadModel = ReadModel, Scope = unknown> {
     // (undocumented)
     readonly apply: StateApplyFunc<Change, T, R>;
@@ -451,7 +432,7 @@ export interface StateProjection<T = unknown, C extends ChangeModel = ChangeMode
     readonly type: Type<T>;
 }
 
-// @public (undocumented)
+// @public
 export interface StateView<T = unknown> {
     // (undocumented)
     readonly kind: "state";
@@ -464,13 +445,10 @@ export interface StateView<T = unknown> {
 // @public
 export type StringOperator = ("equals-ignore-case" | "contains" | "contains-ignore-case" | "starts-with" | "starts-with-ignore-case" | "ends-with" | "ends-with-ignore-case" | "not-equals-ignore-case" | "not-contains" | "not-contains-ignore-case" | "not-starts-with" | "not-starts-with-ignore-case" | "not-ends-with" | "not-ends-with-ignore-case");
 
-// @public (undocumented)
+// @public
 export interface SyncOptions<K extends string = string> {
-    // (undocumented)
     readonly signal: AbortSignal;
-    // (undocumented)
     readonly target: number;
-    // (undocumented)
     readonly views: readonly K[];
 }
 
@@ -480,34 +458,24 @@ export type View = StateView | QueryView | EntityView<Record<string, string | nu
 // @public
 export type ViewOf<H extends AnyProjection> = H extends StateProjection<infer T, any, any, any> ? StateView<T> : H extends QueryHandler<infer P, infer T, any, any> ? QueryView<P, T> : H extends EntityProjection<infer T, infer K, any, any, any> ? EntityView<T, K> : View;
 
-// @public (undocumented)
+// @public
 export interface ViewOptions {
-    // (undocumented)
     readonly auth: boolean | ErrorFactory;
-    // (undocumented)
     readonly signal: AbortSignal;
-    // (undocumented)
     readonly sync: number;
 }
 
 // @public
 export type ViewSnapshotFunc<R extends ReadModel> = <K extends string & keyof R>(this: void, key: K, options?: Partial<Pick<ViewOptions, "auth">>) => Promise<ViewOf<R[K]>>;
 
-// @public (undocumented)
+// @public
 export interface ViewStatus {
-    // (undocumented)
     readonly last_change_timestamp?: Date;
-    // (undocumented)
     readonly last_change_version: number;
-    // (undocumented)
     readonly purged_from_version: number;
-    // (undocumented)
     readonly purged_until_version: number;
-    // (undocumented)
     readonly sync_position: number;
-    // (undocumented)
     readonly sync_timestamp?: Date;
-    // (undocumented)
     readonly sync_version: number;
 }
 

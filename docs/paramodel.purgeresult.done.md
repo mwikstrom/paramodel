@@ -4,6 +4,8 @@
 
 ## PurgeResult.done property
 
+Specifies whether the purge operation ran to completion, or whether another call is required.
+
 <b>Signature:</b>
 
 ```typescript

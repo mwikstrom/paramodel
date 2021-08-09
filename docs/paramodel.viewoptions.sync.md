@@ -4,6 +4,8 @@
 
 ## ViewOptions.sync property
 
+The minimum commit version for which a snapshot shall be returned
+
 <b>Signature:</b>
 
 ```typescript

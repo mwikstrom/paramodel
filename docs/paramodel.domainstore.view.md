@@ -4,6 +4,8 @@
 
 ## DomainStore.view() method
 
+Gets a view snapshot
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,9 +16,9 @@ view<K extends string & keyof Model["views"]>(this: void, key: K, options?: Part
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  this | void |  |
-|  key | K |  |
-|  options | Partial&lt;[ViewOptions](./paramodel.viewoptions.md)<!-- -->&gt; |  |
+|  this | void | <i>(Ignored)</i> This function uses implicit <code>this</code> binding |
+|  key | K | Key of the view to get |
+|  options | Partial&lt;[ViewOptions](./paramodel.viewoptions.md)<!-- -->&gt; | <i>(Optional)</i> View options |
 
 <b>Returns:</b>
 

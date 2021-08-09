@@ -29,8 +29,8 @@ Run-time domain model for event-sourcing.
 |  [Change](./paramodel.change.md) | Data for a change event that has occurred |
 |  [DomainDriver](./paramodel.domaindriver.md) | An underlying driver for a domain model |
 |  [DomainProvider](./paramodel.domainprovider.md) | Provides access to [domain stores](./paramodel.domainstore.md)<!-- -->. |
-|  [DomainStore](./paramodel.domainstore.md) |  |
-|  [DomainStoreStatus](./paramodel.domainstorestatus.md) |  |
+|  [DomainStore](./paramodel.domainstore.md) | A domain store |
+|  [DomainStoreStatus](./paramodel.domainstorestatus.md) | Status of a [DomainStore](./paramodel.domainstore.md) |
 |  [EntityDefinition](./paramodel.entitydefinition.md) | Settings that define an entity projection |
 |  [EntityProjection](./paramodel.entityprojection.md) | Entity state projection |
 |  [EntityProjectionState](./paramodel.entityprojectionstate.md) | The mutable state object provided as the second argument of [EntityProjectionFunc](./paramodel.entityprojectionfunc.md) |
@@ -39,22 +39,22 @@ Run-time domain model for event-sourcing.
 |  [InputRecord](./paramodel.inputrecord.md) | A data record to be written |
 |  [Page](./paramodel.page.md) | A page of items |
 |  [PageOptions](./paramodel.pageoptions.md) | Options for getting a page |
-|  [PurgeOptions](./paramodel.purgeoptions.md) |  |
-|  [PurgeResult](./paramodel.purgeresult.md) |  |
+|  [PurgeOptions](./paramodel.purgeoptions.md) | Options for purging views |
+|  [PurgeResult](./paramodel.purgeresult.md) | The result of running a purge operation |
 |  [Queryable](./paramodel.queryable.md) | A queryable collection |
 |  [QueryDefinition](./paramodel.querydefinition.md) | Settings that define a query handler |
 |  [QueryHandler](./paramodel.queryhandler.md) | A query handler - which is a stateless view projection |
 |  [QuerySpec](./paramodel.queryspec.md) | A data record query specification |
 |  [QueryView](./paramodel.queryview.md) | A query snapshot |
 |  [ReadonlyEntityCollection](./paramodel.readonlyentitycollection.md) | A readonly collection of entities |
-|  [ReadOptions](./paramodel.readoptions.md) |  |
+|  [ReadOptions](./paramodel.readoptions.md) | Options for reading change history |
 |  [SortSpec](./paramodel.sortspec.md) | Specifies how data records shall be sorted |
 |  [StateDefinition](./paramodel.statedefinition.md) | Settings that define a state projection |
-|  [StateProjection](./paramodel.stateprojection.md) |  |
-|  [StateView](./paramodel.stateview.md) |  |
-|  [SyncOptions](./paramodel.syncoptions.md) |  |
-|  [ViewOptions](./paramodel.viewoptions.md) |  |
-|  [ViewStatus](./paramodel.viewstatus.md) |  |
+|  [StateProjection](./paramodel.stateprojection.md) | Simple state projection |
+|  [StateView](./paramodel.stateview.md) | A simple state snapshot |
+|  [SyncOptions](./paramodel.syncoptions.md) | Options for synchronizing views |
+|  [ViewOptions](./paramodel.viewoptions.md) | Options for getting a view snapshot |
+|  [ViewStatus](./paramodel.viewstatus.md) | Status for a view |
 
 ## Variables
 
@@ -85,7 +85,7 @@ Run-time domain model for event-sourcing.
 |  [EntityProjectionFunc](./paramodel.entityprojectionfunc.md) | A function that mutate entity states |
 |  [EqualityOperator](./paramodel.equalityoperator.md) | Defines the equality operators |
 |  [Equatable](./paramodel.equatable.md) | Represents equatable property types |
-|  [ErrorFactory](./paramodel.errorfactory.md) |  |
+|  [ErrorFactory](./paramodel.errorfactory.md) | A function that creates an error to be thrown |
 |  [FilterOperand](./paramodel.filteroperand.md) | A type alias that represents a filter operand for a given property type and operator |
 |  [FilterOperator](./paramodel.filteroperator.md) | A type alias that represents a filter operator for a given property type |
 |  [Forbidden](./paramodel.forbidden.md) | Type of the well-known forbidden symbol |
@@ -98,9 +98,9 @@ Run-time domain model for event-sourcing.
 |  [ReadModel](./paramodel.readmodel.md) | Alias for an unknown read model |
 |  [SortableProps](./paramodel.sortableprops.md) | Extracts sortable properties |
 |  [SortDirection](./paramodel.sortdirection.md) | Sort direction |
-|  [StateApplyFunc](./paramodel.stateapplyfunc.md) |  |
-|  [StateAuthFunc](./paramodel.stateauthfunc.md) |  |
-|  [StateChangeHandlers](./paramodel.statechangehandlers.md) |  |
+|  [StateApplyFunc](./paramodel.stateapplyfunc.md) | A function that mutates projected state |
+|  [StateAuthFunc](./paramodel.stateauthfunc.md) | A function that authorizes access to the projected state |
+|  [StateChangeHandlers](./paramodel.statechangehandlers.md) | An object that define the change event handlers that may mutate the defined state.<!-- -->Each key in this object is the name of a change event and the corresponding value is an [StateApplyFunc](./paramodel.stateapplyfunc.md) that shall be invoked to apply the effect of that change. |
 |  [StringOperator](./paramodel.stringoperator.md) | Defines the string operators |
 |  [View](./paramodel.view.md) | A type alias that represents a view |
 |  [ViewOf](./paramodel.viewof.md) | Extracts the view type of a projection |

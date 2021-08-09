@@ -4,6 +4,8 @@
 
 ## DomainStore.read() method
 
+Reads change history
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,8 +16,8 @@ read(this: void, options?: Partial<ReadOptions<string & keyof Model["events"]>>)
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  this | void |  |
-|  options | Partial&lt;[ReadOptions](./paramodel.readoptions.md)<!-- -->&lt;string &amp; keyof Model\["events"\]&gt;&gt; |  |
+|  this | void | <i>(Ignored)</i> This function uses implicit <code>this</code> binding |
+|  options | Partial&lt;[ReadOptions](./paramodel.readoptions.md)<!-- -->&lt;string &amp; keyof Model\["events"\]&gt;&gt; | <i>(Optional)</i> Read options |
 
 <b>Returns:</b>
 

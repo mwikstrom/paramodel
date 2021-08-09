@@ -4,6 +4,8 @@
 
 ## ViewStatus.purged\_from\_version property
 
+The first version number that is purged
+
 <b>Signature:</b>
 
 ```typescript

@@ -4,6 +4,8 @@
 
 ## ReadOptions.filter property
 
+An optional array of change event keys that shall be read
+
 <b>Signature:</b>
 
 ```typescript

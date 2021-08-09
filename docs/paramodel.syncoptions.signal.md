@@ -4,6 +4,8 @@
 
 ## SyncOptions.signal property
 
+An abort signal that shall be observed while views are synchronized
+
 <b>Signature:</b>
 
 ```typescript

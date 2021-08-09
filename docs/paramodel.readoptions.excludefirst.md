@@ -4,6 +4,8 @@
 
 ## ReadOptions.excludeFirst property
 
+When `true`<!-- -->, reading starts after the specified first version number
+
 <b>Signature:</b>
 
 ```typescript

@@ -4,6 +4,10 @@
 
 ## SyncOptions.views property
 
+An array of view keys that shall be synchronized.
+
+Omit this property to synchronize all views.
+
 <b>Signature:</b>
 
 ```typescript

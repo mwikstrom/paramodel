@@ -4,6 +4,8 @@
 
 ## DomainStore.do() method
 
+Executes an action
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,10 +16,10 @@ do<K extends string & keyof Model["actions"]>(this: void, key: K, input: TypeOf<
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  this | void |  |
-|  key | K |  |
-|  input | TypeOf&lt;Model\["actions"\]\[K\]\["input"\]&gt; |  |
-|  options | [ActionOptions](./paramodel.actionoptions.md) |  |
+|  this | void | <i>(Ignored)</i> This function uses implicit <code>this</code> binding |
+|  key | K | Key of the action to execute |
+|  input | TypeOf&lt;Model\["actions"\]\[K\]\["input"\]&gt; | Action input |
+|  options | [ActionOptions](./paramodel.actionoptions.md) | <i>(Optional)</i> Execution options |
 
 <b>Returns:</b>
 

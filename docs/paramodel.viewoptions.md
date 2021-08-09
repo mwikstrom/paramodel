@@ -4,6 +4,8 @@
 
 ## ViewOptions interface
 
+Options for getting a view snapshot
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,7 +16,7 @@ export interface ViewOptions
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [auth](./paramodel.viewoptions.auth.md) | boolean \| [ErrorFactory](./paramodel.errorfactory.md) |  |
-|  [signal](./paramodel.viewoptions.signal.md) | AbortSignal |  |
-|  [sync](./paramodel.viewoptions.sync.md) | number |  |
+|  [auth](./paramodel.viewoptions.auth.md) | boolean \| [ErrorFactory](./paramodel.errorfactory.md) | Specifies whether the view shall use authorization.<!-- -->Authorization is skipped by default. To enable authorization set this property to <code>true</code> or an [ErrorFactory](./paramodel.errorfactory.md) callback function.<!-- -->The callback function is invoked to create the error that shall be thrown when view access is forbidden. |
+|  [signal](./paramodel.viewoptions.signal.md) | AbortSignal | An abort signal that shall be observed while the snapshot is prepared |
+|  [sync](./paramodel.viewoptions.sync.md) | number | The minimum commit version for which a snapshot shall be returned |
 

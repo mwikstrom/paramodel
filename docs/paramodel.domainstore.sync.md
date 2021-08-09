@@ -4,6 +4,8 @@
 
 ## DomainStore.sync() method
 
+Synchronizes the views of the current store
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,8 +16,8 @@ sync<K extends string & keyof Model["views"]>(this: void, options?: Partial<Sync
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  this | void |  |
-|  options | Partial&lt;[SyncOptions](./paramodel.syncoptions.md)<!-- -->&lt;K&gt;&gt; |  |
+|  this | void | <i>(Ignored)</i> This function uses implicit <code>this</code> binding |
+|  options | Partial&lt;[SyncOptions](./paramodel.syncoptions.md)<!-- -->&lt;K&gt;&gt; | <i>(Optional)</i> Synchronization options |
 
 <b>Returns:</b>
 

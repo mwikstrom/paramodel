@@ -4,11 +4,15 @@
 
 ## StateChangeHandlers type
 
+An object that define the change event handlers that may mutate the defined state.
+
+Each key in this object is the name of a change event and the corresponding value is an [StateApplyFunc](./paramodel.stateapplyfunc.md) that shall be invoked to apply the effect of that change.
+
 <b>Signature:</b>
 
 ```typescript
-export declare type StateChangeHandlers<C extends ChangeModel, T, R extends ReadModel = ReadModel> = Partial<{
-    [K in keyof C]: StateApplyFunc<Change<TypeOf<C[K]>>, T, R>;
+export declare type StateChangeHandlers<Events extends ChangeModel, State, Views extends ReadModel = ReadModel> = Partial<{
+    [K in keyof Events]: StateApplyFunc<Change<TypeOf<Events[K]>>, State, Views>;
 }>;
 ```
 <b>References:</b> [ChangeModel](./paramodel.changemodel.md)<!-- -->, [ReadModel](./paramodel.readmodel.md)<!-- -->, [StateApplyFunc](./paramodel.stateapplyfunc.md)<!-- -->, [Change](./paramodel.change.md)

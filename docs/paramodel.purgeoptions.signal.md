@@ -4,6 +4,8 @@
 
 ## PurgeOptions.signal property
 
+An abort signal that shall be observed while views are purged
+
 <b>Signature:</b>
 
 ```typescript

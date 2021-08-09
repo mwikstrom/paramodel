@@ -4,6 +4,8 @@
 
 ## DomainStore.purge() method
 
+Purges the views of the current store
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,8 +16,8 @@ purge(this: void, options?: Partial<PurgeOptions>): Promise<PurgeResult>;
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  this | void |  |
-|  options | Partial&lt;[PurgeOptions](./paramodel.purgeoptions.md)<!-- -->&gt; |  |
+|  this | void | <i>(Ignored)</i> This function uses implicit <code>this</code> binding |
+|  options | Partial&lt;[PurgeOptions](./paramodel.purgeoptions.md)<!-- -->&gt; | <i>(Optional)</i> Purge options |
 
 <b>Returns:</b>
 

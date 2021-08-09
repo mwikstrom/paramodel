@@ -4,6 +4,8 @@
 
 ## StateView interface
 
+A simple state snapshot
+
 <b>Signature:</b>
 
 ```typescript

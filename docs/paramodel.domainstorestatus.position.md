@@ -4,6 +4,8 @@
 
 ## DomainStoreStatus.position property
 
+The total number of committed change events
+
 <b>Signature:</b>
 
 ```typescript

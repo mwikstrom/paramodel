@@ -4,6 +4,8 @@
 
 ## StateAuthFunc type
 
+A function that authorizes access to the projected state
+
 <b>Signature:</b>
 
 ```typescript
