@@ -25,7 +25,7 @@ import {
 } from "../store";
 import { _ActionContextImpl } from "./action-context-impl";
 import { _Commit, _commitType, _getChangesFromCommit } from "./commit";
-import { _partitionKeys, _rowKeys } from "./data-keys";
+import { _parseVersionFromViewStateRowKey, _partitionKeys, _rowKeys } from "./data-keys";
 import { _logInfo } from "./log";
 import { _QueryImpl } from "./query-impl";
 import { _DriverQuerySource, _QuerySource } from "./query-source";
@@ -252,6 +252,19 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         stateType: Type<T>,
         version: number,
     ): Promise<T> => {
+        const output = await this.#fetchStateSnapshotRecord(viewKey, version);
+
+        if (!output) {
+            throw new Error(`State not found for view "${viewKey}" in "${this.#id}" version ${version}`);
+        }
+
+        return stateType.fromJsonValue(output.value);
+    }
+
+    #fetchStateSnapshotRecord = async (
+        viewKey: string,
+        version: number,
+    ): Promise<OutputRecord | undefined> => {
         const partitionKey = _partitionKeys.view(viewKey);
         const source = new _DriverQuerySource(
             this.#driver,
@@ -264,12 +277,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             .where("key", "!=", _rowKeys.viewHeader)
             .where("key", "<=", _rowKeys.viewState(version))
             .first();
-
-        if (!output) {
-            throw new Error(`State not found for view "${viewKey}" in "${this.#id}" version ${version}`);
-        }
-
-        return stateType.fromJsonValue(output.value);
+        return output;
     }
 
     #createQueryView = <P extends Record<string, unknown>, T>(
@@ -913,12 +921,23 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         purgeVersion: number,
         signal?: AbortSignal,
     ): Promise<boolean> => {
-        // TODO: IMPORTANT! CANNOT PURGE THE LAST STATE BECAUSE IT MIGHT STILL BE IN USE!
+        const recordToKeep = await this.#fetchStateSnapshotRecord(viewKey, purgeVersion + 1);
+
+        if (!recordToKeep) {
+            return false;
+        }
+
+        const versionToKeep = _parseVersionFromViewStateRowKey(recordToKeep.key);
+        if (versionToKeep <= purgeVersion) {
+            purgeVersion = versionToKeep - 1;
+        }
+
         const condition: FilterSpec = {
             path: ["key"],
             operator: "<=",
             operand: _rowKeys.viewState(purgeVersion),
         };
+        
         return this.#expireViewRecords(viewKey, condition, signal);
     }
 
