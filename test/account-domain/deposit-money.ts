@@ -23,7 +23,7 @@ const exec: AccountAction<"accounts", DepositMoney> = async ({
     const found = await (await view("accounts")).get(account_id);
 
     if (!found) {
-        return conflict("Account does not exist");
+        return conflict(`Account ${account_id} does not exist`);
     }
 
     if (found.owner_id !== user_id) {

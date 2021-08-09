@@ -850,7 +850,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     ): Promise<ActionResultType<Model, K> | undefined> => {
         const { dry = false, signal } = options;
         const base = latest?.version || 0;
-        const timestamp = this.#driver.timestamp();               
+        const timestamp = this.#driver.timestamp();
 
         if (!(actionKey in this.#model.actions)) {
             const status = "rejected";
@@ -963,10 +963,18 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         options: Partial<ActionOptions> = {},
     ): Promise<ActionResultType<Model, K>> => {
         let latest = await this.#getLatestCommit();
-        for (;;) {            
+        for (;;) {
             const result = await this.#tryAction(latest, key, input, options);
 
             if (result !== void(0)) {
+                _logInfo(
+                    "Action %s completed with status %s at version %d in \"%s\": %s",
+                    key,
+                    result.status,
+                    result.committed || result.base,
+                    this.#id,
+                    result.message || "(no message)",
+                );
                 return result;
             }
 
