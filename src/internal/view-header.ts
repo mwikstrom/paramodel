@@ -8,8 +8,8 @@ export type _ViewHeader = {
     readonly sync_timestamp: Date;
     readonly last_change_version: number;
     readonly last_change_timestamp: Date;
-    readonly purge_start_version: number;
-    readonly purge_end_version: number;
+    readonly purge_start_version: number; // TODO: Rename to purged_from
+    readonly purge_end_version: number; // TODO: Rename to purged_until
 };
 
 /** @internal */

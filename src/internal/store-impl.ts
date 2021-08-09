@@ -1139,6 +1139,7 @@ const authErrorFromOptions = (options: Partial<Pick<ViewOptions, "auth">>): Erro
     }
 };
 
+// TODO: Declare using Omit<ViewHeader, "kind"> + update token
 type SyncViewInfo = {
     readonly update_token: string | null;
     readonly sync_version: number;
