@@ -4,6 +4,8 @@
 
 ## AnyActionHandler type
 
+Type alias that matches any [ActionHandler](./paramodel.actionhandler.md)
+
 <b>Signature:</b>
 
 ```typescript

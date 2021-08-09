@@ -4,6 +4,8 @@
 
 ## ActionHandler.output property
 
+Type of output that the action provides
+
 <b>Signature:</b>
 
 ```typescript

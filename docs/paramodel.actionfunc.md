@@ -4,10 +4,12 @@
 
 ## ActionFunc type
 
+Type alias that matches the [ActionHandler.exec()](./paramodel.actionhandler.exec.md) function
+
 <b>Signature:</b>
 
 ```typescript
-export declare type ActionFunc<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Scope = unknown, Input = unknown, Output = unknown> = (context: ActionContext<Events, Views, Scope, Input, Output>) => Promise<Forbidden | Conflict | void>;
+export declare type ActionFunc<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Scope = unknown, Input = unknown, Output = unknown> = ActionHandler<Events, Views, Scope, Input, Output>["exec"];
 ```
-<b>References:</b> [ChangeModel](./paramodel.changemodel.md)<!-- -->, [ReadModel](./paramodel.readmodel.md)<!-- -->, [ActionContext](./paramodel.actioncontext.md)<!-- -->, [Forbidden](./paramodel.forbidden.md)<!-- -->, [Conflict](./paramodel.conflict.md)
+<b>References:</b> [ChangeModel](./paramodel.changemodel.md)<!-- -->, [ReadModel](./paramodel.readmodel.md)<!-- -->, [ActionHandler](./paramodel.actionhandler.md)
 

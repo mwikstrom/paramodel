@@ -4,6 +4,8 @@
 
 ## ActionHandler interface
 
+A domain action handler
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,8 +16,13 @@ export interface ActionHandler<Events extends ChangeModel = ChangeModel, Views e
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [dependencies](./paramodel.actionhandler.dependencies.md) | ReadonlySet&lt;string &amp; keyof Views&gt; |  |
-|  [exec](./paramodel.actionhandler.exec.md) | [ActionFunc](./paramodel.actionfunc.md)<!-- -->&lt;Events, Views, Scope, Input, Output&gt; |  |
-|  [input](./paramodel.actionhandler.input.md) | Type&lt;Input&gt; |  |
-|  [output](./paramodel.actionhandler.output.md) | Type&lt;Output&gt; |  |
+|  [dependencies](./paramodel.actionhandler.dependencies.md) | ReadonlySet&lt;string &amp; keyof Views&gt; | A set of view keys that the action depend upon during execution. These views will automatically be synced to the current version just before the action the executed and available via the [ActionContext.view()](./paramodel.actioncontext.view.md) function. |
+|  [input](./paramodel.actionhandler.input.md) | Type&lt;Input&gt; | Type of input that the action requires |
+|  [output](./paramodel.actionhandler.output.md) | Type&lt;Output&gt; | Type of output that the action provides |
+
+## Methods
+
+|  Method | Description |
+|  --- | --- |
+|  [exec(this, context)](./paramodel.actionhandler.exec.md) | Executes the defined action |
 

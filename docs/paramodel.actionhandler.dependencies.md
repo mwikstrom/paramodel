@@ -4,6 +4,8 @@
 
 ## ActionHandler.dependencies property
 
+A set of view keys that the action depend upon during execution. These views will automatically be synced to the current version just before the action the executed and available via the [ActionContext.view()](./paramodel.actioncontext.view.md) function.
+
 <b>Signature:</b>
 
 ```typescript

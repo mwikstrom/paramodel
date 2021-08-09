@@ -4,6 +4,8 @@
 
 ## ActionHandler.input property
 
+Type of input that the action requires
+
 <b>Signature:</b>
 
 ```typescript

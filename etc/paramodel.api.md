@@ -21,18 +21,14 @@ export interface ActionContext<Events extends ChangeModel = ChangeModel, Views e
     view<K extends string & keyof Views>(this: void, key: K, options?: Partial<Pick<ViewOptions, "auth">>): Promise<ViewOf<Views[K]>>;
 }
 
-// @public (undocumented)
-export type ActionFunc<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Scope = unknown, Input = unknown, Output = unknown> = (context: ActionContext<Events, Views, Scope, Input, Output>) => Promise<Forbidden | Conflict | void>;
+// @public
+export type ActionFunc<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Scope = unknown, Input = unknown, Output = unknown> = ActionHandler<Events, Views, Scope, Input, Output>["exec"];
 
-// @public (undocumented)
+// @public
 export interface ActionHandler<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Scope = unknown, Input = unknown, Output = unknown> {
-    // (undocumented)
     readonly dependencies: ReadonlySet<string & keyof Views>;
-    // (undocumented)
-    readonly exec: ActionFunc<Events, Views, Scope, Input, Output>;
-    // (undocumented)
+    exec(this: void, context: ActionContext<Events, Views, Scope, Input, Output>): Promise<Forbidden | Conflict | void>;
     readonly input: Type<Input>;
-    // (undocumented)
     readonly output: Type<Output>;
 }
 
@@ -65,7 +61,7 @@ export interface ActionResult<Output = unknown> {
 // @public (undocumented)
 export type ActionResultType<Model extends Pick<DomainModel, "actions" | "events">, Action extends string & keyof Model["actions"]> = (ActionResult<TypeOf<Model["actions"][Action]["output"]>>);
 
-// @public (undocumented)
+// @public
 export type AnyActionHandler = ActionHandler<any, any, any, any, any>;
 
 // @public (undocumented)

@@ -22,7 +22,7 @@ Run-time domain model for event-sourcing.
 |  Interface | Description |
 |  --- | --- |
 |  [ActionContext](./paramodel.actioncontext.md) | The context in which an action is executed |
-|  [ActionHandler](./paramodel.actionhandler.md) |  |
+|  [ActionHandler](./paramodel.actionhandler.md) | A domain action handler |
 |  [ActionOptions](./paramodel.actionoptions.md) |  |
 |  [ActionResult](./paramodel.actionresult.md) |  |
 |  [Change](./paramodel.change.md) |  |
@@ -63,9 +63,9 @@ Run-time domain model for event-sourcing.
 
 |  Type Alias | Description |
 |  --- | --- |
-|  [ActionFunc](./paramodel.actionfunc.md) |  |
+|  [ActionFunc](./paramodel.actionfunc.md) | Type alias that matches the [ActionHandler.exec()](./paramodel.actionhandler.exec.md) function |
 |  [ActionResultType](./paramodel.actionresulttype.md) |  |
-|  [AnyActionHandler](./paramodel.anyactionhandler.md) |  |
+|  [AnyActionHandler](./paramodel.anyactionhandler.md) | Type alias that matches any [ActionHandler](./paramodel.actionhandler.md) |
 |  [AnyProjection](./paramodel.anyprojection.md) |  |
 |  [ArrayAnyOperator](./paramodel.arrayanyoperator.md) |  |
 |  [ArrayOperator](./paramodel.arrayoperator.md) |  |

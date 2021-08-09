@@ -2,10 +2,24 @@
 
 [Home](./index.md) &gt; [paramodel](./paramodel.md) &gt; [ActionHandler](./paramodel.actionhandler.md) &gt; [exec](./paramodel.actionhandler.exec.md)
 
-## ActionHandler.exec property
+## ActionHandler.exec() method
+
+Executes the defined action
 
 <b>Signature:</b>
 
 ```typescript
-readonly exec: ActionFunc<Events, Views, Scope, Input, Output>;
+exec(this: void, context: ActionContext<Events, Views, Scope, Input, Output>): Promise<Forbidden | Conflict | void>;
 ```
+
+## Parameters
+
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  this | void | <i>(Ignored)</i> This method uses implicit <code>this</code> binding |
+|  context | [ActionContext](./paramodel.actioncontext.md)<!-- -->&lt;Events, Views, Scope, Input, Output&gt; | The [ActionContext](./paramodel.actioncontext.md) in which the action is executed |
+
+<b>Returns:</b>
+
+Promise&lt;[Forbidden](./paramodel.forbidden.md) \| [Conflict](./paramodel.conflict.md) \| void&gt;
+
