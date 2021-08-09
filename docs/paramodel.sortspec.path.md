@@ -4,6 +4,8 @@
 
 ## SortSpec.path property
 
+Path to the property that records shall be sorted by
+
 <b>Signature:</b>
 
 ```typescript

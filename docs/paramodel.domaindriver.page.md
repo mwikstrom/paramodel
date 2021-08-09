@@ -4,6 +4,8 @@
 
 ## DomainDriver.page() method
 
+Returns a promise that resolves with a page of data records from the specified partition and store
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,10 +16,10 @@ page(this: void, store: string, partition: string, query?: QuerySpec): Promise<P
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  this | void |  |
-|  store | string |  |
-|  partition | string |  |
-|  query | [QuerySpec](./paramodel.queryspec.md) |  |
+|  this | void | <i>(Ignored)</i> This method uses implicit <code>this</code> binding |
+|  store | string | Identifies the domain store that contains the records |
+|  partition | string | Identifies the partition that contains the records |
+|  query | [QuerySpec](./paramodel.queryspec.md) | <i>(Optional)</i> A [query](./paramodel.queryspec.md) that selects and sorts the records that shall be returned. |
 
 <b>Returns:</b>
 

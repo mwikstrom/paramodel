@@ -4,6 +4,8 @@
 
 ## FilterSpec.path property
 
+Path to the property that records shall be filtered by
+
 <b>Signature:</b>
 
 ```typescript

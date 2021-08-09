@@ -11,7 +11,7 @@ Run-time domain model for event-sourcing.
 |  Function | Description |
 |  --- | --- |
 |  [createDomainProvider(driver)](./paramodel.createdomainprovider.md) |  |
-|  [createMemoryDriver()](./paramodel.creatememorydriver.md) |  |
+|  [createMemoryDriver(this)](./paramodel.creatememorydriver.md) | Creates an in-memory [driver](./paramodel.domaindriver.md) that could be used to testing your domain |
 |  [defineAction(this, input, exec, dependencies, output)](./paramodel.defineaction.md) | Creates an [ActionHandler](./paramodel.actionhandler.md) |
 |  [defineEntity(this, type, key, mutators, auth, dependencies)](./paramodel.defineentity.md) | Creates an [EntityProjection](./paramodel.entityprojection.md) |
 |  [defineQuery(this, type, params, dependencies, exec, auth)](./paramodel.definequery.md) | Creates a [QueryHandler](./paramodel.queryhandler.md) |
@@ -26,26 +26,26 @@ Run-time domain model for event-sourcing.
 |  [ActionOptions](./paramodel.actionoptions.md) | Options for executing an action |
 |  [ActionResult](./paramodel.actionresult.md) | The result of executing an action |
 |  [Change](./paramodel.change.md) | Data for a change event that has occurred |
-|  [DomainDriver](./paramodel.domaindriver.md) |  |
+|  [DomainDriver](./paramodel.domaindriver.md) | An underlying driver for a domain model |
 |  [DomainProvider](./paramodel.domainprovider.md) |  |
 |  [DomainStore](./paramodel.domainstore.md) |  |
 |  [DomainStoreStatus](./paramodel.domainstorestatus.md) |  |
 |  [EntityProjection](./paramodel.entityprojection.md) |  |
 |  [EntityProjectionState](./paramodel.entityprojectionstate.md) |  |
 |  [EntityView](./paramodel.entityview.md) |  |
-|  [FilterSpec](./paramodel.filterspec.md) |  |
-|  [InputRecord](./paramodel.inputrecord.md) |  |
+|  [FilterSpec](./paramodel.filterspec.md) | Specifies a data record filter condition |
+|  [InputRecord](./paramodel.inputrecord.md) | A data record to be written |
 |  [Page](./paramodel.page.md) |  |
 |  [PageOptions](./paramodel.pageoptions.md) |  |
 |  [PurgeOptions](./paramodel.purgeoptions.md) |  |
 |  [PurgeResult](./paramodel.purgeresult.md) |  |
 |  [Queryable](./paramodel.queryable.md) |  |
 |  [QueryHandler](./paramodel.queryhandler.md) |  |
-|  [QuerySpec](./paramodel.queryspec.md) |  |
+|  [QuerySpec](./paramodel.queryspec.md) | A data record query specification |
 |  [QueryView](./paramodel.queryview.md) |  |
 |  [ReadonlyEntityCollection](./paramodel.readonlyentitycollection.md) |  |
 |  [ReadOptions](./paramodel.readoptions.md) |  |
-|  [SortSpec](./paramodel.sortspec.md) |  |
+|  [SortSpec](./paramodel.sortspec.md) | Specifies how data records shall be sorted |
 |  [StateProjection](./paramodel.stateprojection.md) |  |
 |  [StateView](./paramodel.stateview.md) |  |
 |  [SyncOptions](./paramodel.syncoptions.md) |  |
@@ -87,7 +87,7 @@ Run-time domain model for event-sourcing.
 |  [Forbidden](./paramodel.forbidden.md) |  |
 |  [IsOperand](./paramodel.isoperand.md) |  |
 |  [IsOperator](./paramodel.isoperator.md) |  |
-|  [OutputRecord](./paramodel.outputrecord.md) |  |
+|  [OutputRecord](./paramodel.outputrecord.md) | A data record as returned from a [driver](./paramodel.domaindriver.md) |
 |  [PossibleKeysOf](./paramodel.possiblekeysof.md) |  |
 |  [QueryAuthFunc](./paramodel.queryauthfunc.md) |  |
 |  [QueryExecFunc](./paramodel.queryexecfunc.md) |  |

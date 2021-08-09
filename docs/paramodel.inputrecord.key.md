@@ -4,6 +4,8 @@
 
 ## InputRecord.key property
 
+Key of the data record
+
 <b>Signature:</b>
 
 ```typescript

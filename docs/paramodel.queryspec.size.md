@@ -4,6 +4,8 @@
 
 ## QuerySpec.size property
 
+Optionally specifies a hint for the number of items that should be returned
+
 <b>Signature:</b>
 
 ```typescript

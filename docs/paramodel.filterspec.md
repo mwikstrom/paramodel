@@ -4,6 +4,8 @@
 
 ## FilterSpec interface
 
+Specifies a data record filter condition
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,7 +16,7 @@ export interface FilterSpec
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [operand](./paramodel.filterspec.operand.md) | JsonValue |  |
-|  [operator](./paramodel.filterspec.operator.md) | [FilterOperator](./paramodel.filteroperator.md)<!-- -->&lt;JsonValue&gt; |  |
-|  [path](./paramodel.filterspec.path.md) | readonly string\[\] |  |
+|  [operand](./paramodel.filterspec.operand.md) | JsonValue | The filter condition operand |
+|  [operator](./paramodel.filterspec.operator.md) | [FilterOperator](./paramodel.filteroperator.md)<!-- -->&lt;JsonValue&gt; | The filter condition operator |
+|  [path](./paramodel.filterspec.path.md) | readonly string\[\] | Path to the property that records shall be filtered by |
 

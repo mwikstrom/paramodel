@@ -4,6 +4,8 @@
 
 ## DomainDriver interface
 
+An underlying driver for a domain model
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,10 +16,10 @@ export interface DomainDriver
 
 |  Method | Description |
 |  --- | --- |
-|  [count(this, store, partition, where)](./paramodel.domaindriver.count.md) |  |
-|  [init(this, store)](./paramodel.domaindriver.init.md) |  |
-|  [page(this, store, partition, query)](./paramodel.domaindriver.page.md) |  |
-|  [read(this, store, partition, key)](./paramodel.domaindriver.read.md) |  |
-|  [timestamp(this)](./paramodel.domaindriver.timestamp.md) |  |
-|  [write(this, store, partition, input)](./paramodel.domaindriver.write.md) |  |
+|  [count(this, store, partition, where)](./paramodel.domaindriver.count.md) | Returns a provies that resolves with the number of data records that matches the specified filter in the specified partition and store. |
+|  [init(this, store)](./paramodel.domaindriver.init.md) | Intializes a domain store for usage. This function must be idempotent as it may be invoked several times for a single domain store. |
+|  [page(this, store, partition, query)](./paramodel.domaindriver.page.md) | Returns a promise that resolves with a page of data records from the specified partition and store |
+|  [read(this, store, partition, key)](./paramodel.domaindriver.read.md) | Returns a promise that resolves with a single data record with the specified key from the specified domain store and partition, or <code>undefined</code> when the record doesn't exist. |
+|  [timestamp(this)](./paramodel.domaindriver.timestamp.md) | Gets the current timestamp |
+|  [write(this, store, partition, input)](./paramodel.domaindriver.write.md) | Writes a single data record and returns a promise that resolves with the stored record, or <code>undefined</code> when the specified [replacement token](./paramodel.inputrecord.replace.md) did not match the required value. |
 

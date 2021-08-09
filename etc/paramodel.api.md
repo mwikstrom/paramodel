@@ -99,8 +99,8 @@ export type Conflict = typeof Conflict;
 // @public (undocumented)
 export function createDomainProvider(driver: DomainDriver): DomainProvider;
 
-// @public (undocumented)
-export function createMemoryDriver(): DomainDriver;
+// @public
+export function createMemoryDriver(this: void): DomainDriver;
 
 // @public
 export function defineAction<Input, Output, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(this: void, input: Type<Input>, exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>, dependencies?: Dependencies, output?: Type<Output>): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>;
@@ -118,19 +118,13 @@ export function defineState<State, Events extends ChangeModel = ChangeModel, Sco
     [K in Mutators[number]]: StateApplyFunc<Change<Events[K], K>, State, Pick<Views, Dependencies[number]>>;
 }, auth?: StateAuthFunc<Scope, State, Pick<Views, Dependencies[number]>>, dependencies?: Dependencies): StateProjection<State, Events, Views, Scope>;
 
-// @public (undocumented)
+// @public
 export interface DomainDriver {
-    // (undocumented)
     count(this: void, store: string, partition: string, where?: readonly FilterSpec[]): Promise<number>;
-    // (undocumented)
     init(this: void, store: string): Promise<void>;
-    // (undocumented)
     page(this: void, store: string, partition: string, query?: QuerySpec): Promise<Page<OutputRecord>>;
-    // (undocumented)
     read(this: void, store: string, partition: string, key: string): Promise<OutputRecord | undefined>;
-    // (undocumented)
     timestamp(this: void): Date;
-    // (undocumented)
     write(this: void, store: string, partition: string, input: InputRecord): Promise<OutputRecord | undefined>;
 }
 
@@ -238,13 +232,10 @@ export type FilterOperand<T, O> = (O extends IsOperator ? IsOperand<T> : O exten
 // @public (undocumented)
 export type FilterOperator<T> = ((IsOperand<T> extends never ? never : IsOperator) | (T extends Equatable ? EqualityOperator : never) | (T extends Comparable ? ComparisonOperator : never) | (T extends readonly unknown[] ? ArrayOperator : never) | (T extends string ? StringOperator : never));
 
-// @public (undocumented)
+// @public
 export interface FilterSpec {
-    // (undocumented)
     readonly operand: JsonValue;
-    // (undocumented)
     readonly operator: FilterOperator<JsonValue>;
-    // (undocumented)
     readonly path: readonly string[];
 }
 
@@ -254,15 +245,11 @@ export const Forbidden: unique symbol;
 // @public (undocumented)
 export type Forbidden = typeof Forbidden;
 
-// @public (undocumented)
+// @public
 export interface InputRecord {
-    // (undocumented)
     readonly key: string;
-    // (undocumented)
     readonly replace: string | null;
-    // (undocumented)
     readonly ttl: number;
-    // (undocumented)
     readonly value: JsonValue;
 }
 
@@ -272,7 +259,7 @@ export type IsOperand<T> = ((T extends undefined ? "defined" : never) | (T exten
 // @public (undocumented)
 export type IsOperator = "is" | "is-not";
 
-// @public (undocumented)
+// @public
 export type OutputRecord = {
     readonly key: string;
     readonly value: JsonValue;
@@ -354,15 +341,11 @@ export interface QueryHandler<P extends Record<string, unknown> = Record<string,
     readonly type: Type<T>;
 }
 
-// @public (undocumented)
+// @public
 export interface QuerySpec {
-    // (undocumented)
     readonly by?: SortSpec;
-    // (undocumented)
     readonly continuation?: string;
-    // (undocumented)
     readonly size?: number;
-    // (undocumented)
     readonly where?: readonly FilterSpec[];
 }
 
@@ -407,11 +390,9 @@ export type SortableProps<T> = {
 // @public (undocumented)
 export type SortDirection = "ascending" | "descending";
 
-// @public (undocumented)
+// @public
 export interface SortSpec {
-    // (undocumented)
     readonly direction: SortDirection;
-    // (undocumented)
     readonly path: readonly string[];
 }
 

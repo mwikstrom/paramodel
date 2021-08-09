@@ -4,6 +4,8 @@
 
 ## DomainDriver.init() method
 
+Intializes a domain store for usage. This function must be idempotent as it may be invoked several times for a single domain store.
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,8 +16,8 @@ init(this: void, store: string): Promise<void>;
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  this | void |  |
-|  store | string |  |
+|  this | void | <i>(Ignored)</i> This method uses implicit <code>this</code> binding |
+|  store | string | Identifies the domain store that shall be initialized |
 
 <b>Returns:</b>
 

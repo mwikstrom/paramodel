@@ -4,6 +4,12 @@
 
 ## InputRecord.ttl property
 
+The data record's time to live (TTL) measured in seconds.
+
+- Specify `0` to delete an existing data record
+
+- Specify `-1` to let the newly written data record remain forever
+
 <b>Signature:</b>
 
 ```typescript

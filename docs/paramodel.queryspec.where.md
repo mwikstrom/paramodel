@@ -4,6 +4,8 @@
 
 ## QuerySpec.where property
 
+An optional array of [filters](./paramodel.filterspec.md) that selects which records that shall be included in the result
+
 <b>Signature:</b>
 
 ```typescript

@@ -4,6 +4,8 @@
 
 ## DomainDriver.timestamp() method
 
+Gets the current timestamp
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,7 +16,7 @@ timestamp(this: void): Date;
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  this | void |  |
+|  this | void | <i>(Ignored)</i> This method uses implicit <code>this</code> binding |
 
 <b>Returns:</b>
 

@@ -4,6 +4,8 @@
 
 ## InputRecord interface
 
+A data record to be written
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,8 +16,8 @@ export interface InputRecord
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [key](./paramodel.inputrecord.key.md) | string |  |
-|  [replace](./paramodel.inputrecord.replace.md) | string \| null |  |
-|  [ttl](./paramodel.inputrecord.ttl.md) | number |  |
-|  [value](./paramodel.inputrecord.value.md) | JsonValue |  |
+|  [key](./paramodel.inputrecord.key.md) | string | Key of the data record |
+|  [replace](./paramodel.inputrecord.replace.md) | string \| null | A replacement token. Must be the value of the existing data record's token or <code>null</code> when there is no existing data record with the same key. |
+|  [ttl](./paramodel.inputrecord.ttl.md) | number | The data record's time to live (TTL) measured in seconds.<!-- -->- Specify <code>0</code> to delete an existing data record<!-- -->- Specify <code>-1</code> to let the newly written data record remain forever |
+|  [value](./paramodel.inputrecord.value.md) | JsonValue | Value of the data record |
 

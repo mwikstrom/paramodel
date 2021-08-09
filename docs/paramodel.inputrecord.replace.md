@@ -4,6 +4,8 @@
 
 ## InputRecord.replace property
 
+A replacement token. Must be the value of the existing data record's token or `null` when there is no existing data record with the same key.
+
 <b>Signature:</b>
 
 ```typescript

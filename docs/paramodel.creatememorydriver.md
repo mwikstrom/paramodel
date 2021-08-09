@@ -4,11 +4,20 @@
 
 ## createMemoryDriver() function
 
+Creates an in-memory [driver](./paramodel.domaindriver.md) that could be used to testing your domain
+
 <b>Signature:</b>
 
 ```typescript
-export declare function createMemoryDriver(): DomainDriver;
+export declare function createMemoryDriver(this: void): DomainDriver;
 ```
+
+## Parameters
+
+|  Parameter | Type | Description |
+|  --- | --- | --- |
+|  this | void | <i>(Ignored)</i> This method uses implicit <code>this</code> binding |
+
 <b>Returns:</b>
 
 [DomainDriver](./paramodel.domaindriver.md)

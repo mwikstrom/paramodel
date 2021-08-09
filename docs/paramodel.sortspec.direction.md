@@ -4,6 +4,8 @@
 
 ## SortSpec.direction property
 
+Specifies in which direction records shall be sorted
+
 <b>Signature:</b>
 
 ```typescript

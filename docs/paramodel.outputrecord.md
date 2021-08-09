@@ -4,6 +4,8 @@
 
 ## OutputRecord type
 
+A data record as returned from a [driver](./paramodel.domaindriver.md)
+
 <b>Signature:</b>
 
 ```typescript

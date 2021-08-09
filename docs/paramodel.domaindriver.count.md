@@ -4,6 +4,8 @@
 
 ## DomainDriver.count() method
 
+Returns a provies that resolves with the number of data records that matches the specified filter in the specified partition and store.
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,10 +16,10 @@ count(this: void, store: string, partition: string, where?: readonly FilterSpec[
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  this | void |  |
-|  store | string |  |
-|  partition | string |  |
-|  where | readonly [FilterSpec](./paramodel.filterspec.md)<!-- -->\[\] |  |
+|  this | void | <i>(Ignored)</i> This method uses implicit <code>this</code> binding |
+|  store | string | Identifies the domain store that contains the records to be counted |
+|  partition | string | Identifies the partition that contains the records to be counted |
+|  where | readonly [FilterSpec](./paramodel.filterspec.md)<!-- -->\[\] | <i>(Optional)</i> An array of [filters](./paramodel.filterspec.md) that selects which records that shall be counted. |
 
 <b>Returns:</b>
 

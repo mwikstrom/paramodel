@@ -4,6 +4,8 @@
 
 ## QuerySpec interface
 
+A data record query specification
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,8 +16,8 @@ export interface QuerySpec
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [by?](./paramodel.queryspec.by.md) | [SortSpec](./paramodel.sortspec.md) | <i>(Optional)</i> |
-|  [continuation?](./paramodel.queryspec.continuation.md) | string | <i>(Optional)</i> |
-|  [size?](./paramodel.queryspec.size.md) | number | <i>(Optional)</i> |
-|  [where?](./paramodel.queryspec.where.md) | readonly [FilterSpec](./paramodel.filterspec.md)<!-- -->\[\] | <i>(Optional)</i> |
+|  [by?](./paramodel.queryspec.by.md) | [SortSpec](./paramodel.sortspec.md) | <i>(Optional)</i> An optional [SortSpec](./paramodel.sortspec.md) that defines how data records shall be sorted |
+|  [continuation?](./paramodel.queryspec.continuation.md) | string | <i>(Optional)</i> An optional continuation token that was previously returned by the [DomainDriver.page()](./paramodel.domaindriver.page.md) function |
+|  [size?](./paramodel.queryspec.size.md) | number | <i>(Optional)</i> Optionally specifies a hint for the number of items that should be returned |
+|  [where?](./paramodel.queryspec.where.md) | readonly [FilterSpec](./paramodel.filterspec.md)<!-- -->\[\] | <i>(Optional)</i> An optional array of [filters](./paramodel.filterspec.md) that selects which records that shall be included in the result |
 

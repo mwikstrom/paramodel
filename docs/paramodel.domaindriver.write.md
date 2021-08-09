@@ -4,6 +4,8 @@
 
 ## DomainDriver.write() method
 
+Writes a single data record and returns a promise that resolves with the stored record, or `undefined` when the specified [replacement token](./paramodel.inputrecord.replace.md) did not match the required value.
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,10 +16,10 @@ write(this: void, store: string, partition: string, input: InputRecord): Promise
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  this | void |  |
-|  store | string |  |
-|  partition | string |  |
-|  input | [InputRecord](./paramodel.inputrecord.md) |  |
+|  this | void | <i>(Ignored)</i> This method uses implicit <code>this</code> binding |
+|  store | string | Identifies the domain store to which the data record shall be written |
+|  partition | string | Identifies the partition to which the data record shall be written |
+|  input | [InputRecord](./paramodel.inputrecord.md) | The data record that shall be written |
 
 <b>Returns:</b>
 

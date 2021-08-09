@@ -4,6 +4,8 @@
 
 ## QuerySpec.continuation property
 
+An optional continuation token that was previously returned by the [DomainDriver.page()](./paramodel.domaindriver.page.md) function
+
 <b>Signature:</b>
 
 ```typescript

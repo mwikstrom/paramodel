@@ -4,6 +4,8 @@
 
 ## QuerySpec.by property
 
+An optional [SortSpec](./paramodel.sortspec.md) that defines how data records shall be sorted
+
 <b>Signature:</b>
 
 ```typescript

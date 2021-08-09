@@ -4,6 +4,8 @@
 
 ## FilterSpec.operator property
 
+The filter condition operator
+
 <b>Signature:</b>
 
 ```typescript

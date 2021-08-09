@@ -4,6 +4,8 @@
 
 ## SortSpec interface
 
+Specifies how data records shall be sorted
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,6 +16,6 @@ export interface SortSpec
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [direction](./paramodel.sortspec.direction.md) | [SortDirection](./paramodel.sortdirection.md) |  |
-|  [path](./paramodel.sortspec.path.md) | readonly string\[\] |  |
+|  [direction](./paramodel.sortspec.direction.md) | [SortDirection](./paramodel.sortdirection.md) | Specifies in which direction records shall be sorted |
+|  [path](./paramodel.sortspec.path.md) | readonly string\[\] | Path to the property that records shall be sorted by |
 

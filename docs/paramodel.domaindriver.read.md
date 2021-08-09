@@ -4,6 +4,8 @@
 
 ## DomainDriver.read() method
 
+Returns a promise that resolves with a single data record with the specified key from the specified domain store and partition, or `undefined` when the record doesn't exist.
+
 <b>Signature:</b>
 
 ```typescript
@@ -14,10 +16,10 @@ read(this: void, store: string, partition: string, key: string): Promise<OutputR
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  this | void |  |
-|  store | string |  |
-|  partition | string |  |
-|  key | string |  |
+|  this | void | <i>(Ignored)</i> This method uses implicit <code>this</code> binding |
+|  store | string | Identifies the domain store that contains the data record |
+|  partition | string | Identifies the partition that contains the data record |
+|  key | string | Identifies the data record |
 
 <b>Returns:</b>
 
