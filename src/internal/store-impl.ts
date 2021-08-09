@@ -1,3 +1,4 @@
+import deepEqual from "deep-equal";
 import { positiveIntegerType, recordType, Type, TypeOf } from "paratype";
 import { ActionOptions, ActionResultType } from "../action";
 import { ChangeType } from "../change";
@@ -54,16 +55,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         );
     }
 
-    #createReadonlyEntityCollection = async <T extends Record<string, unknown>>(
+    #createEntityQueryable = <T extends Record<string, unknown>>(
         viewKey: string,
-        definition: EntityProjection<T>,
+        type: Type<T>,
         version: number,
-        circular: readonly string[],
-        authError?: ErrorFactory,
+        mode: "valid_range" | "valid_until" | "valid_from",
         metaMap?: WeakMap<T, EntityMetadata>,
-    ): Promise<ReadonlyEntityCollection<T>> => {        
-        const { auth, dependencies } = definition;
-        const envelopeType = entityEnvelopeType(definition.type);
+    ): Queryable<T> => {
+        const envelopeType = entityEnvelopeType(type);
         const transform = (record: OutputRecord): T => {
             const { value, key, token, ttl } = record;
             const envelope = envelopeType.fromJsonValue(value);
@@ -81,26 +80,59 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             partitionKey,
             transform,
         );
-        
-        const where: readonly FilterSpec[] = Object.freeze([
+
+        const where: FilterSpec[] =[
             {
                 path: ["key"],
                 operator: "!=",
                 operand: _rowKeys.viewHeader,
             },
             {
-                path: ["value", "valid_from"],
-                operator: "<=",
-                operand: version,
-            },
-            {
                 path: ["value", "valid_until"],
                 operator: ">=",
                 operand: version,
             }
-        ]);
+        ];
 
-        let query: Queryable<T> = new _QueryImpl(source, ["value", "entity"], where);
+        if (mode === "valid_range") {
+            where.push({
+                path: ["value", "valid_from"],
+                operator: "<=",
+                operand: version,
+            }, {
+                path: ["value", "valid_until"],
+                operator: ">=",
+                operand: version,
+            });
+        } else if (mode === "valid_from") {
+            where.push({
+                path: ["value", "valid_from"],
+                operator: "==",
+                operand: version,
+            });
+        } else if (mode === "valid_until") {
+            where.push({
+                path: ["value", "valid_until"],
+                operator: "==",
+                operand: version,
+            });
+        } else {
+            throw new Error("Invalid version mode");
+        }
+
+        return new _QueryImpl(source, ["value", "entity"], Object.freeze(where));
+    }
+
+    #createReadonlyEntityCollection = async <T extends Record<string, unknown>>(
+        viewKey: string,
+        definition: EntityProjection<T>,
+        version: number,
+        circular: readonly string[],
+        authError?: ErrorFactory,
+        metaMap?: WeakMap<T, EntityMetadata>,
+    ): Promise<ReadonlyEntityCollection<T>> => {        
+        const { auth, dependencies } = definition;
+        let query = this.#createEntityQueryable(viewKey, definition.type, version, "valid_range", metaMap);
 
         if (authError && auth) {
             const snapshot = this.#createViewSnapshotFunc(version, dependencies, circular);
@@ -591,11 +623,47 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             await definition.apply(change, state, snapshot);
         }
 
-        // TODO: Delete any keys that may have been written before but not in this run
-        //       This will only occur in case the handler logic is indeterministic (or changed)
+        const validUntilBase = this.#createEntityQueryable(viewKey, definition.type, baseVerison, "valid_until");
+        const alreadyMarkedWithValidUntil = new Set<string>();
+        for await (const entity of validUntilBase.all()) {
+            const key = entity[definition.key] as string;
+            if (!written.has(key)) {
+                throw new Error(
+                    `Detected non-deterministic entity projection of view "${viewKey}". ` + 
+                    `Entity "${key}" was marked as valid until ${baseVerison} in an earlier sync ` +
+                    `but was not written now for commit ${commit.version}.`
+                );
+            }
+            alreadyMarkedWithValidUntil.add(key);
+        }
+
+        const validFromCommit = this.#createEntityQueryable(viewKey, definition.type, commit.version, "valid_from");
+        const alreadyWritten = new Set<string>();
+        for await (const entity of validFromCommit.all()) {
+            const key = entity[definition.key] as string;
+            const expected = written.get(key);
+            if (expected === void(0)) {
+                throw new Error(
+                    `Detected non-deterministic entity projection of view "${viewKey}". ` + 
+                    `Entity "${key}" was marked as valid from ${commit.version} in an earlier sync ` +
+                    "but was not written now."
+                );
+            } else if (!deepEqual(entity, expected, { strict: true })) {
+                throw new Error(
+                    `Detected non-deterministic entity projection of view "${viewKey}". ` + 
+                    `Entity "${key}" in version ${commit.version} ` +
+                    "was written with a different value in an earlier sync."
+                );
+            }
+            alreadyWritten.add(key);
+        }
 
         // Write the new entities (ignoring nulls - those are deletions)
         for (const [key, props] of written) {
+            if (alreadyWritten.has(key)) {
+                continue;
+            }
+
             if (!props) {
                 continue; // entity was deleted
             }
@@ -620,9 +688,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             await this.#writeSuccess(pk, input);
         }
 
-        // Set end marks of all written keys in the base version
+        // Mark written entities with 'valid_until' base version
         for (const key of written.keys()) {
+            if (alreadyMarkedWithValidUntil.has(key)) {
+                continue;
+            }
+
             const entity = await base.get(key);
+            
             if (!entity) {
                 continue; // did not exist before
             }

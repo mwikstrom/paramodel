@@ -62,7 +62,9 @@
   },
   "dependencies": {
     "@types/debug": "^4.1.7",
+    "@types/deep-equal": "^1.0.1",
     "debug": "^4.3.2",
+    "deep-equal": "^2.0.5",
     "escape-string-regexp": "^5.0.0"
   }
 }
