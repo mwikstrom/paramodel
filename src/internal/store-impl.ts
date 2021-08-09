@@ -1053,6 +1053,8 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             }
         }
         while (!signal?.aborted && synced < (target || 0));
+
+        _logInfo("Synced %s in %s to version %d", viewKeys.join(", "), this.#id, synced);
         return synced;
     }
 
