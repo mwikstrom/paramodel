@@ -839,20 +839,13 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
     #tryAction = async <K extends string & keyof Model["actions"]>(
         latest: _Commit | undefined,
-        minBase: number,
         actionKey: K, 
         input: TypeOf<Model["actions"][K]["input"]>, 
         options: Partial<ActionOptions> = {},
     ): Promise<ActionResultType<Model, K> | undefined> => {
         const { dry = false, signal } = options;
         const base = latest?.version || 0;
-        const timestamp = this.#driver.timestamp();
-                
-        if (base < minBase) {
-            const status = "aborted";
-            const message = "Optimistic concurrency inconsistency";
-            return { timestamp, base, status, message };
-        }
+        const timestamp = this.#driver.timestamp();               
 
         if (!(actionKey in this.#model.actions)) {
             const status = "rejected";
@@ -957,17 +950,20 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         input: TypeOf<Model["actions"][K]["input"]>, 
         options: Partial<ActionOptions> = {},
     ): Promise<ActionResultType<Model, K>> => {
-        let minBase = 0;
-
-        for (;;) {
-            const latest = await this.#getLatestCommit();            
-            const result = await this.#tryAction(latest, minBase, key, input, options);
+        let latest = await this.#getLatestCommit();
+        for (;;) {            
+            const result = await this.#tryAction(latest, key, input, options);
 
             if (result !== void(0)) {
                 return result;
             }
 
-            minBase = (latest?.version || 0) + 1;
+            const fresh = await this.#getLatestCommit();
+            if (!fresh || fresh.version <= (latest?.version || 0)) {
+                throw new Error("Detected optimistic concurrency inconsistency");
+            }
+
+            latest = fresh;
         }
     }
 
