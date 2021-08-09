@@ -6,7 +6,17 @@
 
 Defines the action result status codes:
 
-- `success`<!-- -->: The action completed successfully - `conflict`<!-- -->: A conflict prevented the action from completing successfully - `forbidden`<!-- -->: The active domain scope was not permitted to execute the action - `aborted`<!-- -->: The action was aborted - `rejected`<!-- -->: The action was rejected due to bad input - `failed`<!-- -->: The action failed to execute
+- `success`<!-- -->: The action completed successfully
+
+- `conflict`<!-- -->: A conflict prevented the action from completing successfully
+
+- `forbidden`<!-- -->: The active domain scope was not permitted to execute the action
+
+- `aborted`<!-- -->: The action was aborted
+
+- `rejected`<!-- -->: The action was rejected due to bad input
+
+- `failed`<!-- -->: The action failed to execute
 
 <b>Signature:</b>
 
