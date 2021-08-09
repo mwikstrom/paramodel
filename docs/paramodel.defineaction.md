@@ -4,20 +4,23 @@
 
 ## defineAction() function
 
+Creates an [ActionHandler](./paramodel.actionhandler.md)
+
 <b>Signature:</b>
 
 ```typescript
-export declare function defineAction<Input, Output, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(input: Type<Input>, exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>, dependencies?: Dependencies, output?: Type<Output>): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>;
+export declare function defineAction<Input, Output, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(this: void, input: Type<Input>, exec: ActionFunc<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>, dependencies?: Dependencies, output?: Type<Output>): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  input | Type&lt;Input&gt; |  |
-|  exec | [ActionFunc](./paramodel.actionfunc.md)<!-- -->&lt;Events, Pick&lt;Views, Dependencies\[number\]&gt;, Scope, Input, Output&gt; |  |
-|  dependencies | Dependencies |  |
-|  output | Type&lt;Output&gt; |  |
+|  this | void | <i>(Ignored)</i> This method uses implicit <code>this</code> binding |
+|  input | Type&lt;Input&gt; | Type of action input |
+|  exec | [ActionFunc](./paramodel.actionfunc.md)<!-- -->&lt;Events, Pick&lt;Views, Dependencies\[number\]&gt;, Scope, Input, Output&gt; | The action handler executor |
+|  dependencies | Dependencies | A set of view keys that the action depend upon during execution. These views will automatically be synced to the current version just before the action the executed and available via the [ActionContext.view()](./paramodel.actioncontext.view.md) function. |
+|  output | Type&lt;Output&gt; | <i>(Optional)</i> Type of action output |
 
 <b>Returns:</b>
 

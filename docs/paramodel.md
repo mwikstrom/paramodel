@@ -12,7 +12,7 @@ Run-time domain model for event-sourcing.
 |  --- | --- |
 |  [createDomainProvider(driver)](./paramodel.createdomainprovider.md) |  |
 |  [createMemoryDriver()](./paramodel.creatememorydriver.md) |  |
-|  [defineAction(input, exec, dependencies, output)](./paramodel.defineaction.md) |  |
+|  [defineAction(this, input, exec, dependencies, output)](./paramodel.defineaction.md) | Creates an [ActionHandler](./paramodel.actionhandler.md) |
 |  [defineEntity(type, key, on, auth, dependencies)](./paramodel.defineentity.md) |  |
 |  [defineQuery(type, params, dependencies, exec, auth)](./paramodel.definequery.md) |  |
 |  [defineState(type, initial, on, dependencies, auth)](./paramodel.definestate.md) |  |
