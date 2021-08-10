@@ -2,6 +2,8 @@ import { Type } from "paratype";
 import { ActionHandler, AnyActionHandler } from "./action-handler";
 import { AnyProjection } from "./projection";
 
+// TODO: Support declaring PII props in events
+
 /**
  * Alias for an unknown change model
  * @public
