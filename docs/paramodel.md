@@ -63,7 +63,7 @@ Run-time domain model for event-sourcing.
 |  --- | --- |
 |  [Conflict](./paramodel.conflict.md) | A well-known symbol that can be used to indicate that an action failed due to a conflict |
 |  [Forbidden](./paramodel.forbidden.md) | A well-known symbol that can be used to indicate that an action failed because the domain access scope is not permitted to execute it |
-|  [piiStringType](./paramodel.piistringtype.md) | A record type that represents a [PiiString](./paramodel.piistring.md) |
+|  [piiStringType](./paramodel.piistringtype.md) | A record type that represents a  |
 
 ## Type Aliases
 
@@ -88,7 +88,7 @@ Run-time domain model for event-sourcing.
 |  [EqualityOperator](./paramodel.equalityoperator.md) | Defines the equality operators |
 |  [Equatable](./paramodel.equatable.md) | Represents equatable property types |
 |  [ErrorFactory](./paramodel.errorfactory.md) | A function that creates an error to be thrown |
-|  [ExposedPii](./paramodel.exposedpii.md) | Type alias that exposes the decrypted or obfuscated value of [PII](./paramodel.piistring.md) |
+|  [ExposedPii](./paramodel.exposedpii.md) | Recursively replaces [PiiString](./paramodel.piistring.md) with <code>string</code> |
 |  [FilterOperand](./paramodel.filteroperand.md) | A type alias that represents a filter operand for a given property type and operator |
 |  [FilterOperator](./paramodel.filteroperator.md) | A type alias that represents a filter operator for a given property type |
 |  [Forbidden](./paramodel.forbidden.md) | Type of the well-known forbidden symbol |
@@ -105,6 +105,7 @@ Run-time domain model for event-sourcing.
 |  [StateAuthFunc](./paramodel.stateauthfunc.md) | A function that authorizes access to the projected state |
 |  [StateChangeHandlers](./paramodel.statechangehandlers.md) | An object that define the change event handlers that may mutate the defined state.<!-- -->Each key in this object is the name of a change event and the corresponding value is an [StateApplyFunc](./paramodel.stateapplyfunc.md) that shall be invoked to apply the effect of that change. |
 |  [StringOperator](./paramodel.stringoperator.md) | Defines the string operators |
+|  [TransparentPii](./paramodel.transparentpii.md) | Recursively replaces <code>string</code> with a union of <code>string</code> and [PiiString](./paramodel.piistring.md) |
 |  [View](./paramodel.view.md) | A type alias that represents a view |
 |  [ViewOf](./paramodel.viewof.md) | Extracts the view type of a projection |
 |  [ViewSnapshotFunc](./paramodel.viewsnapshotfunc.md) | The view snapshot function |

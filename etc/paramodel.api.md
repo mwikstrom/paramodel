@@ -472,6 +472,11 @@ export interface SyncOptions<K extends string = string> {
 }
 
 // @public
+export type TransparentPii<T> = (T extends string ? string | PiiString : T extends Array<infer E> ? Array<TransparentPii<E>> : T extends Record<string, any> ? {
+    [K in keyof T]: TransparentPii<T[K]>;
+} : T);
+
+// @public
 export type View = StateView | QueryView | EntityView<Record<string, string | number>, string>;
 
 // @public

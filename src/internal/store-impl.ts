@@ -1,7 +1,5 @@
 import deepEqual from "deep-equal";
 import { JsonValue, jsonValueType, positiveIntegerType, recordType, Type, TypeOf } from "paratype";
-import crypto from "crypto";
-import buffer from "buffer";
 import { ActionResultType } from "../action-result";
 import { ActionOptions } from "../action-options";
 import { ChangeType } from "../change";
@@ -45,7 +43,7 @@ import {
 } from "./view-header";
 import { ExposedPii, PiiString, piiStringType } from "../pii";
 import { ActionContext } from "../action-context";
-import { _decryptPii, _PiiKey } from "./pii-crypto";
+import { _decryptPii, _encryptPii, _PiiKey } from "./pii-crypto";
 
 /** @internal */
 export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model> {
@@ -68,26 +66,35 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         );
     }
 
-    #fetchPiiKey = async (scope: string): Promise<_PiiKey | undefined> => {
-        throw new Error("TODO: Implement #fetchPiiKey");
+    #getPiiKey = async (scope: string): Promise<_PiiKey | undefined> => {
+        throw new Error("TODO: Implement #getPiiKey");
     }
 
-    #createPii: ActionContext["pii"] = async (scope: string, value: string, obfuscated = ""): Promise<PiiString> => {
-        // TODO: Implement #createPii
-        const version = 0;
-        const encrypted = new ArrayBuffer(0);
+    #getOrCreatePiiKey = async (scope: string, version: number): Promise<_PiiKey> => {
+        // TODO: When key exists, ensure that is hasn't been slated for shredding
+        throw new Error("TODO: Implement #getOrCreatePiiKey");
+    }
+
+    #createPii = async (
+        scope: string,
+        version: number,
+        value: string,
+        obfuscated = ""
+    ): Promise<PiiString> => {
+        const key = await this.#getOrCreatePiiKey(scope, version);
+        version = key.version;
+        const encrypted = await _encryptPii(key, value);
         const pii: PiiString = Object.freeze({
             obfuscated,
             scope,
             version,
             encrypted,
         });
-
         return pii;
     }
 
     #exposePiiString = async (pii: PiiString): Promise<string> => {  
-        const key = await this.#fetchPiiKey(pii.scope);
+        const key = await this.#getPiiKey(pii.scope);
         if (!key || key.version > pii.version) {
             return pii.obfuscated;
         }
@@ -1066,6 +1073,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
 
         const snapshot = this.#createViewSnapshotFunc(base, handler.dependencies, []);
+        const createPii: ActionContext["pii"] = (scope, ...rest) => this.#createPii(scope, version, ...rest);
         const fromContext = await new _ActionContextImpl(
             version,
             timestamp,
@@ -1074,7 +1082,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             this.#model.events,
             handler,
             snapshot,
-            this.#createPii,
+            createPii,
         )._run();
 
         if (fromContext.status !== "success") {

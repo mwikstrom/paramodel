@@ -4,6 +4,7 @@ import { binaryType, positiveIntegerType, recordType, stringType, Type } from "p
  * An encrypted and obfuscated string that contains personally identifiable information (PII)
  * @public
  */
+// TODO: Use a symbol for identifying PiiStrings
 export interface PiiString {
     /** Obfuscated value - must not contain PII */
     readonly obfuscated: string;
@@ -19,7 +20,7 @@ export interface PiiString {
 }
 
 /**
- * Type alias that exposes the decrypted or obfuscated value of {@link PiiString|PII}
+ * Recursively replaces {@link PiiString} with `string`
  * @public
  */
 export type ExposedPii<T> = (
@@ -33,7 +34,21 @@ export type ExposedPii<T> = (
 );
 
 /**
- * A record type that represents a {@link PiiString}
+ * Recursively replaces `string` with a union of `string` and {@link PiiString}
+ * @public
+ */
+export type TransparentPii<T> = (
+    T extends string ? string | PiiString :
+    T extends Array<infer E> ? Array<TransparentPii<E>> :
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    T extends Record<string, any> ? {
+        [K in keyof T]: TransparentPii<T[K]>
+    } :
+    T
+);
+
+/**
+ * A record type that represents a {@link PiiStringData}
  * @public
  */
 export const piiStringType: Type<PiiString> = recordType({

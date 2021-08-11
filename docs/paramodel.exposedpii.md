@@ -4,7 +4,7 @@
 
 ## ExposedPii type
 
-Type alias that exposes the decrypted or obfuscated value of [PII](./paramodel.piistring.md)
+Recursively replaces [PiiString](./paramodel.piistring.md) with `string`
 
 <b>Signature:</b>
 
