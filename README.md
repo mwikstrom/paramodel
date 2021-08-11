@@ -1,4 +1,4 @@
-# paramodel
+# Paramodel
 
 Run-time domain model for event-sourcing.
 
