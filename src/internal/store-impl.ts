@@ -1,5 +1,7 @@
 import deepEqual from "deep-equal";
 import { JsonValue, jsonValueType, positiveIntegerType, recordType, Type, TypeOf } from "paratype";
+import crypto from "crypto";
+import buffer from "buffer";
 import { ActionResultType } from "../action-result";
 import { ActionOptions } from "../action-options";
 import { ChangeType } from "../change";
@@ -43,6 +45,7 @@ import {
 } from "./view-header";
 import { ExposedPii, PiiString, piiStringType } from "../pii";
 import { ActionContext } from "../action-context";
+import { _decryptPii, _PiiKey } from "./pii-crypto";
 
 /** @internal */
 export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model> {
@@ -65,10 +68,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         );
     }
 
+    #fetchPiiKey = async (scope: string): Promise<_PiiKey | undefined> => {
+        throw new Error("TODO: Implement #fetchPiiKey");
+    }
+
     #createPii: ActionContext["pii"] = async (scope: string, value: string, obfuscated = ""): Promise<PiiString> => {
         // TODO: Implement #createPii
         const version = 0;
-        const encrypted = "";
+        const encrypted = new ArrayBuffer(0);
         const pii: PiiString = Object.freeze({
             obfuscated,
             scope,
@@ -79,9 +86,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return pii;
     }
 
-    #exposePiiString = async (pii: PiiString): Promise<string> => {
-        // TODO: Implement #exposePiiString
-        return pii.obfuscated;
+    #exposePiiString = async (pii: PiiString): Promise<string> => {  
+        const key = await this.#fetchPiiKey(pii.scope);
+        if (!key || key.version > pii.version) {
+            return pii.obfuscated;
+        }
+        
+        const plain = await _decryptPii(key, pii.encrypted);
+        return typeof plain === "string" ? plain : pii.obfuscated;
     }
 
     #getEntityValidUntilToBeWritten = async (

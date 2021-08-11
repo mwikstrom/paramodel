@@ -7,7 +7,6 @@
 import { JsonValue } from 'paratype';
 import { Type } from 'paratype';
 import { TypeOf } from 'paratype';
-import { WithRecordOptions } from 'paratype';
 
 // @public
 export interface ActionContext<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Scope = unknown, Input = unknown, Output = unknown> {
@@ -291,19 +290,14 @@ export interface PageOptions {
 
 // @public
 export interface PiiString {
-    readonly encrypted: string;
+    readonly encrypted: ArrayBuffer;
     readonly obfuscated: string;
     readonly scope: string;
     readonly version: number;
 }
 
 // @public
-export const piiStringType: Type<WithRecordOptions<    {
-obfuscated: string;
-scope: string;
-version: number;
-encrypted: string;
-}, []>>;
+export const piiStringType: Type<PiiString>;
 
 // @public
 export type PossibleKeysOf<T> = {

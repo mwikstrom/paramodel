@@ -9,5 +9,5 @@ Encrypted value
 <b>Signature:</b>
 
 ```typescript
-readonly encrypted: string;
+readonly encrypted: ArrayBuffer;
 ```

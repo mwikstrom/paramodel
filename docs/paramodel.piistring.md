@@ -16,7 +16,7 @@ export interface PiiString
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [encrypted](./paramodel.piistring.encrypted.md) | string | Encrypted value |
+|  [encrypted](./paramodel.piistring.encrypted.md) | ArrayBuffer | Encrypted value |
 |  [obfuscated](./paramodel.piistring.obfuscated.md) | string | Obfuscated value - must not contain PII |
 |  [scope](./paramodel.piistring.scope.md) | string | Scope of the PII |
 |  [version](./paramodel.piistring.version.md) | number | Commit version when the PII scope was initialized |

@@ -9,10 +9,5 @@ A record type that represents a [PiiString](./paramodel.piistring.md)
 <b>Signature:</b>
 
 ```typescript
-piiStringType: import("paratype").Type<import("paratype").WithRecordOptions<{
-    obfuscated: string;
-    scope: string;
-    version: number;
-    encrypted: string;
-}, []>>
+piiStringType: Type<PiiString>
 ```

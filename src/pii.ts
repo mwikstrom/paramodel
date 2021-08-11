@@ -1,4 +1,4 @@
-import { positiveIntegerType, recordType, stringType } from "paratype";
+import { binaryType, positiveIntegerType, recordType, stringType, Type } from "paratype";
 
 /**
  * An encrypted and obfuscated string that contains personally identifiable information (PII)
@@ -15,7 +15,7 @@ export interface PiiString {
     readonly version: number;
 
     /** Encrypted value */
-    readonly encrypted: string;    
+    readonly encrypted: ArrayBuffer;    
 }
 
 /**
@@ -36,9 +36,9 @@ export type ExposedPii<T> = (
  * A record type that represents a {@link PiiString}
  * @public
  */
-export const piiStringType = recordType({
+export const piiStringType: Type<PiiString> = recordType({
     obfuscated: stringType,
     scope: stringType,
     version: positiveIntegerType,
-    encrypted: stringType,
+    encrypted: binaryType,
 });

@@ -8,9 +8,11 @@ Run-time domain model for event-sourcing.
 
 ----
 
+- TODO: Implement _decryptString
+
 - TODO: Implement #createPii
 
-- TODO: Implement #exposePiiString
+- TODO: Implement #fetchPiiKey
 
 - TODO: Include shredded scopes in commit
 
