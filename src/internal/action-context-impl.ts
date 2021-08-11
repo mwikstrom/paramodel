@@ -5,7 +5,6 @@ import { ActionHandler } from "../action-handler";
 import { Change } from "../change";
 import { ChangeModel, Conflict, Forbidden, ReadModel } from "../model";
 import { ViewOf, ViewSnapshotFunc } from "../projection";
-import { _ConversionContextFactory } from "./store-impl";
 
 /** @internal */
 export class _ActionContextImpl<
@@ -21,10 +20,9 @@ export class _ActionContextImpl<
     #output: Output | undefined;
     #status: ActionResult["status"] | undefined;
     #message: ActionResult["message"];
-    #emittedEvents: EmittedEvent[] = [];
+    #emittedEvents: Omit<Change<JsonValue>, "version" | "timestamp" | "position">[] = [];
     #emittedChanges = new Set<string>();
     #snapshot: ViewSnapshotFunc<Views>;
-    #makeConversionContext: _ConversionContextFactory;
 
     constructor(
         public readonly version: number,
@@ -34,12 +32,10 @@ export class _ActionContextImpl<
         events: Events,
         handler: ActionHandler<Events, Views, Scope, Input, Output>,
         snapshot: ViewSnapshotFunc<Views>,
-        conversionContextFactory: _ConversionContextFactory,
     ) {
         this.#events = events;
         this.#handler = handler;
         this.#snapshot = snapshot;
-        this.#makeConversionContext = conversionContextFactory;
     }
 
     #fail = <T>(symbol: T, status: ActionResult["status"], message?: string): T => {
@@ -90,15 +86,9 @@ export class _ActionContextImpl<
             this.#output = void(0);
         }
 
-        const events: Omit<Change<JsonValue>, "version" | "timestamp" | "position">[] = [];
-        for (const { key, promise } of this.#emittedEvents) {
-            const arg = await promise;
-            events.push({ key, arg });
-        }
-
         const result: _ActionContextRunResult<Output> = {
             changes: Array.from(this.#emittedChanges),
-            events: Object.freeze(events),
+            events: [...this.#emittedEvents],
             status: this.#status,
             message: this.#message,
             output: this.#output,
@@ -132,13 +122,13 @@ export class _ActionContextImpl<
         const eventType: Type = this.#events[key];
         eventType.assert(arg, msg => new Error(`Invalid argument for event '${key}': ${msg}`));
 
-        const promise = eventType.toJsonValue(
+        const jsonArg = eventType.toJsonValue(
             arg, 
-            this.#makeConversionContext(`Argument for event '${key}' could not be converted to json`),
+            msg => new Error(`Argument for event '${key}' could not be converted to json: ${msg}`)
         );
 
         this.#emittedChanges.add(key);
-        this.#emittedEvents.push({ key, promise });
+        this.#emittedEvents.push({ key, arg: jsonArg });
     }
 
     view = <K extends string & keyof Views>(key: K): Promise<ViewOf<Views[K]>> => this.#snapshot(key);
@@ -151,9 +141,4 @@ export type _ActionContextRunResult<Output> = {
     status: "success" | "conflict" | "forbidden" | "aborted" | "rejected" | "failed";
     message: string | undefined;
     output: Output | undefined;
-};
-
-type EmittedEvent = {
-    key: string,
-    promise: Promise<JsonValue>;
 };

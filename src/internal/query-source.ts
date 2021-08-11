@@ -37,7 +37,7 @@ export class _DriverQuerySource<T> implements _QuerySource<T> {
     page = async (query: QuerySpec): Promise<Page<T>> => {
         const { items, ...rest } = await this.#driver.page(this.#store, this.#partition, query);
         const result: Page<T> = {
-            items: await Promise.all(items.map(this.#transform)),
+            items: items.map(this.#transform),
             ...rest
         };
         return result;
@@ -45,4 +45,4 @@ export class _DriverQuerySource<T> implements _QuerySource<T> {
 }
 
 /** @internal */
-export type _OutputRecordTransform<T> = (output: OutputRecord) => Promise<T>;
+export type _OutputRecordTransform<T> = (output: OutputRecord) => T;

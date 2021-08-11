@@ -1,5 +1,5 @@
 import deepEqual from "deep-equal";
-import { ConversionContext, JsonValue, jsonValueType, positiveIntegerType, recordType, Type, TypeOf } from "paratype";
+import { JsonValue, jsonValueType, positiveIntegerType, recordType, Type, TypeOf } from "paratype";
 import { ActionResultType } from "../action-result";
 import { ActionOptions } from "../action-options";
 import { ChangeType } from "../change";
@@ -66,11 +66,6 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         );
     }
 
-    #makeConversionContext: _ConversionContextFactory = (errorPrefix?: string): ConversionContext => ({
-        error: errorPrefix ? message => new Error(`${errorPrefix}: ${message}`) : message => new Error(message),
-        service: () => void(0), // TODO: Expose PII service
-    })
-
     #getEntityValidUntilToBeWritten = async (
         viewKey: string,
         entityKeyProp: string,
@@ -78,9 +73,9 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         validFrom: number,        
     ): Promise<number> => {
         const envelopeType = entityEnvelopeType(jsonValueType);
-        const transform = (record: OutputRecord): Promise<EntityEnvelope<JsonValue>> => {
+        const transform = (record: OutputRecord): EntityEnvelope<JsonValue> => {
             const { value } = record;
-            return envelopeType.fromJsonValue(value, this.#makeConversionContext());
+            return envelopeType.fromJsonValue(value);
         };
         const partitionKey = _partitionKeys.view(viewKey);
         const source = new _DriverQuerySource(
@@ -117,9 +112,9 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         metaMap?: WeakMap<T, EntityMetadata>,
     ): Queryable<T> => {
         const envelopeType = entityEnvelopeType(type);
-        const transform = async (record: OutputRecord): Promise<T> => {
+        const transform = (record: OutputRecord): T => {
             const { value, key, token, ttl } = record;
-            const envelope = await envelopeType.fromJsonValue(value, this.#makeConversionContext());
+            const envelope = envelopeType.fromJsonValue(value);
             const entity = envelope.entity;
             if (metaMap) {
                 const meta: EntityMetadata = Object.freeze({ key, token, ttl, envelope });
@@ -274,7 +269,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             throw new Error(`State not found for view "${viewKey}" in "${this.#id}" version ${version}`);
         }
 
-        return await stateType.fromJsonValue(output.value, this.#makeConversionContext());
+        return stateType.fromJsonValue(output.value);
     }
 
     #fetchStateSnapshotRecord = async (
@@ -286,7 +281,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             this.#driver,
             this.#id,
             partitionKey,
-            async record => record,
+            record => record,
         );
         const output = await new _QueryImpl(source, [], [])
             .by("key", "descending")
@@ -400,21 +395,18 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     #getCommit = async (version: number): Promise<_Commit | undefined> => {
         const record = await this.#driver.read(this.#id, _partitionKeys.commits, _rowKeys.commit(version));
         if (record) {
-            return await _commitType.fromJsonValue(record.value, this.#makeConversionContext());
+            return _commitType.fromJsonValue(record.value);
         }
     }
 
     #getSyncInfoMap = async (
         viewKeys: readonly string[]
-    ): Promise<Map<string, _SyncViewInfo>> => {
-        const result = new Map<string, _SyncViewInfo>();
-        for (const key of viewKeys) {
-            const record = await this.#getViewHeaderRecord(key);
-            const info = await _getSyncInfoFromRecord(record, this.#makeConversionContext);
-            result.set(key, info);
-        }
-        return result;
-    };
+    ): Promise<Map<string, _SyncViewInfo>> => new Map<string, _SyncViewInfo>(
+        (await Promise.all(viewKeys.map(this.#getViewHeaderRecord))).map((record, index) => ([
+            viewKeys[index],
+            _getSyncInfoFromRecord(record),
+        ]))    
+    );    
 
     #getViewHeaderRecord = (key: string): Promise<OutputRecord | undefined> => {
         const partition = _partitionKeys.view(key);
@@ -424,7 +416,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
     #getViewHeader = async (key: string): Promise<_ViewHeader | undefined> => {
         const record = await this.#getViewHeaderRecord(key);
-        return record && await _viewHeader.fromJsonValue(record.value, this.#makeConversionContext());
+        return record && _viewHeader.fromJsonValue(record.value);
     }
 
     #getViewSyncVersion = async (key: string, definition?: AnyProjection): Promise<number | undefined> => {
@@ -664,12 +656,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     }
 
     #syncEntities = async (commit: _Commit, projection: EntityProjection, viewKey: string): Promise<boolean> => {
-        const changes = await _getChangesFromCommit(
-            commit, 
-            this.#model.events, 
-            this.#makeConversionContext, 
-            projection.mutators
-        );
+        const changes = _getChangesFromCommit(commit, this.#model.events, projection.mutators);
         const snapshot = this.#createViewSnapshotFunc(commit.version, projection.dependencies, [viewKey]);
         const metaMap = new WeakMap<Record<string, unknown>, EntityMetadata>();
         const baseVerison = commit.version - 1;
@@ -754,10 +741,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 valid_until: valid_until,
                 entity: props,
             };
-            const value = await envelopeType.toJsonValue(
-                envelope, 
-                this.#makeConversionContext("Could not serialize entity")
-            );
+            const value = envelopeType.toJsonValue(envelope, msg => new Error(`Could not serialize entity: ${msg}`));
             const input: InputRecord = {
                 key: rk(key),
                 value,
@@ -795,9 +779,9 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 entity: meta.envelope.entity,
             };
 
-            const value = await envelopeType.toJsonValue(
+            const value = envelopeType.toJsonValue(
                 envelope,
-                this.#makeConversionContext("Could not rewrite entity envelope"),
+                msg => new Error(`Could not rewrite entity envelope: ${msg}`)
             );
 
             const input: InputRecord = {
@@ -814,12 +798,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     }
 
     #syncState = async (commit: _Commit, projection: StateProjection, key: string): Promise<boolean> => {
-        const changes = await _getChangesFromCommit(
-            commit, 
-            this.#model.events,
-            this.#makeConversionContext,
-            projection.mutators
-        );
+        const changes = _getChangesFromCommit(commit, this.#model.events, projection.mutators);
         const snapshot = this.#createViewSnapshotFunc(commit.version, projection.dependencies, [key]);
         const before = commit.version === 1 ?
             projection.initial :
@@ -829,9 +808,9 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             after = await projection.apply(change, after, snapshot);
         }
         
-        const jsonState = await projection.type.toJsonValue(
+        const jsonState = projection.type.toJsonValue(
             after,
-            this.#makeConversionContext("Could not serialize view state to json"),
+            msg => new Error(`Could not serialize view state to json: ${msg}`)
         );
 
         const input: InputRecord = {
@@ -854,7 +833,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     ): Promise<_SyncViewInfo | undefined> => this.#storeViewHeader(
         key, 
         prev, 
-        info => _getViewHeaderRecordForCommit(commit, info, kind, modified, this.#makeConversionContext),
+        info => _getViewHeaderRecordForCommit(commit, info, kind, modified)
     );
 
     #storeViewHeaderForPurge = async (
@@ -875,19 +854,18 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return await this.#storeViewHeader(
             key, 
             prev, 
-            info => _getViewHeaderRecordForPurge(purgeVersion, info, kind, this.#makeConversionContext),
+            info => _getViewHeaderRecordForPurge(purgeVersion, info, kind)
         );
     }
 
     #storeViewHeader = async (
         key: string, 
         prev: _SyncViewInfo, 
-        update: (info: _SyncViewInfo) => Promise<InputRecord | undefined>
+        update: (info: _SyncViewInfo) => InputRecord | undefined
     ): Promise<_SyncViewInfo | undefined> => {
         const pk = _partitionKeys.view(key);
         for (;;) {
-            const input = await update(prev);
-
+            const input = update(prev);
             if (!input) {
                 return void(0);
             }
@@ -895,12 +873,12 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             let output = await this.#driver.write(this.#id, pk, input);
 
             if (output) {
-                return await _getSyncInfoFromRecord(output, this.#makeConversionContext);
+                return _getSyncInfoFromRecord(output);
             }
 
             // Update token mismatch. Read current header and try again (loop continues)
             output = await this.#driver.read(this.#id, pk, input.key);
-            prev = await _getSyncInfoFromRecord(output, this.#makeConversionContext);
+            prev = _getSyncInfoFromRecord(output);
         }
     }
 
@@ -980,7 +958,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         signal?: AbortSignal,
     ): Promise<boolean> => {
         const pk = _partitionKeys.view(viewKey);
-        const source = new _DriverQuerySource(this.#driver, this.#id, pk, async record => record);
+        const source = new _DriverQuerySource(this.#driver, this.#id, pk, record => record);
         const filter: FilterSpec[] = [
             {
                 path: ["ttl"],
@@ -1066,7 +1044,6 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             this.#model.events,
             handler,
             snapshot,
-            this.#makeConversionContext,
         )._run();
 
         if (fromContext.status !== "success") {
@@ -1118,10 +1095,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
     #tryCommit = async (commit: _Commit): Promise<boolean> => {
         const key = _rowKeys.commit(commit.version);
-        const value = await _commitType.toJsonValue(
-            commit, 
-            this.#makeConversionContext("Failed to serialize commit"),
-        );
+        const value = _commitType.toJsonValue(commit, msg => new Error(`Failed to serialize commit: ${msg}`));
         const input: InputRecord = {
             key,
             value,
@@ -1168,14 +1142,13 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     ): AsyncIterable<ChangeType<Model["events"]>> => {
         const changeModel = this.#model.events;
         const readCommits = () => this.#readCommits(options);
-        const makeConversionContext = this.#makeConversionContext;
         let filter: ReadonlySet<string> | undefined = void(0);
         if (options.filter) {
             filter = new Set(options.filter);
         }
         return {[Symbol.asyncIterator]: async function*() {
             for await (const commit of readCommits()) {
-                for (const change of await _getChangesFromCommit(commit, changeModel, makeConversionContext, filter)) {
+                for (const change of _getChangesFromCommit(commit, changeModel, filter)) {
                     yield change as ChangeType<Model["events"]>;
                 }
             }
@@ -1301,9 +1274,6 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return view as ViewOf<Model["views"][K]>;
     }
 }
-
-/** @internal */
-export type _ConversionContextFactory = (errorPrefix?: string) => ConversionContext;
 
 const PURGE_TTL = 3600; // 1 hour
 const INF_VERSION = 9000000000000000;
