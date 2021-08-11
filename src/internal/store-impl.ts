@@ -41,9 +41,9 @@ import {
     _viewHeader, 
     _ViewHeader 
 } from "./view-header";
-import { ExposedPii, PiiString, piiStringType } from "../pii";
+import { ExposedPii, PiiString, piiStringType, _createPiiString } from "../pii";
 import { ActionContext } from "../action-context";
-import { _decryptPii, _encryptPii, _PiiKey } from "./pii-crypto";
+import { _decryptPii, _encryptPii, _PiiKey, _PiiStringAuthData } from "./pii-crypto";
 
 /** @internal */
 export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model> {
@@ -82,25 +82,26 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         obfuscated = ""
     ): Promise<PiiString> => {
         const key = await this.#getOrCreatePiiKey(scope, version);
-        version = key.version;
-        const encrypted = await _encryptPii(key, value);
-        const pii: PiiString = Object.freeze({
-            obfuscated,
-            scope,
-            version,
-            encrypted,
-        });
-        return pii;
+        const auth: _PiiStringAuthData = {
+            obf: obfuscated,
+            scp: scope,
+            ver: version,
+        };
+        const data = _encryptPii(key, value, auth);
+        return _createPiiString(data);
     }
 
     #exposePiiString = async (pii: PiiString): Promise<string> => {  
-        const key = await this.#getPiiKey(pii.scope);
-        if (!key || key.version > pii.version) {
-            return pii.obfuscated;
-        }
-        
-        const plain = await _decryptPii(key, pii.encrypted);
-        return typeof plain === "string" ? plain : pii.obfuscated;
+        const data = pii._getData();
+        const key = await this.#getPiiKey(data.scp);
+        let result = data.obf;
+        if (key && key.ver <= data.ver) {
+            const plain = _decryptPii(key, data);
+            if (typeof plain === "string") {
+                result = plain;
+            }
+        }                
+        return result;
     }
 
     #getEntityValidUntilToBeWritten = async (

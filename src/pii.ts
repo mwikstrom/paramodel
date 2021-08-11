@@ -1,14 +1,5 @@
-import {
-    binaryType,
-    classType,
-    ErrorCallback, 
-    JsonValue, 
-    PathArray, 
-    positiveIntegerType, 
-    recordType, 
-    stringType, 
-    Type 
-} from "paratype";
+import { classType, ErrorCallback, JsonValue, PathArray, Type } from "paratype";
+import { _PiiStringData, _piiStringDataType } from "./internal/pii-crypto";
 
 /**
  * Recursively replaces {@link PiiString} with `string`
@@ -52,15 +43,12 @@ export interface PiiString {
     /** Gets the underlying json data */
     toJsonValue(error?: ErrorCallback, path?: PathArray): JsonValue;
 
-    /** Gets the PII scope name */
-    getScopeName(): string;
-
-    /** Gets the PII scope version */
-    getScopeVersion(): number;
-
-    /** Gets the encrypted value */
-    getEncryptedValue(): ArrayBuffer;
+    /** @internal */
+    _getData(): _PiiStringData;
 }
+
+/** @internal */
+export const _createPiiString = (data: _PiiStringData): PiiString => new _PiiString(data);
 
 type PiiStringInterface = PiiString;
 const _PiiString = class PiiString implements PiiStringInterface {
@@ -74,12 +62,10 @@ const _PiiString = class PiiString implements PiiStringInterface {
         this.#data = data;
     }
 
-    toString = () => this.#data.obfuscated;
-    valueOf = () => this.#data.obfuscated;
-    toJSON = () => this.#data.obfuscated;
-    getScopeName = () => this.#data.scope;
-    getScopeVersion = () => this.#data.version;
-    getEncryptedValue = () => this.#data.encrypted;
+    toString = () => this.#data.obf;
+    valueOf = () => this.#data.obf;
+    toJSON = () => this.#data.obf;
+    _getData = () => this.#data;
     toJsonValue = (error?: ErrorCallback, path?: PathArray) => _piiStringDataType.toJsonValue(this.#data, error, path);
 };
 
@@ -88,24 +74,3 @@ const _PiiString = class PiiString implements PiiStringInterface {
  * @public
  */
 export const piiStringType = classType(_PiiString) as Type<PiiString>;
-
-interface _PiiStringData {
-    /** Obfuscated value - must not contain PII */
-    readonly obfuscated: string;
-
-    /** Scope of the PII  */
-    readonly scope: string;
-
-    /** Commit version when the PII scope was initialized */
-    readonly version: number;
-
-    /** Encrypted value */
-    readonly encrypted: ArrayBuffer;    
-}
-
-const _piiStringDataType: Type<_PiiStringData> = recordType({
-    obfuscated: stringType,
-    scope: stringType,
-    version: positiveIntegerType,
-    encrypted: binaryType,
-});
