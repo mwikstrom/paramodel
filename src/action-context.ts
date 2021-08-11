@@ -1,5 +1,6 @@
 import { TypeOf } from "paratype";
 import { ChangeModel, Conflict, Forbidden, ReadModel } from "./model";
+import { PiiString } from "./pii";
 import { ViewOf } from "./projection";
 import { ViewOptions } from "./store";
 
@@ -54,6 +55,23 @@ export interface ActionContext<
      * @param result - The output value
      */
     output(this: void, result: Output): void;
+
+    /**
+     * Protects the specified personally identifiable information (PII)
+     * @param this - <i>(Ignored)</i> This method uses implicit `this` binding
+     * @param scope - Scope of the PII
+     * @param value - The value to be protected
+     * @param obfuscated - <i>(Optional)</i> An obfuscated value to be exposed after the PII scope is shredded
+     */
+    pii(this: void, scope: string, value: string, obfuscated?: string): Promise<PiiString>;
+
+    /**
+     * Registers that the specified PII scope shall be shredded when the current action
+     * is successfully committed and the store is purged up to the committed version.
+     * @param this - <i>(Ignored)</i> This method uses implicit `this` binding
+     * @param scope- The PII scope that shall be shredded
+     */
+    shred(this: void, scope: string): void;
 
     /**
      * Emits a change event from the current action.

@@ -4,6 +4,7 @@ import { ActionOptions } from "./action-options";
 import { ChangeType } from "./change";
 import { DomainModel } from "./model";
 import { ViewOf } from "./projection";
+import { ExposedPii } from "./pii";
 
 /**
  * A domain store
@@ -23,6 +24,14 @@ export interface DomainStore<Model extends DomainModel> {
         input: TypeOf<Model["actions"][K]["input"]>,
         options?: ActionOptions,
     ): Promise<ActionResultType<Model, K>>;
+
+    /**
+     * Processes the specified value recursively by replacing any {@link PiiString} with
+     * the underlying decrypted or obfuscated value.
+     * @param this - <i>(Ignored)</i> This function uses implicit `this` binding
+     * @param value - The value from which PII shall be exposed
+     */
+    exposePii<T>(this: void, value: T): Promise<ExposedPii<T>>;
 
     /**
      * Reads change history

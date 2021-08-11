@@ -5,6 +5,7 @@ import { ActionHandler } from "../action-handler";
 import { Change } from "../change";
 import { ChangeModel, Conflict, Forbidden, ReadModel } from "../model";
 import { ViewOf, ViewSnapshotFunc } from "../projection";
+import { PiiString } from "../pii";
 
 /** @internal */
 export class _ActionContextImpl<
@@ -108,6 +109,14 @@ export class _ActionContextImpl<
 
         this.#handler.output.assert(result, msg => new Error(`Invalid action output: ${msg}`));
         this.#output = result;
+    }
+
+    pii = (scope: string, value: string, obfuscated = ""): Promise<PiiString> => {
+        throw new Error("TODO");
+    }
+
+    shred = (scope: string): void => {
+        throw new Error("TODO");
     }
 
     emit = <K extends string & keyof Events>(key: K, arg: TypeOf<Events[K]>): void => {

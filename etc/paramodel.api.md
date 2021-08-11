@@ -7,6 +7,7 @@
 import { JsonValue } from 'paratype';
 import { Type } from 'paratype';
 import { TypeOf } from 'paratype';
+import { WithRecordOptions } from 'paratype';
 
 // @public
 export interface ActionContext<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Scope = unknown, Input = unknown, Output = unknown> {
@@ -15,7 +16,9 @@ export interface ActionContext<Events extends ChangeModel = ChangeModel, Views e
     forbidden(this: void, message?: string): Forbidden;
     readonly input: Input;
     output(this: void, result: Output): void;
+    pii(this: void, scope: string, value: string, obfuscated?: string): Promise<PiiString>;
     readonly scope: Scope;
+    shred(this: void, scope: string): void;
     readonly timestamp: Date;
     readonly version: number;
     view<K extends string & keyof Views>(this: void, key: K, options?: Partial<Pick<ViewOptions, "auth">>): Promise<ViewOf<Views[K]>>;
@@ -149,6 +152,7 @@ export interface DomainProvider {
 // @public
 export interface DomainStore<Model extends DomainModel> {
     do<K extends string & keyof Model["actions"]>(this: void, key: K, input: TypeOf<Model["actions"][K]["input"]>, options?: ActionOptions): Promise<ActionResultType<Model, K>>;
+    exposePii<T>(this: void, value: T): Promise<ExposedPii<T>>;
     purge(this: void, options?: Partial<PurgeOptions>): Promise<PurgeResult>;
     read(this: void, options?: Partial<ReadOptions<string & keyof Model["events"]>>): AsyncIterable<ChangeType<Model["events"]>>;
     stat(this: void): Promise<DomainStoreStatus>;
@@ -227,6 +231,11 @@ export type Equatable = null | boolean | Comparable;
 export type ErrorFactory = () => Error;
 
 // @public
+export type ExposedPii<T> = (T extends PiiString ? string : T extends Array<infer E> ? Array<ExposedPii<E>> : T extends Record<string, any> ? {
+    [K in keyof T]: ExposedPii<T[K]>;
+} : T);
+
+// @public
 export type FilterOperand<T, O> = (O extends IsOperator ? IsOperand<T> : O extends EqualityOperator ? T : O extends ComparisonOperator ? T : O extends ArrayAnyOperator ? T : O extends ArrayOperator ? T extends unknown[infer E] ? E : never : O extends StringOperator ? string : never);
 
 // @public
@@ -279,6 +288,22 @@ export interface PageOptions {
     continuation?: string;
     size?: number;
 }
+
+// @public
+export interface PiiString {
+    readonly encrypted: string;
+    readonly obfuscated: string;
+    readonly scope: string;
+    readonly version: number;
+}
+
+// @public
+export const piiStringType: Type<WithRecordOptions<    {
+obfuscated: string;
+scope: string;
+version: number;
+encrypted: string;
+}, []>>;
 
 // @public
 export type PossibleKeysOf<T> = {

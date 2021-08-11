@@ -39,6 +39,7 @@ Run-time domain model for event-sourcing.
 |  [InputRecord](./paramodel.inputrecord.md) | A data record to be written |
 |  [Page](./paramodel.page.md) | A page of items |
 |  [PageOptions](./paramodel.pageoptions.md) | Options for getting a page |
+|  [PiiString](./paramodel.piistring.md) | An encrypted and obfuscated string that contains personally identifiable information (PII) |
 |  [PurgeOptions](./paramodel.purgeoptions.md) | Options for purging views |
 |  [PurgeResult](./paramodel.purgeresult.md) | The result of running a purge operation |
 |  [Queryable](./paramodel.queryable.md) | A queryable collection |
@@ -62,6 +63,7 @@ Run-time domain model for event-sourcing.
 |  --- | --- |
 |  [Conflict](./paramodel.conflict.md) | A well-known symbol that can be used to indicate that an action failed due to a conflict |
 |  [Forbidden](./paramodel.forbidden.md) | A well-known symbol that can be used to indicate that an action failed because the domain access scope is not permitted to execute it |
+|  [piiStringType](./paramodel.piistringtype.md) | A record type that represents a [PiiString](./paramodel.piistring.md) |
 
 ## Type Aliases
 
@@ -86,6 +88,7 @@ Run-time domain model for event-sourcing.
 |  [EqualityOperator](./paramodel.equalityoperator.md) | Defines the equality operators |
 |  [Equatable](./paramodel.equatable.md) | Represents equatable property types |
 |  [ErrorFactory](./paramodel.errorfactory.md) | A function that creates an error to be thrown |
+|  [ExposedPii](./paramodel.exposedpii.md) | Type alias that exposes the decrypted or obfuscated value of [PII](./paramodel.piistring.md) |
 |  [FilterOperand](./paramodel.filteroperand.md) | A type alias that represents a filter operand for a given property type and operator |
 |  [FilterOperator](./paramodel.filteroperator.md) | A type alias that represents a filter operator for a given property type |
 |  [Forbidden](./paramodel.forbidden.md) | Type of the well-known forbidden symbol |

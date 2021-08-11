@@ -16,6 +16,7 @@ export * from "./driver";
 export * from "./entity-projection";
 export * from "./entity-view";
 export * from "./model";
+export * from "./pii";
 export * from "./projection";
 export * from "./provider";
 export * from "./query-handler";

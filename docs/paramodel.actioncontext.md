@@ -29,5 +29,7 @@ export interface ActionContext<Events extends ChangeModel = ChangeModel, Views e
 |  [emit(this, key, arg)](./paramodel.actioncontext.emit.md) | Emits a change event from the current action. |
 |  [forbidden(this, message)](./paramodel.actioncontext.forbidden.md) | Marks the current action as forbidden if it is not previosuly marked as unsuccessful. |
 |  [output(this, result)](./paramodel.actioncontext.output.md) | Sets the ouput value of the current action |
+|  [pii(this, scope, value, obfuscated)](./paramodel.actioncontext.pii.md) | Protects the specified personally identifiable information (PII) |
+|  [shred(this, scope)](./paramodel.actioncontext.shred.md) | Registers that the specified PII scope shall be shredded when the current action is successfully committed and the store is purged up to the committed version. |
 |  [view(this, key, options)](./paramodel.actioncontext.view.md) | Gets a view snapshot that expose state as it were just before the current action was executed. |
 

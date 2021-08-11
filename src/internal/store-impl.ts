@@ -41,6 +41,7 @@ import {
     _viewHeader, 
     _ViewHeader 
 } from "./view-header";
+import { ExposedPii } from "../pii";
 
 // TODO: Continuation tokens must include version and timestamp and shall expire when too old
 //       (older than purge ttl) - or be renewed in case version is still not purged!
@@ -1135,6 +1136,10 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
             latest = fresh;
         }
+    }
+
+    exposePii = async <T>(value: T): Promise<ExposedPii<T>> => {
+        throw new Error("TODO");
     }
 
     read = (

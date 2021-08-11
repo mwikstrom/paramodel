@@ -17,6 +17,7 @@ export interface DomainStore<Model extends DomainModel>
 |  Method | Description |
 |  --- | --- |
 |  [do(this, key, input, options)](./paramodel.domainstore.do.md) | Executes an action |
+|  [exposePii(this, value)](./paramodel.domainstore.exposepii.md) | Processes the specified value recursively by replacing any [PiiString](./paramodel.piistring.md) with the underlying decrypted or obfuscated value. |
 |  [purge(this, options)](./paramodel.domainstore.purge.md) | Purges the views of the current store |
 |  [read(this, options)](./paramodel.domainstore.read.md) | Reads change history |
 |  [stat(this)](./paramodel.domainstore.stat.md) | Returns status of the current store |
