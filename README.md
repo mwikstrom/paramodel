@@ -8,6 +8,14 @@ Run-time domain model for event-sourcing.
 
 ----
 
+- TODO: Implement #createPii
+
+- TODO: Implement #exposePiiString
+
+- TODO: Include shredded scopes in commit
+
+- TODO: Drop shredded scopes during purge
+
 - TODO: Equality query operators for PiiString
 
 - TODO: Expose PiiString in materialized views. Take dependency on exposed PII scopes,

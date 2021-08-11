@@ -41,7 +41,8 @@ import {
     _viewHeader, 
     _ViewHeader 
 } from "./view-header";
-import { ExposedPii } from "../pii";
+import { ExposedPii, PiiString, piiStringType } from "../pii";
+import { ActionContext } from "../action-context";
 
 /** @internal */
 export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model> {
@@ -62,6 +63,25 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             _partitionKeys.commits,
             record => _commitType.fromJsonValue(record.value)
         );
+    }
+
+    #createPii: ActionContext["pii"] = async (scope: string, value: string, obfuscated = ""): Promise<PiiString> => {
+        // TODO: Implement #createPii
+        const version = 0;
+        const encrypted = "";
+        const pii: PiiString = Object.freeze({
+            obfuscated,
+            scope,
+            version,
+            encrypted,
+        });
+
+        return pii;
+    }
+
+    #exposePiiString = async (pii: PiiString): Promise<string> => {
+        // TODO: Implement #exposePiiString
+        return pii.obfuscated;
     }
 
     #getEntityValidUntilToBeWritten = async (
@@ -1042,6 +1062,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             this.#model.events,
             handler,
             snapshot,
+            this.#createPii,
         )._run();
 
         if (fromContext.status !== "success") {
@@ -1136,7 +1157,28 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     }
 
     exposePii = async <T>(value: T): Promise<ExposedPii<T>> => {
-        throw new Error("TODO");
+        if (piiStringType.test(value)) {
+            const mapped = await this.#exposePiiString(value);
+            return mapped as ExposedPii<T>;
+        }
+
+        if (Array.isArray(value)) {
+            const mapped = new Array<unknown>();
+            for (const item of value) {
+                mapped.push(await this.exposePii(item));
+            }
+            return mapped as ExposedPii<T>;
+        }
+
+        if (value !== null && typeof value === "object") {
+            const mapped = new Map();
+            for (const key in value) {
+                mapped.set(key, await this.exposePii(value[key]));
+            }
+            return Object.fromEntries(mapped);
+        }
+
+        return value as ExposedPii<T>;
     }
 
     read = (

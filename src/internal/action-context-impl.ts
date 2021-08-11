@@ -5,7 +5,6 @@ import { ActionHandler } from "../action-handler";
 import { Change } from "../change";
 import { ChangeModel, Conflict, Forbidden, ReadModel } from "../model";
 import { ViewOf, ViewSnapshotFunc } from "../projection";
-import { PiiString } from "../pii";
 
 /** @internal */
 export class _ActionContextImpl<
@@ -23,6 +22,7 @@ export class _ActionContextImpl<
     #message: ActionResult["message"];
     #emittedEvents: Omit<Change<JsonValue>, "version" | "timestamp" | "position">[] = [];
     #emittedChanges = new Set<string>();
+    #shredded = new Set<string>();
     #snapshot: ViewSnapshotFunc<Views>;
 
     constructor(
@@ -33,6 +33,7 @@ export class _ActionContextImpl<
         events: Events,
         handler: ActionHandler<Events, Views, Scope, Input, Output>,
         snapshot: ViewSnapshotFunc<Views>,
+        public readonly pii: ActionContext["pii"],
     ) {
         this.#events = events;
         this.#handler = handler;
@@ -83,6 +84,7 @@ export class _ActionContextImpl<
 
         if (this.#status !== "success") {
             this.#emittedChanges.clear();
+            this.#shredded.clear();
             this.#emittedEvents.splice(0, this.#emittedEvents.length);
             this.#output = void(0);
         }
@@ -90,6 +92,7 @@ export class _ActionContextImpl<
         const result: _ActionContextRunResult<Output> = {
             changes: Array.from(this.#emittedChanges),
             events: [...this.#emittedEvents],
+            shredded: Array.from(this.#shredded),
             status: this.#status,
             message: this.#message,
             output: this.#output,
@@ -111,12 +114,10 @@ export class _ActionContextImpl<
         this.#output = result;
     }
 
-    pii = (scope: string, value: string, obfuscated = ""): Promise<PiiString> => {
-        throw new Error("TODO");
-    }
-
     shred = (scope: string): void => {
-        throw new Error("TODO");
+        if (this.#active) {
+            this.#shredded.add(scope);
+        }
     }
 
     emit = <K extends string & keyof Events>(key: K, arg: TypeOf<Events[K]>): void => {
@@ -148,6 +149,7 @@ export type _ActionContextRunResult<Output> = {
     changes: readonly string[];
     events: readonly Omit<Change<JsonValue>, "version" | "timestamp" | "position">[];
     status: "success" | "conflict" | "forbidden" | "aborted" | "rejected" | "failed";
+    shredded: readonly string[];
     message: string | undefined;
     output: Output | undefined;
 };
