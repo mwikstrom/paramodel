@@ -10,6 +10,7 @@ import {
 } from "paratype";
 import { Change, ChangeType } from "../change";
 import { ChangeModel } from "../model";
+import { _ConversionContextFactory } from "./store-impl";
 
 /** @internal */
 export type _Commit = {
@@ -42,17 +43,18 @@ export const _commitType: Type<_Commit> = recordType({
 );
 
 /** @internal */
-export const _getChangesFromCommit = <Events extends ChangeModel>(
+export const _getChangesFromCommit = async <Events extends ChangeModel>(
     commit: _Commit,
     model: Events,
+    makeConversionContext: _ConversionContextFactory,
     filter?: ReadonlySet<string>,
-): ChangeType<Events>[] => {
+): Promise<ChangeType<Events>[]> => {
     const { timestamp, version } = commit;
     const result: ChangeType<Events>[]= [];
     let { position } = commit;
 
     for (const entry of commit.events) {
-        const { key, arg, ...rest } = entry;
+        const { key, arg: jsonArg, ...rest } = entry;
 
         if (filter === void(0) || filter.has(key)) {
             const eventType = model[key];
@@ -60,13 +62,14 @@ export const _getChangesFromCommit = <Events extends ChangeModel>(
                 throw new Error(`Cannot read unknown event: ${key}`);
             }
 
+            const arg = await eventType.fromJsonValue(jsonArg, makeConversionContext());
             const change: Change = {
                 ...rest,
                 key: key,
                 timestamp, 
                 version, 
                 position,
-                arg: eventType.fromJsonValue(arg),
+                arg,
             };
 
             result.push(change as ChangeType<Events>);

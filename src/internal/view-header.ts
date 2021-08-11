@@ -2,6 +2,7 @@ import { enumType, nonNegativeIntegerType, recordType, timestampType, Type } fro
 import { InputRecord, OutputRecord } from "../driver";
 import { _Commit } from "./commit";
 import { _rowKeys } from "./data-keys";
+import { _ConversionContextFactory } from "./store-impl";
 
 /** @internal */
 export type _ViewHeader = {
@@ -56,7 +57,10 @@ export type _SyncViewInfo = (
 );
 
 /** @internal */
-export const _getSyncInfoFromRecord = (record: OutputRecord | undefined): _SyncViewInfo => {
+export const _getSyncInfoFromRecord = async (
+    record: OutputRecord | undefined,
+    makeConversionContext: _ConversionContextFactory,
+): Promise<_SyncViewInfo> => {
     let update_token: string | null = null;
     let sync_version = 0;
     let sync_position = 0;
@@ -67,7 +71,7 @@ export const _getSyncInfoFromRecord = (record: OutputRecord | undefined): _SyncV
     let purged_until_version = 0;
 
     if (record) {
-        const header = _viewHeader.fromJsonValue(record.value);
+        const header = await _viewHeader.fromJsonValue(record.value, makeConversionContext());
         update_token = record.token;
         sync_version = header.sync_version;
         sync_position = header.sync_position;
@@ -91,35 +95,41 @@ export const _getSyncInfoFromRecord = (record: OutputRecord | undefined): _SyncV
 };
 
 /** @internal */
-export const _getViewHeaderRecordForPurge = (
+export const _getViewHeaderRecordForPurge = async (
     purgeVersion: number,
     prev: _SyncViewInfo,
     kind: _MaterialViewKind,
-): InputRecord | undefined => {
+    makeConversionContext: _ConversionContextFactory,
+): Promise<InputRecord | undefined> => {
     const header = _getViewHeaderForPurge(purgeVersion, prev, kind);
-    return _getViewHeaderRecord(header, prev.update_token);
+    return await _getViewHeaderRecord(header, prev.update_token, makeConversionContext);
 };
 
 /** @internal */
-export const _getViewHeaderRecordForCommit = (
+export const _getViewHeaderRecordForCommit = async (
     commit: _Commit,
     prev: _SyncViewInfo,
     kind: _MaterialViewKind,
     modified: boolean,
-): InputRecord | undefined => {
+    makeConversionContext: _ConversionContextFactory,
+): Promise<InputRecord | undefined> => {
     const header = _getViewHeaderForCommit(commit, prev, kind, modified);
-    return _getViewHeaderRecord(header, prev.update_token);
+    return await _getViewHeaderRecord(header, prev.update_token, makeConversionContext);
 };
 
-const _getViewHeaderRecord = (
+const _getViewHeaderRecord = async (
     header: _ViewHeader | undefined,
     token: string | null,
-): InputRecord | undefined => {
+    makeConversionContext: _ConversionContextFactory,
+): Promise<InputRecord | undefined> => {
     if(!header) {
         return void(0);
     }
 
-    const jsonHeader = _viewHeader.toJsonValue(header, msg => new Error(`Failed to serialize view header: ${msg}`));
+    const jsonHeader = await _viewHeader.toJsonValue(
+        header, 
+        makeConversionContext("Failed to serialize view header"),
+    );
     const input: InputRecord = {
         key: _rowKeys.viewHeader,
         value: jsonHeader,
