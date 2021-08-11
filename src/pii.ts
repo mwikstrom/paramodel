@@ -1,23 +1,14 @@
-import { binaryType, positiveIntegerType, recordType, stringType, Type } from "paratype";
-
-/**
- * An encrypted and obfuscated string that contains personally identifiable information (PII)
- * @public
- */
-// TODO: Use a symbol for identifying PiiStrings
-export interface PiiString {
-    /** Obfuscated value - must not contain PII */
-    readonly obfuscated: string;
-
-    /** Scope of the PII  */
-    readonly scope: string;
-
-    /** Commit version when the PII scope was initialized */
-    readonly version: number;
-
-    /** Encrypted value */
-    readonly encrypted: ArrayBuffer;    
-}
+import {
+    binaryType,
+    classType,
+    ErrorCallback, 
+    JsonValue, 
+    PathArray, 
+    positiveIntegerType, 
+    recordType, 
+    stringType, 
+    Type 
+} from "paratype";
 
 /**
  * Recursively replaces {@link PiiString} with `string`
@@ -48,10 +39,71 @@ export type TransparentPii<T> = (
 );
 
 /**
- * A record type that represents a {@link PiiStringData}
+ * An encrypted and obfuscated string that contains personally identifiable information (PII)
  * @public
  */
-export const piiStringType: Type<PiiString> = recordType({
+export interface PiiString {
+    /** Gets the obfuscated value */
+    toString(): string;
+    
+    /** Gets the obfuscated value */
+    valueOf(): string;
+
+    /** Gets the underlying json data */
+    toJsonValue(error?: ErrorCallback, path?: PathArray): JsonValue;
+
+    /** Gets the PII scope name */
+    getScopeName(): string;
+
+    /** Gets the PII scope version */
+    getScopeVersion(): number;
+
+    /** Gets the encrypted value */
+    getEncryptedValue(): ArrayBuffer;
+}
+
+type PiiStringInterface = PiiString;
+const _PiiString = class PiiString implements PiiStringInterface {
+    static fromJsonValue(value: JsonValue, error?: ErrorCallback, path?: PathArray) {
+        return new _PiiString(_piiStringDataType.fromJsonValue(value, error, path));
+    }
+
+    #data: _PiiStringData;
+
+    constructor(data: _PiiStringData) {
+        this.#data = data;
+    }
+
+    toString = () => this.#data.obfuscated;
+    valueOf = () => this.#data.obfuscated;
+    toJSON = () => this.#data.obfuscated;
+    getScopeName = () => this.#data.scope;
+    getScopeVersion = () => this.#data.version;
+    getEncryptedValue = () => this.#data.encrypted;
+    toJsonValue = (error?: ErrorCallback, path?: PathArray) => _piiStringDataType.toJsonValue(this.#data, error, path);
+};
+
+/**
+ * A type that represents a {@link _PiiStringData}
+ * @public
+ */
+export const piiStringType = classType(_PiiString) as Type<PiiString>;
+
+interface _PiiStringData {
+    /** Obfuscated value - must not contain PII */
+    readonly obfuscated: string;
+
+    /** Scope of the PII  */
+    readonly scope: string;
+
+    /** Commit version when the PII scope was initialized */
+    readonly version: number;
+
+    /** Encrypted value */
+    readonly encrypted: ArrayBuffer;    
+}
+
+const _piiStringDataType: Type<_PiiStringData> = recordType({
     obfuscated: stringType,
     scope: stringType,
     version: positiveIntegerType,
