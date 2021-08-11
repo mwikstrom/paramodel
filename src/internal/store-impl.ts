@@ -43,9 +43,6 @@ import {
 } from "./view-header";
 import { ExposedPii } from "../pii";
 
-// TODO: Continuation tokens must include version and timestamp and shall expire when too old
-//       (older than purge ttl) - or be renewed in case version is still not purged!
-
 /** @internal */
 export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model> {
     readonly #driver: DomainDriver;
