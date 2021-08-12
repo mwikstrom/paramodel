@@ -16,20 +16,6 @@ export type DisclosedPii<T> = (
 );
 
 /**
- * Recursively replaces `string` with a union of `string` and {@link PiiString}
- * @public
- */
-export type TransparentPii<T> = (
-    T extends string ? string | PiiString :
-    T extends Array<infer E> ? Array<TransparentPii<E>> :
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    T extends Record<string, any> ? {
-        [K in keyof T]: TransparentPii<T[K]>
-    } :
-    T
-);
-
-/**
  * An encrypted and obfuscated string that contains personally identifiable information (PII)
  * @public
  */
