@@ -433,6 +433,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         authError?: ErrorFactory,
     ): Promise<ViewOf<Definition> | undefined> => {
         switch (projection.kind) {
+            // TODO: "mapped-entities"!
             case "entities":
                 return await this.#createEntityView(
                     viewKey, 
@@ -656,7 +657,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             const projection = this.#model.views[key];
             if (projection?.kind === "state" || projection?.kind === "entities") {
                 projection.mutators.forEach(e => eventsToSync.add(e));
-            } else {
+            } else { // TODO: Support syncing mapped entities
                 throw new Error(`Don't know how to sync view: ${key}`);
             }
         }
@@ -717,7 +718,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 modified = await this.#syncEntities(commit, projection, key);
             } else if (projection?.kind === "state") {
                 modified = await this.#syncState(commit, projection, key);
-            } else {
+            } else { // TODO: Support syncing mapped entities
                 throw new Error(`Don't know how to sync view: ${key}`);
             }
 
@@ -1000,7 +1001,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             return await this.#expirePurgedEntities(key, info.purged_until_version, signal);
         } else if (kind === "state") {
             return await this.#expirePurgedState(key, info.purged_until_version, signal);
-        } else {
+        } else { // TODO: Support purging mapped entities
             return false;
         }
     }

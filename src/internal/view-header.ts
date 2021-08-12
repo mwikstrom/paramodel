@@ -16,7 +16,7 @@ export type _ViewHeader = {
 };
 
 /** @internal */
-export type _MaterialViewKind = "state" | "entities";
+export type _MaterialViewKind = "state" | "entities"; // TODO: mapped entities should be material too
 
 /** @internal */
 export const _materialViewKindType: Type<_MaterialViewKind> = enumType(["state", "entities"]);
