@@ -8,13 +8,6 @@ Run-time domain model for event-sourcing.
 
 ----
 
-- TODO: View depdencies must not be disclosing pii (that means: not mapped-entities)
-
-- TODO: ViewSnapshotFunc must verify that a disclosing view isn't retrieved when acting
-  as a dependency.
-
-- TODO: Support "mapped-entities" as a MaterializedView
-
 - TODO: Implement purging and syncing of "mapped-entities"
 
 - TODO: Drop shredded scopes during purge
@@ -28,11 +21,6 @@ Run-time domain model for event-sourcing.
 
   During mapping, the system shall record which PII scopes that are disclosed. The mapping
   shall then be rerun (during purge) whenever one of those scopes are shredded.
-
-  IMPORTANT: Only query handler shall be allowed to take dependency on a (disclosing)
-  entity-mapper.
-
-- TODO: Add support for disclosing query handler
 
 - TODO: Purging of PII:
 
