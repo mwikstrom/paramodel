@@ -7,5 +7,5 @@
 <b>Signature:</b>
 
 ```typescript
-readonly kind: "query";
+readonly kind: "query" | "disclosing-query";
 ```

@@ -9,7 +9,7 @@ Processes the specified value recursively by replacing any [PiiString](./paramod
 <b>Signature:</b>
 
 ```typescript
-disclose<T>(this: void, value: T): Promise<DisclosedPii<T>>;
+disclose<T>(this: void, value: T): Promise<Disclosed<T>>;
 ```
 
 ## Parameters
@@ -21,5 +21,5 @@ disclose<T>(this: void, value: T): Promise<DisclosedPii<T>>;
 
 <b>Returns:</b>
 
-Promise&lt;[DisclosedPii](./paramodel.disclosedpii.md)<!-- -->&lt;T&gt;&gt;
+Promise&lt;[Disclosed](./paramodel.disclosed.md)<!-- -->&lt;T&gt;&gt;
 

@@ -16,7 +16,7 @@ export interface QueryView<P = unknown, T = unknown>
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [kind](./paramodel.queryview.kind.md) | "query" |  |
+|  [kind](./paramodel.queryview.kind.md) | "query" \| "disclosing-query" |  |
 |  [version](./paramodel.queryview.version.md) | number |  |
 
 ## Methods

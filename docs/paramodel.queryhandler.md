@@ -19,7 +19,7 @@ export interface QueryHandler<P extends Record<string, unknown> = Record<string,
 |  [auth?](./paramodel.queryhandler.auth.md) | [QueryAuthFunc](./paramodel.queryauthfunc.md)<!-- -->&lt;R, P, Scope, T&gt; | <i>(Optional)</i> |
 |  [dependencies](./paramodel.queryhandler.dependencies.md) | ReadonlySet&lt;string &amp; keyof R&gt; |  |
 |  [exec](./paramodel.queryhandler.exec.md) | [QueryExecFunc](./paramodel.queryexecfunc.md)<!-- -->&lt;R, P, Scope, T&gt; |  |
-|  [kind](./paramodel.queryhandler.kind.md) | "query" |  |
+|  [kind](./paramodel.queryhandler.kind.md) | "query" \| "disclosing-query" |  |
 |  [params](./paramodel.queryhandler.params.md) | Type&lt;P&gt; |  |
 |  [type](./paramodel.queryhandler.type.md) | Type&lt;T&gt; |  |
 

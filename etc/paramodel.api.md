@@ -135,8 +135,8 @@ export function defineQuery<Views extends ReadModel, Result, Params extends Reco
 export function defineState<State, Events extends ChangeModel = ChangeModel, Scope = unknown, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(this: void, definition: StateDefinition<State, Events, Scope, Views, Mutators, Dependencies>): StateProjection<State, Events, Views, Scope>;
 
 // @public
-export type DisclosedPii<T> = (T extends PiiString ? string : T extends Array<infer E> ? Array<DisclosedPii<E>> : T extends Record<string, any> ? {
-    [K in keyof T]: DisclosedPii<T[K]>;
+export type Disclosed<T> = (T extends PiiString ? string : T extends Array<infer E> ? Array<Disclosed<E>> : T extends Record<string, any> ? {
+    [K in keyof T]: Disclosed<T[K]>;
 } : T);
 
 // @public
@@ -165,7 +165,7 @@ export interface DomainProvider {
 
 // @public
 export interface DomainStore<Model extends DomainModel> {
-    disclose<T>(this: void, value: T): Promise<DisclosedPii<T>>;
+    disclose<T>(this: void, value: T): Promise<Disclosed<T>>;
     do<K extends string & keyof Model["actions"]>(this: void, key: K, input: TypeOf<Model["actions"][K]["input"]>, options?: ActionOptions): Promise<ActionResultType<Model, K>>;
     purge(this: void, options?: Partial<PurgeOptions>): Promise<PurgeResult>;
     read(this: void, options?: Partial<ReadOptions<string & keyof Model["events"]>>): AsyncIterable<ChangeType<Model["events"]>>;
@@ -200,7 +200,7 @@ export interface EntityDefinition<Props extends Record<string, unknown>, Key ext
 }
 
 // @public
-export interface EntityMapping<Props extends Record<string, unknown>, Key extends PossibleKeysOf<Props>, Source extends (string & keyof EntityViews<Views>), Scope = unknown, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []> {
+export interface EntityMapping<Props extends Record<string, unknown>, Key extends PossibleKeysOf<Props> = PossibleKeysOf<Props>, Source extends (string & keyof EntityViews<Views>) = string, Scope = unknown, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []> {
     // (undocumented)
     auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number] | Source>>;
     // (undocumented)
@@ -210,7 +210,7 @@ export interface EntityMapping<Props extends Record<string, unknown>, Key extend
     // (undocumented)
     readonly kind: "mapped-entities";
     // (undocumented)
-    map(source: TypeOf<EntityViews<Views>[Source]["type"]>, disclose: (pii: PiiString) => Promise<string>): Promise<Props>;
+    map(source: TypeOf<EntityViews<Views>[Source]["type"]>, disclose: <T>(value: T) => Promise<Disclosed<T>>): Promise<Props>;
     // (undocumented)
     readonly source: Source;
     // (undocumented)
@@ -222,7 +222,7 @@ export interface EntityMappingDefinition<Props extends Record<string, unknown>, 
     auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number] | Source>>;
     dependencies?: Dependencies;
     key: Key;
-    map(source: TypeOf<EntityViews<Views>[Source]["type"]>, disclose: (pii: PiiString) => Promise<string>): Promise<Props>;
+    map(source: TypeOf<EntityViews<Views>[Source]["type"]>, disclose: <T>(value: T) => Promise<Disclosed<T>>): Promise<Props>;
     source: Source;
     type: Type<Props>;
 }
@@ -383,13 +383,14 @@ export type QueryAuthFunc<R extends ReadModel = ReadModel, P extends Record<stri
 export interface QueryDefinition<Views extends ReadModel, Result, Params extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, Dependencies extends (string & keyof Views)[] = []> {
     auth?: QueryAuthFunc<Pick<Views, Dependencies[number]>, Params, Scope, Result>;
     dependencies: Dependencies;
+    disclosing?: boolean;
     exec: QueryExecFunc<Pick<Views, Dependencies[number]>, Params, Scope, Result>;
     params: Type<Params>;
     type: Type<Result>;
 }
 
 // @public
-export type QueryExecFunc<R extends ReadModel = ReadModel, P extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, T = unknown> = (this: void, view: ViewSnapshotFunc<R>, params: P, scope: Scope) => Promise<T>;
+export type QueryExecFunc<R extends ReadModel = ReadModel, P extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, T = unknown> = (this: void, view: ViewSnapshotFunc<R>, params: P, scope: Scope, disclose: <T>(value: T) => Promise<Disclosed<T>>) => Promise<T>;
 
 // @public
 export interface QueryHandler<P extends Record<string, unknown> = Record<string, unknown>, T = unknown, R extends ReadModel = ReadModel, Scope = unknown> {
@@ -400,7 +401,7 @@ export interface QueryHandler<P extends Record<string, unknown> = Record<string,
     // (undocumented)
     readonly exec: QueryExecFunc<R, P, Scope, T>;
     // (undocumented)
-    readonly kind: "query";
+    readonly kind: "query" | "disclosing-query";
     // (undocumented)
     readonly params: Type<P>;
     // (undocumented)
@@ -418,7 +419,7 @@ export interface QuerySpec {
 // @public
 export interface QueryView<P = unknown, T = unknown> {
     // (undocumented)
-    readonly kind: "query";
+    readonly kind: "query" | "disclosing-query";
     // (undocumented)
     query(this: void, params: P): Promise<T>;
     // (undocumented)
@@ -514,11 +515,6 @@ export interface SyncOptions<K extends string = string> {
     readonly target: number;
     readonly views: readonly K[];
 }
-
-// @public
-export type TransparentPii<T> = (T extends string ? string | PiiString : T extends Array<infer E> ? Array<TransparentPii<E>> : T extends Record<string, any> ? {
-    [K in keyof T]: TransparentPii<T[K]>;
-} : T);
 
 // @public
 export type View = StateView | QueryView | EntityView<Record<string, string | number>, string>;

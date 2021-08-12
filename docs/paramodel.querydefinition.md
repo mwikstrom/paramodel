@@ -18,6 +18,7 @@ export interface QueryDefinition<Views extends ReadModel, Result, Params extends
 |  --- | --- | --- |
 |  [auth?](./paramodel.querydefinition.auth.md) | [QueryAuthFunc](./paramodel.queryauthfunc.md)<!-- -->&lt;Pick&lt;Views, Dependencies\[number\]&gt;, Params, Scope, Result&gt; | <i>(Optional)</i> Optional function that provide authorization |
 |  [dependencies](./paramodel.querydefinition.dependencies.md) | Dependencies | Optional array of vies keys that the query handler depends upon.<!-- -->These views will automatically be synced to the current version just before the query handler is executed and are made available via the <code>view</code> function (second argument of [QueryExecFunc](./paramodel.queryexecfunc.md)<!-- -->). |
+|  [disclosing?](./paramodel.querydefinition.disclosing.md) | boolean | <i>(Optional)</i> Specifies whether the query handler can disclose PII |
 |  [exec](./paramodel.querydefinition.exec.md) | [QueryExecFunc](./paramodel.queryexecfunc.md)<!-- -->&lt;Pick&lt;Views, Dependencies\[number\]&gt;, Params, Scope, Result&gt; | Query executor function |
 |  [params](./paramodel.querydefinition.params.md) | Type&lt;Params&gt; | Query parameter type |
 |  [type](./paramodel.querydefinition.type.md) | Type&lt;Result&gt; | Query result type |

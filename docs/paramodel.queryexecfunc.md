@@ -9,7 +9,7 @@ The query executor function
 <b>Signature:</b>
 
 ```typescript
-export declare type QueryExecFunc<R extends ReadModel = ReadModel, P extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, T = unknown> = (this: void, view: ViewSnapshotFunc<R>, params: P, scope: Scope) => Promise<T>;
+export declare type QueryExecFunc<R extends ReadModel = ReadModel, P extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, T = unknown> = (this: void, view: ViewSnapshotFunc<R>, params: P, scope: Scope, disclose: <T>(value: T) => Promise<Disclosed<T>>) => Promise<T>;
 ```
-<b>References:</b> [ReadModel](./paramodel.readmodel.md)<!-- -->, [ViewSnapshotFunc](./paramodel.viewsnapshotfunc.md)
+<b>References:</b> [ReadModel](./paramodel.readmodel.md)<!-- -->, [ViewSnapshotFunc](./paramodel.viewsnapshotfunc.md)<!-- -->, [Disclosed](./paramodel.disclosed.md)
 

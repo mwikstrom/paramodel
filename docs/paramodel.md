@@ -84,7 +84,7 @@ Run-time domain model for event-sourcing.
 |  [Comparable](./paramodel.comparable.md) | Represents comparable property types |
 |  [ComparisonOperator](./paramodel.comparisonoperator.md) | Defines the comparison operators |
 |  [Conflict](./paramodel.conflict.md) | Type of the well-known conflict symbol |
-|  [DisclosedPii](./paramodel.disclosedpii.md) | Recursively replaces [PiiString](./paramodel.piistring.md) with <code>string</code> |
+|  [Disclosed](./paramodel.disclosed.md) | Recursively replaces [PiiString](./paramodel.piistring.md) with <code>string</code> |
 |  [DomainModel](./paramodel.domainmodel.md) | Alias for a domain model |
 |  [EntityAuthFunc](./paramodel.entityauthfunc.md) | A function that authorizes access to entities |
 |  [EntityChangeHandlers](./paramodel.entitychangehandlers.md) | An object that define the change event handlers that may mutate entity states.<!-- -->Each key in this object is the name of a change event and the corresponding value is an [EntityProjectionFunc](./paramodel.entityprojectionfunc.md) that shall be invoked to apply the effect of that change. |
@@ -109,7 +109,6 @@ Run-time domain model for event-sourcing.
 |  [StateAuthFunc](./paramodel.stateauthfunc.md) | A function that authorizes access to the projected state |
 |  [StateChangeHandlers](./paramodel.statechangehandlers.md) | An object that define the change event handlers that may mutate the defined state.<!-- -->Each key in this object is the name of a change event and the corresponding value is an [StateApplyFunc](./paramodel.stateapplyfunc.md) that shall be invoked to apply the effect of that change. |
 |  [StringOperator](./paramodel.stringoperator.md) | Defines the string operators |
-|  [TransparentPii](./paramodel.transparentpii.md) | Recursively replaces <code>string</code> with a union of <code>string</code> and [PiiString](./paramodel.piistring.md) |
 |  [View](./paramodel.view.md) | A type alias that represents a view |
 |  [ViewOf](./paramodel.viewof.md) | Extracts the view type of a projection |
 |  [ViewSnapshotFunc](./paramodel.viewsnapshotfunc.md) | The view snapshot function |

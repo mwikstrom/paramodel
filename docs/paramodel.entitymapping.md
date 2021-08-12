@@ -9,7 +9,7 @@ Entity mapping projection
 <b>Signature:</b>
 
 ```typescript
-export interface EntityMapping<Props extends Record<string, unknown>, Key extends PossibleKeysOf<Props>, Source extends (string & keyof EntityViews<Views>), Scope = unknown, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []> 
+export interface EntityMapping<Props extends Record<string, unknown>, Key extends PossibleKeysOf<Props> = PossibleKeysOf<Props>, Source extends (string & keyof EntityViews<Views>) = string, Scope = unknown, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []> 
 ```
 
 ## Properties
