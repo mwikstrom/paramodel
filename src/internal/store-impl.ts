@@ -59,6 +59,7 @@ import {
     _piiKeyType, 
     _PiiStringAuthData
 } from "./pii-crypto";
+import { EntityMapping } from "../entity-mapping";
 
 /** @internal */
 export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model> {
@@ -260,7 +261,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
     #createReadonlyEntityCollection = async <T extends Record<string, unknown>>(
         viewKey: string,
-        projection: EntityProjection<T>,
+        projection: EntityProjection<T> | EntityMapping<T>,
         version: number,
         circular: readonly string[],
         authError?: ErrorFactory,
@@ -291,7 +292,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
     #createEntityView = async <T extends Record<string, unknown>>(
         viewKey: string,
-        projection: EntityProjection<T>,
+        projection: EntityProjection<T> | EntityMapping<T>,
         version: number,
         circular: readonly string[],
         authError?: ErrorFactory,
@@ -433,8 +434,8 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         authError?: ErrorFactory,
     ): Promise<ViewOf<Definition> | undefined> => {
         switch (projection.kind) {
-            // TODO: "mapped-entities"!
             case "entities":
+            case "mapped-entities":
                 return await this.#createEntityView(
                     viewKey, 
                     projection, 
@@ -470,6 +471,8 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         if (!dependencies.has(key)) {
             throw new Error(`Cannot access view '${key}' because it is not a registered dependency`);
         }
+
+        // TODO: Verify whether disclosing view is allowed
 
         if (circular.includes(key)) {
             throw new Error(`Detected circular view dependency: ${circular.map(item => `'${item}'`).join(" -> ")}`);

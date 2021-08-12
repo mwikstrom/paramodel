@@ -10,8 +10,8 @@ import { PiiString } from "./pii";
  */
 export interface EntityMapping<
     Props extends Record<string, unknown>,
-    Key extends PossibleKeysOf<Props>,
-    Source extends (string & keyof EntityViews<Views>),
+    Key extends PossibleKeysOf<Props> = PossibleKeysOf<Props>,
+    Source extends (string & keyof EntityViews<Views>) = string,
     Scope = unknown,
     Views extends ReadModel = ReadModel,
     Dependencies extends (string & keyof Views)[] = [],
