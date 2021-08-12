@@ -81,6 +81,7 @@ Run-time domain model for event-sourcing.
 |  [Comparable](./paramodel.comparable.md) | Represents comparable property types |
 |  [ComparisonOperator](./paramodel.comparisonoperator.md) | Defines the comparison operators |
 |  [Conflict](./paramodel.conflict.md) | Type of the well-known conflict symbol |
+|  [DisclosedPii](./paramodel.disclosedpii.md) | Recursively replaces [PiiString](./paramodel.piistring.md) with <code>string</code> |
 |  [DomainModel](./paramodel.domainmodel.md) | Alias for a domain model |
 |  [EntityAuthFunc](./paramodel.entityauthfunc.md) | A function that authorizes access to entities |
 |  [EntityChangeHandlers](./paramodel.entitychangehandlers.md) | An object that define the change event handlers that may mutate entity states.<!-- -->Each key in this object is the name of a change event and the corresponding value is an [EntityProjectionFunc](./paramodel.entityprojectionfunc.md) that shall be invoked to apply the effect of that change. |
@@ -88,7 +89,6 @@ Run-time domain model for event-sourcing.
 |  [EqualityOperator](./paramodel.equalityoperator.md) | Defines the equality operators |
 |  [Equatable](./paramodel.equatable.md) | Represents equatable property types |
 |  [ErrorFactory](./paramodel.errorfactory.md) | A function that creates an error to be thrown |
-|  [ExposedPii](./paramodel.exposedpii.md) | Recursively replaces [PiiString](./paramodel.piistring.md) with <code>string</code> |
 |  [FilterOperand](./paramodel.filteroperand.md) | A type alias that represents a filter operand for a given property type and operator |
 |  [FilterOperator](./paramodel.filteroperator.md) | A type alias that represents a filter operator for a given property type |
 |  [Forbidden](./paramodel.forbidden.md) | Type of the well-known forbidden symbol |

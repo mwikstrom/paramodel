@@ -132,6 +132,11 @@ export function defineQuery<Views extends ReadModel, Result, Params extends Reco
 export function defineState<State, Events extends ChangeModel = ChangeModel, Scope = unknown, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(this: void, definition: StateDefinition<State, Events, Scope, Views, Mutators, Dependencies>): StateProjection<State, Events, Views, Scope>;
 
 // @public
+export type DisclosedPii<T> = (T extends PiiString ? string : T extends Array<infer E> ? Array<DisclosedPii<E>> : T extends Record<string, any> ? {
+    [K in keyof T]: DisclosedPii<T[K]>;
+} : T);
+
+// @public
 export interface DomainDriver {
     count(this: void, store: string, partition: string, where?: readonly FilterSpec[]): Promise<number>;
     init(this: void, store: string): Promise<void>;
@@ -157,8 +162,8 @@ export interface DomainProvider {
 
 // @public
 export interface DomainStore<Model extends DomainModel> {
+    disclose<T>(this: void, value: T): Promise<DisclosedPii<T>>;
     do<K extends string & keyof Model["actions"]>(this: void, key: K, input: TypeOf<Model["actions"][K]["input"]>, options?: ActionOptions): Promise<ActionResultType<Model, K>>;
-    exposePii<T>(this: void, value: T): Promise<ExposedPii<T>>;
     purge(this: void, options?: Partial<PurgeOptions>): Promise<PurgeResult>;
     read(this: void, options?: Partial<ReadOptions<string & keyof Model["events"]>>): AsyncIterable<ChangeType<Model["events"]>>;
     stat(this: void): Promise<DomainStoreStatus>;
@@ -235,11 +240,6 @@ export type Equatable = null | boolean | Comparable;
 
 // @public
 export type ErrorFactory = () => Error;
-
-// @public
-export type ExposedPii<T> = (T extends PiiString ? string : T extends Array<infer E> ? Array<ExposedPii<E>> : T extends Record<string, any> ? {
-    [K in keyof T]: ExposedPii<T[K]>;
-} : T);
 
 // @public
 export type FilterOperand<T, O> = (O extends IsOperator ? IsOperand<T> : O extends EqualityOperator ? T : O extends ComparisonOperator ? T : O extends ArrayAnyOperator ? T : O extends ArrayOperator ? T extends unknown[infer E] ? E : never : O extends StringOperator ? string : never);
