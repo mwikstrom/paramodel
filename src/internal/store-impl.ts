@@ -107,7 +107,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 const sync = await this.#getPiiSyncVersion();
                 const shredded = await this
                     .#getCommitQuery({ first: sync, excludeFirst: true})
-                    .where("shred", "includes", scope)
+                    .where("shredded", "includes", scope)
                     .any();
                 if (!shredded) {
                     return _piiKeyType.fromJsonValue(output.value);
@@ -1152,14 +1152,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
         if (!dry) {
             const position = latest ? latest.position + latest.events.length : 1;
-            const { changes, events, shred } = fromContext;
+            const { changes, events, shredded } = fromContext;
             const commit: _Commit = {
                 version,
                 position,
                 timestamp,
                 changes,
                 events,
-                shred,
+                shredded,
             };
 
             if (!await this.#tryCommit(commit)) {
