@@ -5,12 +5,12 @@ import { _PiiStringData, _piiStringDataType } from "./internal/pii-crypto";
  * Recursively replaces {@link PiiString} with `string`
  * @public
  */
-export type ExposedPii<T> = (
+export type DisclosedPii<T> = (
     T extends PiiString ? string :
-    T extends Array<infer E> ? Array<ExposedPii<E>> :
+    T extends Array<infer E> ? Array<DisclosedPii<E>> :
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     T extends Record<string, any> ? {
-        [K in keyof T]: ExposedPii<T[K]>
+        [K in keyof T]: DisclosedPii<T[K]>
     } :
     T
 );

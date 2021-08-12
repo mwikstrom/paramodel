@@ -49,7 +49,7 @@ import {
     _viewHeader, 
     _ViewHeader 
 } from "./view-header";
-import { ExposedPii, PiiString, piiStringType, _createPiiString } from "../pii";
+import { DisclosedPii, PiiString, piiStringType, _createPiiString } from "../pii";
 import { ActionContext } from "../action-context";
 import { 
     _createPiiKey, 
@@ -144,7 +144,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return _createPiiString(data);
     }
 
-    #exposePiiString = async (pii: PiiString): Promise<string> => {  
+    #discloseString = async (pii: PiiString): Promise<string> => {  
         const data = pii._getData();
         const key = await this.#getPiiKey(data.scp);
         let result = data.obf;
@@ -1231,29 +1231,29 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
     }
 
-    exposePii = async <T>(value: T): Promise<ExposedPii<T>> => {
+    disclose = async <T>(value: T): Promise<DisclosedPii<T>> => {
         if (piiStringType.test(value)) {
-            const mapped = await this.#exposePiiString(value);
-            return mapped as ExposedPii<T>;
+            const mapped = await this.#discloseString(value);
+            return mapped as DisclosedPii<T>;
         }
 
         if (Array.isArray(value)) {
             const mapped = new Array<unknown>();
             for (const item of value) {
-                mapped.push(await this.exposePii(item));
+                mapped.push(await this.disclose(item));
             }
-            return mapped as ExposedPii<T>;
+            return mapped as DisclosedPii<T>;
         }
 
         if (value !== null && typeof value === "object") {
             const mapped = new Map();
             for (const key in value) {
-                mapped.set(key, await this.exposePii(value[key]));
+                mapped.set(key, await this.disclose(value[key]));
             }
             return Object.fromEntries(mapped);
         }
 
-        return value as ExposedPii<T>;
+        return value as DisclosedPii<T>;
     }
 
     read = (

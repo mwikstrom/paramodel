@@ -12,20 +12,31 @@ Run-time domain model for event-sourcing.
 
 - TODO: Equality query operators for PiiString
 
-- TODO: Expose PiiString in materialized views. Take dependency on exposed PII scopes,
+- TODO: Disclose PiiString in materialized views. Take dependency on disclosed PII scopes,
   and cascade those scopes to derived materialized views. Purge after shredding
   shall rewrite the exposure.
 
-  View state record shall contain: "undisclosed state" and "exposed scopes"
+  View state record shall contain "disclosed state" in addition to the "internal state",
+  but only when that record did disclose any close.
 
-  Purging of PII:
+  In addition, the "disclosed scopes" must also be stored in the record so that they
+  can be filtered on during purge.
+
+  Query handler shall provide disclosed state from its dependencies.
+
+  View func on store shall provide disclosed state.
+
+  However, state projection and entity project shall NOT see disclosed state from their
+  dependencies!
+
+- TODO: Purging of PII:
 
   First delete the key (if it's version is less than or equal to the shredded version)
   
-  Then, query all materialized view states that exposes the shredded scope:
+  Then, query all materialized view states that disclosed the shredded scope:
 
   For each such state, rewrite it - possibly ending up without "undisclosed state" because
-  no more exposed scopes remain.
+  no more disclosed scopes remain.
 
   Finally, update the pii sync record to the newly synced version.
 
