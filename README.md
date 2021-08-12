@@ -24,6 +24,8 @@ Run-time domain model for event-sourcing.
   IMPORTANT: Only query handler shall be allowed to take dependency on a (disclosing)
   entity-mapper.
 
+- TODO: Add support for disclosing query handler
+
   ----
   ALTERNATIVE:
 
