@@ -1,5 +1,6 @@
 import { Type } from "paratype";
 import { Forbidden, ReadModel } from "./model";
+import { Disclosed } from "./pii";
 import { ViewSnapshotFunc } from "./projection";
 
 /**
@@ -33,7 +34,8 @@ export type QueryExecFunc<
     this: void, 
     view: ViewSnapshotFunc<R>, 
     params: P, 
-    scope: Scope
+    scope: Scope,
+    disclose: <T>(value: T) => Promise<Disclosed<T>>,
 ) => Promise<T>;
 
 /**

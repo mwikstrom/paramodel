@@ -391,7 +391,6 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     ): QueryView<P, T> => {
         const { kind, exec, auth, dependencies } = handler;
         const snapshot = this.#createViewSnapshotFunc(version, dependencies, circular);
-
         const query: QueryView<P, T>["query"] = (
             authError && auth ? async params => {
                 const result = await auth(exec, snapshot, params, this.#scope);
@@ -399,7 +398,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                     throw authError();
                 }
                 return result;    
-            } : params => exec(snapshot, params, this.#scope)
+            } : params => exec(snapshot, params, this.#scope, this.disclose)
         );
 
         const view: QueryView<P, T> = Object.freeze({ kind, version, query });
