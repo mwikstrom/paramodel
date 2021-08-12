@@ -23,6 +23,18 @@ Run-time domain model for event-sourcing.
 
   IMPORTANT: Only query handler shall be allowed to take dependency on a (disclosing)
   entity-mapper.
+
+  ----
+  ALTERNATIVE:
+
+  Another idea is to allow PiiString to be converted to/from plain string, in which case
+  it is considered to be exposed.
+
+  We could then store a dual view for all state + entities (implicitly) - perhaps 
+  by adding a setting: "expose": "pii".
+
+  No matter alternative, it boils down to having to declare a mapping... so this alternative
+  should probably be scratched... better to implicitly declare a mapping.
  
 - TODO: Query handler shall be able to disclose PII on-the-fly too!
 
