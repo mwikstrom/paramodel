@@ -3,7 +3,7 @@ import { EntityMapping } from "./entity-mapping";
 import { EntityAuthFunc } from "./entity-projection";
 import { EntityViews } from "./entity-view";
 import { ReadModel } from "./model";
-import { PiiString } from "./pii";
+import { Disclosed } from "./pii";
 
 /**
  * Settings that define an entity mapping
@@ -29,7 +29,7 @@ export interface EntityMappingDefinition<
     /** The entity mapping func */
     map(
         source: TypeOf<EntityViews<Views>[Source]["type"]>, 
-        disclose: (pii: PiiString) => Promise<string>
+        disclose: <T>(value: T) => Promise<Disclosed<T>>,
     ): Promise<Props>;
 
     /** An optional {@link EntityAuthFunc} that authorizes access to entities */

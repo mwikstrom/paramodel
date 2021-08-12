@@ -4,7 +4,7 @@ import { ActionOptions } from "./action-options";
 import { ChangeType } from "./change";
 import { DomainModel } from "./model";
 import { ViewOf } from "./projection";
-import { DisclosedPii } from "./pii";
+import { Disclosed } from "./pii";
 
 /**
  * A domain store
@@ -31,7 +31,7 @@ export interface DomainStore<Model extends DomainModel> {
      * @param this - <i>(Ignored)</i> This function uses implicit `this` binding
      * @param value - The value from which PII shall be disclosed
      */
-    disclose<T>(this: void, value: T): Promise<DisclosedPii<T>>;
+    disclose<T>(this: void, value: T): Promise<Disclosed<T>>;
 
     /**
      * Reads change history

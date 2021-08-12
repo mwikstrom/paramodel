@@ -2,7 +2,7 @@ import { Type, TypeOf } from "paratype";
 import { EntityAuthFunc } from "./entity-projection";
 import { EntityViews, PossibleKeysOf } from "./entity-view";
 import { ReadModel } from "./model";
-import { PiiString } from "./pii";
+import { Disclosed } from "./pii";
 
 /**
  * Entity mapping projection
@@ -23,7 +23,7 @@ export interface EntityMapping<
     readonly dependencies: ReadonlySet<string & keyof Views>;
     map(
         source: TypeOf<EntityViews<Views>[Source]["type"]>, 
-        disclose: (pii: PiiString) => Promise<string>
+        disclose: <T>(value: T) => Promise<Disclosed<T>>
     ): Promise<Props>;
     auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number] | Source>>;
 }

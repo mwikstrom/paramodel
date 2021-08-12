@@ -49,7 +49,7 @@ import {
     _viewHeader, 
     _ViewHeader 
 } from "./view-header";
-import { DisclosedPii, PiiString, piiStringType, _createPiiString } from "../pii";
+import { Disclosed, PiiString, piiStringType, _createPiiString } from "../pii";
 import { ActionContext } from "../action-context";
 import { 
     _createPiiKey, 
@@ -1235,10 +1235,10 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
     }
 
-    disclose = async <T>(value: T): Promise<DisclosedPii<T>> => {
+    disclose = async <T>(value: T): Promise<Disclosed<T>> => {
         if (piiStringType.test(value)) {
             const mapped = await this.#discloseString(value);
-            return mapped as DisclosedPii<T>;
+            return mapped as Disclosed<T>;
         }
 
         if (Array.isArray(value)) {
@@ -1246,7 +1246,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             for (const item of value) {
                 mapped.push(await this.disclose(item));
             }
-            return mapped as DisclosedPii<T>;
+            return mapped as Disclosed<T>;
         }
 
         if (value !== null && typeof value === "object") {
@@ -1257,7 +1257,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             return Object.fromEntries(mapped);
         }
 
-        return value as DisclosedPii<T>;
+        return value as Disclosed<T>;
     }
 
     read = (
