@@ -16,10 +16,14 @@ export type _ViewHeader = {
 };
 
 /** @internal */
-export type _MaterialViewKind = "state" | "entities"; // TODO: mapped entities should be material too
+export type _MaterialViewKind = "state" | "entities" | "mapped-entities";
 
 /** @internal */
-export const _materialViewKindType: Type<_MaterialViewKind> = enumType(["state", "entities"]);
+export const _materialViewKindType: Type<_MaterialViewKind> = enumType([
+    "state", 
+    "entities",
+    "mapped-entities"
+]);
 
 /** @internal */
 export const _viewHeader: Type<_ViewHeader> = recordType({
