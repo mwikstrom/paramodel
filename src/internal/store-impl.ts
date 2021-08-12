@@ -720,6 +720,8 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     }
 
     #syncCommit = async (commit: _Commit, infoMap: Map<string, _SyncViewInfo>, keys: Set<string>): Promise<boolean> => {
+        // TODO: Must sync views in an order that ensures that dependencies are synced first
+        // NOTE: Computing that order may discover that there are circular dependencies...
         for (const key of keys) {
             const info = infoMap.get(key);
             const projection = this.#model.views[key];
