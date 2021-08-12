@@ -4,7 +4,9 @@
 
 ```ts
 
+import { ErrorCallback } from 'paratype';
 import { JsonValue } from 'paratype';
+import { PathArray } from 'paratype';
 import { Type } from 'paratype';
 import { TypeOf } from 'paratype';
 
@@ -111,6 +113,11 @@ export function createDomainProvider(this: void, driver: DomainDriver): DomainPr
 
 // @public
 export function createMemoryDriver(this: void): DomainDriver;
+
+// Warning: (ae-forgotten-export) The symbol "_PiiStringData" needs to be exported by the entry point index.d.ts
+//
+// @internal (undocumented)
+export const _createPiiString: (data: _PiiStringData) => PiiString;
 
 // @public
 export function defineAction<Input, Output, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(this: void, definition: ActionDefinition<Input, Output, Scope, Events, Views, Dependencies>): ActionHandler<Events, Pick<Views, Dependencies[number]>, Scope, Input, Output>;
@@ -290,10 +297,11 @@ export interface PageOptions {
 
 // @public
 export interface PiiString {
-    readonly encrypted: ArrayBuffer;
-    readonly obfuscated: string;
-    readonly scope: string;
-    readonly version: number;
+    // @internal (undocumented)
+    _getData(): _PiiStringData;
+    toJsonValue(error?: ErrorCallback, path?: PathArray): JsonValue;
+    toString(): string;
+    valueOf(): string;
 }
 
 // @public

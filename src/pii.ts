@@ -70,7 +70,7 @@ const _PiiString = class PiiString implements PiiStringInterface {
 };
 
 /**
- * A type that represents a {@link _PiiStringData}
+ * A type that represents a {@link PiiString}
  * @public
  */
 export const piiStringType = classType(_PiiString) as Type<PiiString>;

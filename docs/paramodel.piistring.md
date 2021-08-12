@@ -12,12 +12,11 @@ An encrypted and obfuscated string that contains personally identifiable informa
 export interface PiiString 
 ```
 
-## Properties
+## Methods
 
-|  Property | Type | Description |
-|  --- | --- | --- |
-|  [encrypted](./paramodel.piistring.encrypted.md) | ArrayBuffer | Encrypted value |
-|  [obfuscated](./paramodel.piistring.obfuscated.md) | string | Obfuscated value - must not contain PII |
-|  [scope](./paramodel.piistring.scope.md) | string | Scope of the PII |
-|  [version](./paramodel.piistring.version.md) | number | Commit version when the PII scope was initialized |
+|  Method | Description |
+|  --- | --- |
+|  [toJsonValue(error, path)](./paramodel.piistring.tojsonvalue.md) | Gets the underlying json data |
+|  [toString()](./paramodel.piistring.tostring.md) | Gets the obfuscated value |
+|  [valueOf()](./paramodel.piistring.valueof.md) | Gets the obfuscated value |
 

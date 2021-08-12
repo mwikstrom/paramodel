@@ -1,12 +1,25 @@
 import crypto from "crypto";
-import { binaryType, positiveIntegerType, recordType, stringType, Type } from "paratype";
+import { binaryType, enumType, positiveIntegerType, recordType, stringType, Type } from "paratype";
 
 /** @internal */
 export interface _PiiKey {
-    readonly alg: "aes-256-gcm";
+    readonly alg: _PiiKeyAlg;
     readonly ver: number;
     readonly val: ArrayBuffer;
 }
+
+/** @internal */
+export type _PiiKeyAlg = "aes-256-gcm";
+
+/** @internal */
+export const _piiKeyAlgType = enumType(["aes-256-gcm"]);
+
+/** @internal */
+export const _piiKeyType: Type<_PiiKey> = recordType({
+    alg: _piiKeyAlgType,
+    ver: positiveIntegerType,
+    val: binaryType,
+});
 
 /** @internal */
 export interface _PiiStringData {
@@ -41,6 +54,14 @@ export const _piiStringDataType: Type<_PiiStringData> = recordType({
     enc: binaryType,
     tag: binaryType,
 });
+
+/** @internal */
+export const _createPiiKey = (version: number): _PiiKey => {
+    const alg: _PiiKeyAlg = "aes-256-gcm";
+    const ver = version;
+    const val = bufferToArrayBuffer(crypto.randomBytes(32));
+    return Object.freeze({ alg, ver, val });
+};
 
 /** @internal */
 export const _encryptPii = (

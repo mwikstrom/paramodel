@@ -22,7 +22,7 @@ export class _ActionContextImpl<
     #message: ActionResult["message"];
     #emittedEvents: Omit<Change<JsonValue>, "version" | "timestamp" | "position">[] = [];
     #emittedChanges = new Set<string>();
-    #shredded = new Set<string>();
+    #shred = new Set<string>();
     #snapshot: ViewSnapshotFunc<Views>;
 
     constructor(
@@ -84,7 +84,7 @@ export class _ActionContextImpl<
 
         if (this.#status !== "success") {
             this.#emittedChanges.clear();
-            this.#shredded.clear();
+            this.#shred.clear();
             this.#emittedEvents.splice(0, this.#emittedEvents.length);
             this.#output = void(0);
         }
@@ -92,7 +92,7 @@ export class _ActionContextImpl<
         const result: _ActionContextRunResult<Output> = {
             changes: Array.from(this.#emittedChanges),
             events: [...this.#emittedEvents],
-            shredded: Array.from(this.#shredded),
+            shred: Array.from(this.#shred),
             status: this.#status,
             message: this.#message,
             output: this.#output,
@@ -116,7 +116,7 @@ export class _ActionContextImpl<
 
     shred = (scope: string): void => {
         if (this.#active) {
-            this.#shredded.add(scope);
+            this.#shred.add(scope);
         }
     }
 
@@ -149,7 +149,7 @@ export type _ActionContextRunResult<Output> = {
     changes: readonly string[];
     events: readonly Omit<Change<JsonValue>, "version" | "timestamp" | "position">[];
     status: "success" | "conflict" | "forbidden" | "aborted" | "rejected" | "failed";
-    shredded: readonly string[];
+    shred: readonly string[];
     message: string | undefined;
     output: Output | undefined;
 };

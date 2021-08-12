@@ -4,7 +4,7 @@
 
 ## piiStringType variable
 
-A record type that represents a 
+A type that represents a 
 
 <b>Signature:</b>
 

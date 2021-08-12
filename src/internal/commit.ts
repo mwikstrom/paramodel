@@ -18,6 +18,7 @@ export type _Commit = {
     timestamp: Date;
     changes: readonly string[];
     events: readonly Omit<Change<JsonValue>, "version" | "timestamp" | "position">[];
+    shred: readonly string[];
 }
 
 /** @internal */
@@ -30,6 +31,7 @@ export const _commitType: Type<_Commit> = recordType({
         key: stringType,
         arg: jsonValueType,
     })),
+    shred: arrayType(stringType),
 }).restrict(
     "Commit record's changes and events must be consistent",
     ({changes, events}) => {

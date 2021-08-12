@@ -1,5 +1,13 @@
 import deepEqual from "deep-equal";
-import { JsonValue, jsonValueType, positiveIntegerType, recordType, Type, TypeOf } from "paratype";
+import { 
+    JsonValue, 
+    jsonValueType, 
+    nonNegativeIntegerType, 
+    positiveIntegerType, 
+    recordType, 
+    Type, 
+    TypeOf
+} from "paratype";
 import { ActionResultType } from "../action-result";
 import { ActionOptions } from "../action-options";
 import { ChangeType } from "../change";
@@ -43,7 +51,14 @@ import {
 } from "./view-header";
 import { ExposedPii, PiiString, piiStringType, _createPiiString } from "../pii";
 import { ActionContext } from "../action-context";
-import { _decryptPii, _encryptPii, _PiiKey, _PiiStringAuthData } from "./pii-crypto";
+import { 
+    _createPiiKey, 
+    _decryptPii, 
+    _encryptPii, 
+    _PiiKey, 
+    _piiKeyType, 
+    _PiiStringAuthData
+} from "./pii-crypto";
 
 /** @internal */
 export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model> {
@@ -61,18 +76,56 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         this.#commitSource = new _DriverQuerySource(
             this.#driver,
             this.#id,
-            _partitionKeys.commits,
+            _partitionKeys.history,
             record => _commitType.fromJsonValue(record.value)
         );
     }
 
     #getPiiKey = async (scope: string): Promise<_PiiKey | undefined> => {
-        throw new Error("TODO: Implement #getPiiKey");
+        const output = await this.#getPiiKeyRecord(scope);
+        if (output) {
+            return _piiKeyType.fromJsonValue(output.value);
+        }
     }
 
+    #getPiiKeyRecord = async (scope: string): Promise<OutputRecord | undefined> => (
+        this.#driver.read(this.#id, _partitionKeys.pii, _rowKeys.piiScope(scope))
+    );
+
+    #getPiiSyncVersion = async (): Promise<number> => {
+        const output = await this.#driver.read(this.#id, _partitionKeys.pii, _rowKeys.piiSync);
+        if (!output) {
+            return 0;
+        }
+        return nonNegativeIntegerType.fromJsonValue(output.value);
+    };
+
     #getOrCreatePiiKey = async (scope: string, version: number): Promise<_PiiKey> => {
-        // TODO: When key exists, ensure that is hasn't been slated for shredding
-        throw new Error("TODO: Implement #getOrCreatePiiKey");
+        for (;;) {
+            const output = await this.#getPiiKeyRecord(scope);
+            if (output) {
+                const sync = await this.#getPiiSyncVersion();
+                const shredded = await this
+                    .#getCommitQuery({ first: sync, excludeFirst: true})
+                    .where("shred", "includes", scope)
+                    .any();
+                if (!shredded) {
+                    return _piiKeyType.fromJsonValue(output.value);
+                }
+            }
+
+            const data = _createPiiKey(version);
+            const input: InputRecord = {
+                key: _rowKeys.piiScope(scope),
+                value: _piiKeyType.toJsonValue(data),
+                replace: output?.token || null,
+                ttl: -1,
+            };
+
+            if (await this.#driver.write(this.#id, _partitionKeys.pii, input)) {
+                return data;
+            }
+        }
     }
 
     #createPii = async (
@@ -431,7 +484,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     )
 
     #getCommit = async (version: number): Promise<_Commit | undefined> => {
-        const record = await this.#driver.read(this.#id, _partitionKeys.commits, _rowKeys.commit(version));
+        const record = await this.#driver.read(this.#id, _partitionKeys.history, _rowKeys.commit(version));
         if (record) {
             return _commitType.fromJsonValue(record.value);
         }
@@ -1099,13 +1152,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
         if (!dry) {
             const position = latest ? latest.position + latest.events.length : 1;
-            const { changes, events } = fromContext;
+            const { changes, events, shred } = fromContext;
             const commit: _Commit = {
                 version,
                 position,
                 timestamp,
                 changes,
                 events,
+                shred,
             };
 
             if (!await this.#tryCommit(commit)) {
@@ -1115,8 +1169,8 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             _logInfo(
                 "Committed version %d in \"%s\": %s", 
                 version, 
-                this.#id, 
-                changes.join(", ")
+                this.#id,
+                changes.length > 0 ? changes.join(", ") : "(no changes)"
             );
         }
 
@@ -1143,7 +1197,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             ttl: -1,
         };
 
-        const output = await this.#driver.write(this.#id, _partitionKeys.commits, input);
+        const output = await this.#driver.write(this.#id, _partitionKeys.history, input);
         return !!output;
     };
 
