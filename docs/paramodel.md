@@ -63,7 +63,7 @@ Run-time domain model for event-sourcing.
 |  --- | --- |
 |  [Conflict](./paramodel.conflict.md) | A well-known symbol that can be used to indicate that an action failed due to a conflict |
 |  [Forbidden](./paramodel.forbidden.md) | A well-known symbol that can be used to indicate that an action failed because the domain access scope is not permitted to execute it |
-|  [piiStringType](./paramodel.piistringtype.md) | A type that represents a  |
+|  [piiStringType](./paramodel.piistringtype.md) | A type that represents a [PiiString](./paramodel.piistring.md) |
 
 ## Type Aliases
 

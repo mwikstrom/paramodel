@@ -4,7 +4,7 @@
 
 ## piiStringType variable
 
-A type that represents a 
+A type that represents a [PiiString](./paramodel.piistring.md)
 
 <b>Signature:</b>
 
