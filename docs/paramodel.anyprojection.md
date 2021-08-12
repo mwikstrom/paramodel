@@ -9,7 +9,7 @@ A type alias that represents any projection (state, query or entities)
 <b>Signature:</b>
 
 ```typescript
-export declare type AnyProjection = (StateProjection<any, any, any, any> | QueryHandler<any, any, any, any> | EntityProjection<any, any, any, any, any>);
+export declare type AnyProjection = (StateProjection<any, any, any, any> | QueryHandler<any, any, any, any> | EntityProjection<any, any, any, any, any> | EntityMapping<any, any, any, any, any>);
 ```
-<b>References:</b> [StateProjection](./paramodel.stateprojection.md)<!-- -->, [QueryHandler](./paramodel.queryhandler.md)<!-- -->, [EntityProjection](./paramodel.entityprojection.md)
+<b>References:</b> [StateProjection](./paramodel.stateprojection.md)<!-- -->, [QueryHandler](./paramodel.queryhandler.md)<!-- -->, [EntityProjection](./paramodel.entityprojection.md)<!-- -->, [EntityMapping](./paramodel.entitymapping.md)
 

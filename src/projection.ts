@@ -1,3 +1,4 @@
+import { EntityMapping } from "./entity-mapping";
 import { EntityProjection } from "./entity-projection";
 import { EntityView } from "./entity-view";
 import { ReadModel } from "./model";
@@ -17,7 +18,9 @@ export type AnyProjection = (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     QueryHandler<any, any, any, any> | 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    EntityProjection<any, any, any, any, any>
+    EntityProjection<any, any, any, any, any> |
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    EntityMapping<any, any, any, any, any>
 );
 
 /**
@@ -31,6 +34,8 @@ export type ViewOf<H extends AnyProjection> =
     H extends QueryHandler<infer P, infer T, any, any> ? QueryView<P, T> :
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     H extends EntityProjection<infer T, infer K, any, any, any> ? EntityView<T, K> :
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    H extends EntityMapping<infer T, infer K, any, any, any, any> ? EntityView<T, K> :
     View;
 
 /**

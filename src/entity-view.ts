@@ -1,3 +1,5 @@
+import { EntityProjection } from "./entity-projection";
+import { ReadModel } from "./model";
 import { Queryable } from "./queryable";
 
 /**
@@ -8,7 +10,7 @@ export interface EntityView<
     T extends Record<string, unknown> = Record<string, unknown>,
     K extends PossibleKeysOf<T> = PossibleKeysOf<T>
 > extends ReadonlyEntityCollection<T, K> {
-    readonly kind: "entities";
+    readonly kind: "entities" | "mapped-entities";
     readonly version: number;
 }
 
@@ -27,3 +29,11 @@ export interface ReadonlyEntityCollection<T, K extends PossibleKeysOf<T> = Possi
 export type PossibleKeysOf<T> = {
     [P in keyof T]: T[P] extends (string | number | unknown) ? P extends string ? P : never : never;
 }[keyof T];
+
+/**
+ * Extracts all entity views from a read model
+ * @public
+ */
+export type EntityViews<AllViews extends ReadModel> = {
+    [P in keyof AllViews]: AllViews[P] extends EntityProjection ? AllViews[P] : never;
+};

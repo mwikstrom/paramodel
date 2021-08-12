@@ -71,7 +71,7 @@ export type ActionResultType<Model extends Pick<DomainModel, "actions" | "events
 export type AnyActionHandler = ActionHandler<any, any, any, any, any>;
 
 // @public
-export type AnyProjection = (StateProjection<any, any, any, any> | QueryHandler<any, any, any, any> | EntityProjection<any, any, any, any, any>);
+export type AnyProjection = (StateProjection<any, any, any, any> | QueryHandler<any, any, any, any> | EntityProjection<any, any, any, any, any> | EntityMapping<any, any, any, any, any>);
 
 // @public
 export type ArrayAnyOperator = ("includes-any" | "not-includes-any");
@@ -124,6 +124,9 @@ export function defineAction<Input, Output, Scope = unknown, Events extends Chan
 
 // @public
 export function defineEntity<Props extends Record<string, unknown>, Key extends PossibleKeysOf<Props>, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(this: void, definition: EntityDefinition<Props, Key, Scope, Events, Views, Mutators, Dependencies>): EntityProjection<Props, Key, Events, Views, Scope>;
+
+// @public
+export function defineEntityMapping<Props extends Record<string, unknown>, Key extends EntityViews<Views>[Source]["key"], Source extends (string & keyof EntityViews<Views>), Scope = unknown, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(this: void, definition: EntityMappingDefinition<Props, Key, Source, Scope, Views, Dependencies>): EntityMapping<Props, Key, Source, Scope, Views, Dependencies>;
 
 // @public
 export function defineQuery<Views extends ReadModel, Result, Params extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, Dependencies extends (string & keyof Views)[] = []>(this: void, definition: QueryDefinition<Views, Result, Params, Scope, Dependencies>): QueryHandler<Params, Result, Pick<Views, Dependencies[number]>, Scope>;
@@ -197,6 +200,34 @@ export interface EntityDefinition<Props extends Record<string, unknown>, Key ext
 }
 
 // @public
+export interface EntityMapping<Props extends Record<string, unknown>, Key extends PossibleKeysOf<Props>, Source extends (string & keyof EntityViews<Views>), Scope = unknown, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []> {
+    // (undocumented)
+    auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number] | Source>>;
+    // (undocumented)
+    readonly dependencies: ReadonlySet<string & keyof Views>;
+    // (undocumented)
+    readonly key: Key;
+    // (undocumented)
+    readonly kind: "mapped-entities";
+    // (undocumented)
+    map(source: TypeOf<EntityViews<Views>[Source]["type"]>, disclose: (pii: PiiString) => Promise<string>): Promise<Props>;
+    // (undocumented)
+    readonly source: Source;
+    // (undocumented)
+    readonly type: Type<Props>;
+}
+
+// @public
+export interface EntityMappingDefinition<Props extends Record<string, unknown>, Key extends EntityViews<Views>[Source]["key"], Source extends (string & keyof EntityViews<Views>), Scope = unknown, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []> {
+    auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number] | Source>>;
+    dependencies?: Dependencies;
+    key: Key;
+    map(source: TypeOf<EntityViews<Views>[Source]["type"]>, disclose: (pii: PiiString) => Promise<string>): Promise<Props>;
+    source: Source;
+    type: Type<Props>;
+}
+
+// @public
 export interface EntityProjection<T extends Record<string, unknown> = Record<string, unknown>, K extends PossibleKeysOf<T> = PossibleKeysOf<T>, C extends ChangeModel = ChangeModel, R extends ReadModel = ReadModel, Scope = unknown> {
     // (undocumented)
     readonly apply: EntityProjectionFunc<T, K, Change, R>;
@@ -227,10 +258,15 @@ export interface EntityProjectionState<T = Record<string, unknown>, K extends Po
 // @public
 export interface EntityView<T extends Record<string, unknown> = Record<string, unknown>, K extends PossibleKeysOf<T> = PossibleKeysOf<T>> extends ReadonlyEntityCollection<T, K> {
     // (undocumented)
-    readonly kind: "entities";
+    readonly kind: "entities" | "mapped-entities";
     // (undocumented)
     readonly version: number;
 }
+
+// @public
+export type EntityViews<AllViews extends ReadModel> = {
+    [P in keyof AllViews]: AllViews[P] extends EntityProjection ? AllViews[P] : never;
+};
 
 // @public
 export type EqualityOperator = "==" | "!=" | "in" | "not-in";
@@ -488,7 +524,7 @@ export type TransparentPii<T> = (T extends string ? string | PiiString : T exten
 export type View = StateView | QueryView | EntityView<Record<string, string | number>, string>;
 
 // @public
-export type ViewOf<H extends AnyProjection> = H extends StateProjection<infer T, any, any, any> ? StateView<T> : H extends QueryHandler<infer P, infer T, any, any> ? QueryView<P, T> : H extends EntityProjection<infer T, infer K, any, any, any> ? EntityView<T, K> : View;
+export type ViewOf<H extends AnyProjection> = H extends StateProjection<infer T, any, any, any> ? StateView<T> : H extends QueryHandler<infer P, infer T, any, any> ? QueryView<P, T> : H extends EntityProjection<infer T, infer K, any, any, any> ? EntityView<T, K> : H extends EntityMapping<infer T, infer K, any, any, any, any> ? EntityView<T, K> : View;
 
 // @public
 export interface ViewOptions {

@@ -7,5 +7,5 @@
 <b>Signature:</b>
 
 ```typescript
-readonly kind: "entities";
+readonly kind: "entities" | "mapped-entities";
 ```

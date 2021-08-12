@@ -36,7 +36,7 @@ export interface EntityDefinition<
     auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number]>>;
 
     /**
-     * Optional array of vies keys that the entity projection depends upon.
+     * Optional array of view keys that the entity projection depends upon.
      * 
      * These views will automatically be synced to the current version just before mutators
      * are applied and are made available via the `view` function (third argument of {@link EntityProjectionFunc}).

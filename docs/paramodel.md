@@ -14,6 +14,7 @@ Run-time domain model for event-sourcing.
 |  [createMemoryDriver(this)](./paramodel.creatememorydriver.md) | Creates an in-memory [driver](./paramodel.domaindriver.md) that could be used to testing your domain |
 |  [defineAction(this, definition)](./paramodel.defineaction.md) | Creates an [ActionHandler](./paramodel.actionhandler.md) |
 |  [defineEntity(this, definition)](./paramodel.defineentity.md) | Creates an [EntityProjection](./paramodel.entityprojection.md) |
+|  [defineEntityMapping(this, definition)](./paramodel.defineentitymapping.md) | Creates an [EntityMappingDefinition](./paramodel.entitymappingdefinition.md) |
 |  [defineQuery(this, definition)](./paramodel.definequery.md) | Creates a [QueryHandler](./paramodel.queryhandler.md) |
 |  [defineState(this, definition)](./paramodel.definestate.md) | Creates a [StateProjection](./paramodel.stateprojection.md) |
 
@@ -32,6 +33,8 @@ Run-time domain model for event-sourcing.
 |  [DomainStore](./paramodel.domainstore.md) | A domain store |
 |  [DomainStoreStatus](./paramodel.domainstorestatus.md) | Status of a [DomainStore](./paramodel.domainstore.md) |
 |  [EntityDefinition](./paramodel.entitydefinition.md) | Settings that define an entity projection |
+|  [EntityMapping](./paramodel.entitymapping.md) | Entity mapping projection |
+|  [EntityMappingDefinition](./paramodel.entitymappingdefinition.md) | Settings that define an entity mapping |
 |  [EntityProjection](./paramodel.entityprojection.md) | Entity state projection |
 |  [EntityProjectionState](./paramodel.entityprojectionstate.md) | The mutable state object provided as the second argument of [EntityProjectionFunc](./paramodel.entityprojectionfunc.md) |
 |  [EntityView](./paramodel.entityview.md) | A snapshot of entities |
@@ -86,6 +89,7 @@ Run-time domain model for event-sourcing.
 |  [EntityAuthFunc](./paramodel.entityauthfunc.md) | A function that authorizes access to entities |
 |  [EntityChangeHandlers](./paramodel.entitychangehandlers.md) | An object that define the change event handlers that may mutate entity states.<!-- -->Each key in this object is the name of a change event and the corresponding value is an [EntityProjectionFunc](./paramodel.entityprojectionfunc.md) that shall be invoked to apply the effect of that change. |
 |  [EntityProjectionFunc](./paramodel.entityprojectionfunc.md) | A function that mutate entity states |
+|  [EntityViews](./paramodel.entityviews.md) | Extracts all entity views from a read model |
 |  [EqualityOperator](./paramodel.equalityoperator.md) | Defines the equality operators |
 |  [Equatable](./paramodel.equatable.md) | Represents equatable property types |
 |  [ErrorFactory](./paramodel.errorfactory.md) | A function that creates an error to be thrown |

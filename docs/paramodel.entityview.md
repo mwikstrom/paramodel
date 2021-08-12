@@ -17,6 +17,6 @@ export interface EntityView<T extends Record<string, unknown> = Record<string, u
 
 |  Property | Type | Description |
 |  --- | --- | --- |
-|  [kind](./paramodel.entityview.kind.md) | "entities" |  |
+|  [kind](./paramodel.entityview.kind.md) | "entities" \| "mapped-entities" |  |
 |  [version](./paramodel.entityview.version.md) | number |  |
 
