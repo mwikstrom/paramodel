@@ -43,6 +43,7 @@ import {
     _getSyncInfoFromRecord, 
     _getViewHeaderRecordForCommit, 
     _getViewHeaderRecordForPurge, 
+    _isDisclosingViewKind, 
     _MaterialViewKind, 
     _materialViewKindType, 
     _SyncViewInfo, 
@@ -390,7 +391,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         authError?: ErrorFactory,
     ): QueryView<P, T> => {
         const { kind, exec, auth, dependencies } = handler;
-        const snapshot = this.#createViewSnapshotFunc(version, dependencies, circular);
+        const snapshot = this.#createViewSnapshotFunc(version, dependencies, circular, { allowDisclosure: true });
+        const disclose = handler.kind === "disclosing-query" ? 
+            this.disclose : 
+            async () => {
+                throw new Error(
+                    "Cannot disclose PII from a standard query handler, must be a disclosing query handler"
+                );
+            };
         const query: QueryView<P, T>["query"] = (
             authError && auth ? async params => {
                 const result = await auth(exec, snapshot, params, this.#scope);
@@ -398,7 +406,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                     throw authError();
                 }
                 return result;    
-            } : params => exec(snapshot, params, this.#scope, this.disclose)
+            } : params => exec(snapshot, params, this.#scope, disclose)
         );
 
         const view: QueryView<P, T> = Object.freeze({ kind, version, query });
@@ -466,12 +474,11 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         version: number,
         dependencies: ReadonlySet<string>,
         circular: readonly string[],
+        mode: { allowDisclosure?: boolean } = {}
     ): ViewSnapshotFunc<Model["views"]> => async (key, options = {}) => {
         if (!dependencies.has(key)) {
             throw new Error(`Cannot access view '${key}' because it is not a registered dependency`);
         }
-
-        // TODO: Verify whether disclosing view is allowed
 
         if (circular.includes(key)) {
             throw new Error(`Detected circular view dependency: ${circular.map(item => `'${item}'`).join(" -> ")}`);
@@ -479,6 +486,11 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
 
         const authError = authErrorFromOptions(options);
         const view = await this.#createView(key, version, [...circular, key], authError);
+
+        if (_isDisclosingViewKind(view.kind) && !mode.allowDisclosure) {
+            throw new Error("Cannot access disclosing view from this context");
+        }
+
         return view as ViewOf<Model["views"][typeof key]>;
     }
 

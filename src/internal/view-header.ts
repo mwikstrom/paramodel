@@ -26,6 +26,12 @@ export const _materialViewKindType: Type<_MaterialViewKind> = enumType([
 ]);
 
 /** @internal */
+export const _isDisclosingViewKind = (kind: string): boolean => (
+    kind === "disclosing-query" ||
+    kind === "mapped-entities"
+);
+
+/** @internal */
 export const _viewHeader: Type<_ViewHeader> = recordType({
     kind: _materialViewKindType,
     sync_version: nonNegativeIntegerType,

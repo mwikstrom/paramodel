@@ -13,7 +13,7 @@ export interface QueryHandler<
     R extends ReadModel = ReadModel,
     Scope = unknown,
 > {
-    readonly kind: "query";
+    readonly kind: "query" | "disclosing-query";
     readonly type: Type<T>;
     readonly params: Type<P>;
     readonly dependencies: ReadonlySet<string & keyof R>;

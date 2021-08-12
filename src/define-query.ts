@@ -19,6 +19,9 @@ export interface QueryDefinition<
     /** Query parameter type */
     params: Type<Params>;
 
+    /** Specifies whether the query handler can disclose PII */
+    disclosing?: boolean;
+
     /**
      * Optional array of vies keys that the query handler depends upon.
      * 
@@ -54,11 +57,12 @@ export function defineQuery<
         type,
         params,
         dependencies,
+        disclosing,
         exec,
         auth,
     } = definition;
     return Object.freeze({
-        kind: "query",
+        kind: disclosing ? "disclosing-query" : "query",
         type,
         params,
         dependencies: Object.freeze(new Set(dependencies)),
