@@ -9,7 +9,7 @@ import { Disclosed } from "./pii";
  * @public
  */
 export interface EntityMapping<
-    Props extends Record<string, unknown>,
+    Props extends Record<string, unknown> = Record<string, unknown>,
     Key extends PossibleKeysOf<Props> = PossibleKeysOf<Props>,
     Source extends (string & keyof EntityViews<Views>) = string,
     Scope = unknown,

@@ -671,8 +671,10 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             const projection = this.#model.views[key];
             if (projection?.kind === "state" || projection?.kind === "entities") {
                 projection.mutators.forEach(e => eventsToSync.add(e));
-            } else { // TODO: Support syncing mapped entities
-                throw new Error(`Don't know how to sync view: ${key}`);
+            } else if (projection?.kind === "mapped-entities") {
+                // entity mapping does not have any mutators
+            } else {
+                throw new Error(`Don't know how to sync view: ${key} (${projection?.kind})`);
             }
         }
 
@@ -732,8 +734,10 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 modified = await this.#syncEntities(commit, projection, key);
             } else if (projection?.kind === "state") {
                 modified = await this.#syncState(commit, projection, key);
-            } else { // TODO: Support syncing mapped entities
-                throw new Error(`Don't know how to sync view: ${key}`);
+            } else if (projection?.kind === "mapped-entities") {
+                modified = await this.#syncMappedEntities(commit.version, projection, key);
+            } else {
+                throw new Error(`Don't know how to sync view: ${key} (${projection?.kind})`);
             }
 
             const newInfo = await this.#storeViewHeaderForCommit(commit, key, projection.kind, info, modified);
@@ -901,6 +905,10 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
 
         return written.size > 0;
+    }
+
+    #syncMappedEntities = async (version: number, projection: EntityMapping, viewKey: string): Promise<boolean> => {
+        throw new Error("TODO: Implement syncMappedEntities");
     }
 
     #syncState = async (commit: _Commit, projection: StateProjection, key: string): Promise<boolean> => {
