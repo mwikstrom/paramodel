@@ -10,7 +10,8 @@ Run-time domain model for event-sourcing.
 
 - TODO: Drop shredded scopes during purge
 
-- TODO: Equality query operators for PiiString
+- TODO: (NOPE?) Equality query operators for PiiString (not needed because queryables are
+  disclosed when supported)
 
 - TODO: Disclose PiiString in materialized views. Take dependency on disclosed PII scopes,
   and cascade those scopes to derived materialized views. Purge after shredding
