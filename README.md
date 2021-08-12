@@ -13,22 +13,18 @@ Run-time domain model for event-sourcing.
 - TODO: (NOPE?) Equality query operators for PiiString (not needed because queryables are
   disclosed when supported)
 
-- TODO: Disclose PiiString in materialized views. Take dependency on disclosed PII scopes,
-  and cascade those scopes to derived materialized views. Purge after shredding
-  shall rewrite the exposure.
+- TODO: Add entity-mapper projection, that can disclose PII in the mapping function.
 
-  View state record shall contain "disclosed state" in addition to the "internal state",
-  but only when that record did disclose any close.
+  In the future, add support for auto-mapping (disclosing all PII). For now, mapping has
+  to be handcoded.
 
-  In addition, the "disclosed scopes" must also be stored in the record so that they
-  can be filtered on during purge.
+  During mapping, the system shall record which PII scopes that are disclosed. The mapping
+  shall then be rerun (during purge) whenever one of those scopes are shredded.
 
-  Query handler shall provide disclosed state from its dependencies.
-
-  View func on store shall provide disclosed state.
-
-  However, state projection and entity project shall NOT see disclosed state from their
-  dependencies!
+  IMPORTANT: Only query handler shall be allowed to take dependency on a (disclosing)
+  entity-mapper.
+ 
+- TODO: Query handler shall be able to disclose PII on-the-fly too!
 
 - TODO: Purging of PII:
 
