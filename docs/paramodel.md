@@ -45,7 +45,6 @@ Run-time domain model for event-sourcing.
 |  [PageOptions](./paramodel.pageoptions.md) | Options for getting a page |
 |  [PiiString](./paramodel.piistring.md) | An encrypted and obfuscated string that contains personally identifiable information (PII) |
 |  [PurgeOptions](./paramodel.purgeoptions.md) | Options for purging views |
-|  [PurgeResult](./paramodel.purgeresult.md) | The result of running a purge operation |
 |  [Queryable](./paramodel.queryable.md) | A queryable collection |
 |  [QueryDefinition](./paramodel.querydefinition.md) | Settings that define a query handler |
 |  [QueryHandler](./paramodel.queryhandler.md) | A query handler - which is a stateless view projection |

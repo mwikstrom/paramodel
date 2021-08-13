@@ -61,10 +61,17 @@ export interface DomainStore<Model extends DomainModel> {
 
     /**
      * Purges the views of the current store
+     * 
      * @param this - <i>(Ignored)</i> This function uses implicit `this` binding
      * @param options - <i>(Optional)</i> Purge options
+     * 
+     * @returns A promise that resolves with a boolean value indicating whether
+     * the purge operation ran to completion. 
+     * 
+     * When it resolves to `false` the purge operation should be run again until it 
+     * eventually completes.
      */
-    purge(this: void, options?: Partial<PurgeOptions>): Promise<PurgeResult>;
+    purge(this: void, options?: Partial<PurgeOptions>): Promise<boolean>;
     
     /**
      * Gets a view snapshot
@@ -209,18 +216,6 @@ export interface SyncOptions<K extends string = string> {
 export interface PurgeOptions {
     /** An abort signal that shall be observed while views are purged */
     readonly signal: AbortSignal;
-}
-
-/**
- * The result of running a purge operation
- * @public
- */
-export interface PurgeResult {
-    /**
-     * Specifies whether the purge operation ran to completion, or whether
-     * another call is required.
-     */
-    readonly done: boolean;
 }
 
 /**

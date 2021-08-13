@@ -167,7 +167,7 @@ export interface DomainProvider {
 export interface DomainStore<Model extends DomainModel> {
     disclose<T>(this: void, value: T): Promise<Disclosed<T>>;
     do<K extends string & keyof Model["actions"]>(this: void, key: K, input: TypeOf<Model["actions"][K]["input"]>, options?: ActionOptions): Promise<ActionResultType<Model, K>>;
-    purge(this: void, options?: Partial<PurgeOptions>): Promise<PurgeResult>;
+    purge(this: void, options?: Partial<PurgeOptions>): Promise<boolean>;
     read(this: void, options?: Partial<ReadOptions<string & keyof Model["events"]>>): AsyncIterable<ChangeType<Model["events"]>>;
     stat(this: void): Promise<DomainStoreStatus>;
     sync<K extends string & keyof Model["views"]>(this: void, options?: Partial<SyncOptions<K>>): Promise<number>;
@@ -365,11 +365,6 @@ export type PossibleKeysOf<T> = {
 // @public
 export interface PurgeOptions {
     readonly signal: AbortSignal;
-}
-
-// @public
-export interface PurgeResult {
-    readonly done: boolean;
 }
 
 // @public

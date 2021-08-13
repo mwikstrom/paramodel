@@ -8,8 +8,6 @@ Run-time domain model for event-sourcing.
 
 ----
 
-- TODO: Review done output from purge. Maybe it's not enough with just a single done prop?!
-
 - TODO: Add store.shred() for shredding PII keys and remapping mapped entities that
   disclosed one of the shredded scopes.
 

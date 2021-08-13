@@ -26,7 +26,6 @@ import {
     DomainStoreStatus, 
     ErrorFactory, 
     PurgeOptions, 
-    PurgeResult, 
     ReadOptions, 
     SyncOptions, 
     ViewOptions, 
@@ -1577,45 +1576,37 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return synced;
     }
 
-    purge = async (options: Partial<PurgeOptions> = {}): Promise<PurgeResult> => {
+    purge = async (options: Partial<PurgeOptions> = {}): Promise<boolean> => {
         const { signal } = options;
-        const viewKeys = this.#getMaterialViews();
-        const infoMap = await this.#getSyncInfoMap(viewKeys);
+        const infoMap = await this.#getSyncInfoMap(this.#getMaterialViews());
         const purgeVersion = _getMinSyncVersion(infoMap.values()) - 1;
-        let aborted = false;
 
-        // Phase 1: Update the purged range of all material views
-        for (const key of viewKeys) {
-            const oldInfo = infoMap.get(key);
-            if (!oldInfo) {
-                aborted = true;
-            } else {
-                const newInfo = await this.#storeViewHeaderForPurge(key, purgeVersion, oldInfo);
-                if (!newInfo) {
-                    aborted = true;
-                }
+        // Update the purged range of all material views
+        for (const [key, oldInfo] of infoMap) {
+            const newInfo = await this.#storeViewHeaderForPurge(key, purgeVersion, oldInfo);
+
+            if (!newInfo || signal?.aborted) {
+                return false;
             }
-            
-            aborted = !aborted || !signal?.aborted;           
-            if (aborted) {
-                break;
-            }            
+
+            infoMap.set(key, newInfo);
         }
 
-        // Phase 2: Mark all state/entity records in the purged range with a TTL
+        // Mark all state/entity records in the purged range with a TTL
         for (const [key, info] of infoMap) {
-            aborted = aborted || !await this.#expirePurgedViewData(key, info, signal) || !!signal?.aborted;
-            if (aborted) {
-                break;
-            }            
+            if (signal?.aborted || !await this.#expirePurgedViewData(key, info, signal)) {
+                return false;
+            }
         }
 
-        const done = !aborted && viewKeys.every(key => {
-            const info = infoMap.get(key);
-            return info && info.purged_from_version === 0 && info.purged_until_version >= purgeVersion;
-        });
-        
-        return { done };
+        // Finally return true only if all views are fully purged
+        for (const info of infoMap.values()) {
+            if (info.purged_from_version !== 0 || info.purged_until_version < purgeVersion) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     view = async <K extends string & keyof Model["views"]>(

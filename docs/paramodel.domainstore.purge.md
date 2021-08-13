@@ -9,7 +9,7 @@ Purges the views of the current store
 <b>Signature:</b>
 
 ```typescript
-purge(this: void, options?: Partial<PurgeOptions>): Promise<PurgeResult>;
+purge(this: void, options?: Partial<PurgeOptions>): Promise<boolean>;
 ```
 
 ## Parameters
@@ -21,5 +21,9 @@ purge(this: void, options?: Partial<PurgeOptions>): Promise<PurgeResult>;
 
 <b>Returns:</b>
 
-Promise&lt;[PurgeResult](./paramodel.purgeresult.md)<!-- -->&gt;
+Promise&lt;boolean&gt;
+
+A promise that resolves with a boolean value indicating whether the purge operation ran to completion.
+
+When it resolves to `false` the purge operation should be run again until it eventually completes.
 
