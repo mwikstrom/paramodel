@@ -16,7 +16,7 @@ Run-time domain model for event-sourcing.
 
 - TODO: Purge should return more than just "done"!? - aborting too early prevent progress...
 
-- TODO: Add auto-mapping projection
+- TODO: Add auto-mapping projection (disclosing all PII)
 
 - TODO: Purging of PII:
 
