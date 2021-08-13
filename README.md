@@ -8,6 +8,8 @@ Run-time domain model for event-sourcing.
 
 ----
 
+- TODO: Review done output from purge. Maybe it's not enough with just a single done prop?!
+
 - TODO: Add store.shred() for shredding PII keys and remapping mapped entities that
   disclosed one of the shredded scopes.
 
@@ -27,8 +29,6 @@ Run-time domain model for event-sourcing.
 - TODO: Add store.drop() for dropping views that are no longer modelled.
 
 - TODO: Support fast sweeping sync (not storing every commit, like a purge on the fly sort of)
-
-- TODO: Review done output from purge. Maybe it's not enough with just a single done prop?!
 
 - TODO: Add auto-mapping projection (disclosing all PII)
 
