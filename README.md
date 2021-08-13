@@ -28,7 +28,7 @@ Run-time domain model for event-sourcing.
 
 - TODO: Support fast sweeping sync (not storing every commit, like a purge on the fly sort of)
 
-- TODO: Purge should return more than just "done"!? - aborting too early prevent progress...
+- TODO: Review done output from purge. Maybe it's not enough with just a single done prop?!
 
 - TODO: Add auto-mapping projection (disclosing all PII)
 
