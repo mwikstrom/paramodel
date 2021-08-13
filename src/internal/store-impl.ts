@@ -97,8 +97,8 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         this.#driver.read(this.#id, _partitionKeys.pii, _rowKeys.piiScope(scope))
     );
 
-    #getPiiSyncVersion = async (): Promise<number> => {
-        const output = await this.#driver.read(this.#id, _partitionKeys.pii, _rowKeys.piiSync);
+    #getPiiShredVersion = async (): Promise<number> => {
+        const output = await this.#driver.read(this.#id, _partitionKeys.pii, _rowKeys.piiShred);
         if (!output) {
             return 0;
         }
@@ -109,12 +109,12 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         for (;;) {
             const output = await this.#getPiiKeyRecord(scope);
             if (output) {
-                const sync = await this.#getPiiSyncVersion();
-                const shredded = await this
-                    .#getCommitQuery({ first: sync, excludeFirst: true})
+                const lastShreddedVersion = await this.#getPiiShredVersion();
+                const isShredded = await this
+                    .#getCommitQuery({ first: lastShreddedVersion, excludeFirst: true})
                     .where("shredded", "includes", scope)
                     .any();
-                if (!shredded) {
+                if (!isShredded) {
                     return _piiKeyType.fromJsonValue(output.value);
                 }
             }

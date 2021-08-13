@@ -9,7 +9,7 @@ export const _partitionKeys = Object.freeze({
 /** @internal */
 export const _rowKeys = Object.freeze({
     commit: (version: number) => version.toString(10).padStart(16, "0"),
-    piiSync: "sync",
+    piiShred: "shred",
     piiScope: (scope: string) => `$${scope}`,
     viewState: (version: number) => `state:${version.toString(10).padStart(16, "0")}`,
     entity: (key: string, version: number) => `entity:${version.toString(10).padStart(16, "0")}:${key}`,
