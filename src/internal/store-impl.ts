@@ -30,7 +30,7 @@ import {
     ReadOptions, 
     SyncOptions, 
     ViewOptions, 
-    ViewStatus 
+    MaterializedViewStatus 
 } from "../store";
 import { _ActionContextImpl } from "./action-context-impl";
 import { _Commit, _commitType, _getChangesFromCommit } from "./commit";
@@ -540,6 +540,20 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     #getViewHeader = async (key: string): Promise<_ViewHeader | undefined> => {
         const record = await this.#getViewHeaderRecord(key);
         return record && _viewHeader.fromJsonValue(record.value);
+    }
+
+    #getStoredViewHeaders = async (): Promise<Map<string, _ViewHeader>> => {
+        const source = new _DriverQuerySource(
+            this.#driver, 
+            this.#id, 
+            _partitionKeys.views,
+            record => record,
+        );
+        const result = new Map<string, _ViewHeader>();
+        for await (const record of new _QueryImpl(source, []).all()) {
+            result.set(record.key, _viewHeader.fromJsonValue(record.value));
+        }
+        return result;
     }
 
     #getViewSyncVersion = async (key: string, definition?: AnyProjection): Promise<number | undefined> => {
@@ -1502,33 +1516,42 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     }
 
     stat = async (): Promise<DomainStoreStatus> => {
-        const materialViewKeys = this.#getMaterialViews();
-        const [
-            latest,
-            headers,
-        ] = await Promise.all([
-            this.#getLatestCommit(),
-            Promise.all(materialViewKeys.map(key => this.#getViewHeader(key))),
-        ]);
-        const views = Object.fromEntries(materialViewKeys.map((key, index) => {
-            const header = headers[index];
-            const viewStatus: ViewStatus = {
-                sync_version: header?.sync_version || 0,
-                sync_position: header?.sync_position || 0,
-                sync_timestamp: header?.sync_timestamp,
-                last_change_version: header?.last_change_version || 0,
-                last_change_timestamp: header?.last_change_timestamp,
-                purged_from_version: header?.purged_from_version || 0,
-                purged_until_version: header?.purged_until_version || 0,
+        const materialViewKeys = this.#getMaterialViews();        
+        const views: Record<string, MaterializedViewStatus> = {};
+        
+        for (const [key, header] of await this.#getStoredViewHeaders()) {
+            const viewStatus: MaterializedViewStatus = {
+                active: materialViewKeys.includes(key),
+                ...header,
             };
-            return [key, viewStatus];
-        }));
+            views[key] = viewStatus;
+        }
+
+        for (const key of materialViewKeys) {
+            if (key in views) {
+                continue;
+            }
+            const viewStatus: MaterializedViewStatus = {
+                active: true,
+                kind: this.#model.views[key].kind,
+                sync_version: 0,
+                sync_position: 0,
+                last_change_version: 0,
+                purged_from_version: 0,
+                purged_until_version: 0,
+                shred_version: 0,
+            };
+            views[key] = viewStatus;
+        }
+
+        const latest = await this.#getLatestCommit();
         const result: DomainStoreStatus = {
             version: latest?.version || 0,
             position: latest?.position || 0,
             timestamp: latest?.timestamp,
             views,
         };
+
         return result;
     }
 

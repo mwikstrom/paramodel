@@ -115,14 +115,20 @@ export interface DomainStoreStatus {
     readonly timestamp?: Date;
 
     /** Status for each defined view */
-    readonly views: Readonly<Record<string, ViewStatus>>;
+    readonly views: Readonly<Record<string, MaterializedViewStatus>>;
 }
 
 /**
- * Status for a view
+ * Status for a materialized view
  * @public
  */
-export interface ViewStatus {
+export interface MaterializedViewStatus {
+    /** Specifies whether the view is active (included in the model) */
+    readonly active: boolean;
+
+    /** Specifies the kind of materialized view */
+    readonly kind: string;
+
     /** The commit version number that the view is synchronized with */
     readonly sync_version: number;
 
@@ -149,6 +155,9 @@ export interface ViewStatus {
 
     /** The last version number that is purged */
     readonly purged_until_version: number;
+
+    /** The last version number that safe for shredded PII (remains at zero for non-disclosing views) */
+    readonly shred_version: number;
 }
 
 /**
