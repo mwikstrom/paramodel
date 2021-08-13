@@ -16,13 +16,7 @@ Run-time domain model for event-sourcing.
 
 - TODO: Purge should return more than just "done"!? - aborting too early prevent progress...
 
-- TODO: Add entity-mapper projection, that can disclose PII in the mapping function.
-
-  In the future, add support for auto-mapping (disclosing all PII). For now, mapping has
-  to be handcoded.
-
-  During mapping, the system shall record which PII scopes that are disclosed. The mapping
-  shall then be rerun (during purge) whenever one of those scopes are shredded.
+- TODO: Add auto-mapping projection
 
 - TODO: Purging of PII:
 
