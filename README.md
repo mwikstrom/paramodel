@@ -8,6 +8,8 @@ Run-time domain model for event-sourcing.
 
 ----
 
+- TODO: Memory driver continuation tokens must be improved (can't just skip over stuff)
+
 - TODO: Add store.views() for iterating over all views
 
 - TODO: Add provider.stores() for iterating over all stores (this requires store to be registered somehow)
@@ -18,5 +20,5 @@ Run-time domain model for event-sourcing.
 
 - TODO: Add auto-mapping projection (disclosing all PII)
 
-- TODO: Continuation tokens must include version and timestamp and shall expire when too old
+- TODO: External continuation tokens (when there's a server) must include version and timestamp and shall expire when too old
   (older than purge ttl) - or be renewed in case version is still not purged!
