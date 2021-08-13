@@ -1241,7 +1241,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         signal?: AbortSignal,
     ): Promise<boolean> => {
         const condition: FilterSpec = {
-            path: ["value", "end"],
+            path: ["value", "valid_until"],
             operator: "<=",
             operand: purgeVersion,
         };
