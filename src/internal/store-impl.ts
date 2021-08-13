@@ -1226,11 +1226,11 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             return false;
         }
 
-        if (kind === "entities") {
+        if (kind === "entities" || kind === "mapped-entities") {
             return await this.#expirePurgedEntities(key, info.purged_until_version, signal);
         } else if (kind === "state") {
             return await this.#expirePurgedState(key, info.purged_until_version, signal);
-        } else { // TODO: Support purging mapped entities
+        } else {
             return false;
         }
     }
