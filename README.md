@@ -8,17 +8,13 @@ Run-time domain model for event-sourcing.
 
 ----
 
-- TODO: Implement purging and syncing of "mapped-entities"
+- TODO: Entity envelope disclosed prop shall be a map: scope -> version
 
-- TODO: Drop shredded scopes during purge
+- TODO: View header must store shred version, otherwise unmodelled views will continue
+  to disclose shredded data after they're re-added...
 
-- TODO: Support fast sweeping sync (not storing every commit, like a purge on the fly sort of)
-
-- TODO: Purge should return more than just "done"!? - aborting too early prevent progress...
-
-- TODO: Add auto-mapping projection (disclosing all PII)
-
-- TODO: Purging of PII:
+- TODO: Add store.shred() for shredding PII keys and remapping mapped entities that
+  disclosed one of the shredded scopes.
 
   First delete the key (if it's version is less than or equal to the shredded version)
   
@@ -28,6 +24,18 @@ Run-time domain model for event-sourcing.
   no more disclosed scopes remain.
 
   Finally, update the pii sync record to the newly synced version.
+
+- TODO: Add store.views() for iterating over all views
+
+- TODO: Add provider.stores() for iterating over all stores (this requires store to be registered somehow)
+
+- TODO: Add store.drop() for dropping views that are no longer modelled.
+
+- TODO: Support fast sweeping sync (not storing every commit, like a purge on the fly sort of)
+
+- TODO: Purge should return more than just "done"!? - aborting too early prevent progress...
+
+- TODO: Add auto-mapping projection (disclosing all PII)
 
 - TODO: Continuation tokens must include version and timestamp and shall expire when too old
   (older than purge ttl) - or be renewed in case version is still not purged!
