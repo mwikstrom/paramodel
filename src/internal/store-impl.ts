@@ -4,6 +4,7 @@ import {
     mapType, 
     nonNegativeIntegerType, 
     positiveIntegerType, 
+    Predicate, 
     recordType, 
     Type, 
     TypeOf
@@ -25,7 +26,7 @@ import {
     DomainStore, 
     DomainStoreStatus, 
     ErrorFactory, 
-    PurgeOptions, 
+    AbortOptions, 
     ReadOptions, 
     SyncOptions, 
     ViewOptions, 
@@ -91,23 +92,31 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
     }
 
+    #deletePiiKey = async (scope: string, version: number): Promise<void> => {
+        const output = await this.#getPiiKeyRecord(scope);
+        if (output) {
+            const key = _piiKeyType.fromJsonValue(output.value);
+            if (key.ver <= version) {
+                const input: InputRecord = {
+                    key: output.key,
+                    value: null,
+                    replace: output.token,
+                    ttl: 0,
+                };
+                await this.#driver.write(this.#id, _partitionKeys.pii, input);
+            }
+        }
+    }
+
     #getPiiKeyRecord = async (scope: string): Promise<OutputRecord | undefined> => (
         this.#driver.read(this.#id, _partitionKeys.pii, _rowKeys.piiScope(scope))
     );
-
-    #getPiiShredVersion = async (): Promise<number> => {
-        const output = await this.#driver.read(this.#id, _partitionKeys.pii, _rowKeys.piiShred);
-        if (!output) {
-            return 0;
-        }
-        return nonNegativeIntegerType.fromJsonValue(output.value);
-    };
 
     #getOrCreatePiiKey = async (scope: string, version: number): Promise<_PiiKey> => {
         for (;;) {
             const output = await this.#getPiiKeyRecord(scope);
             if (output) {
-                const lastShreddedVersion = await this.#getPiiShredVersion();
+                const lastShreddedVersion = await this.#getShredVersion();
                 const isShredded = await this
                     .#getCommitQuery({ first: lastShreddedVersion, excludeFirst: true})
                     .where("shredded", "includes", scope)
@@ -214,7 +223,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             transform,
         );
 
-        const where: FilterSpec[] =[];
+        const where: FilterSpec[] = [];
 
         if (mode === "valid_range") {
             where.push({
@@ -581,10 +590,15 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
     }
 
-    #getMaterialViews = (filter?: readonly string[]): string[] => Object
+    #getActiveViews = (predicate: Predicate<AnyProjection>, filter?: readonly string[]): string[] => Object
         .entries(this.#model.views)
-        .filter(([key,def]) => (filter === void(0) || filter.includes(key)) && _materialViewKindType.test(def.kind))
+        .filter(([key, proj]) => (filter === void(0) || filter.includes(key)) && predicate(proj))
         .map(([key]) => key);
+
+    #getMaterialViews = (filter?: readonly string[]): string[] => this.#getActiveViews(
+        proj => _materialViewKindType.test(proj.kind),
+        filter
+    );
 
     #getMaterialViewDependencies = (...keys: string[]): string[] => {
         const [key, ...queue] = keys;
@@ -943,7 +957,8 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         const sourceEnvelopeType = entityEnvelopeType(sourceProjection.type);
         const toBeWritten = new Map<string, Record<string, unknown> | null>();
         const envelopeMetadata = new Map<string, Omit<EntityEnvelope, "entity">>();
-        
+        const rk = (key: string): string => _rowKeys.entity(key, commitVersion);       
+
         for await (const record of this.#createEntityRecordQueryable(
             projection.source,
             commitVersion,
@@ -952,6 +967,13 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             const sourceEnvelope = sourceEnvelopeType.fromJsonValue(record.value);
             const sourceEntity = sourceEnvelope.entity;
             const sourceEntityKey = sourceEntity[sourceProjection.key] as string;
+
+            if (record.key !== rk(sourceEntityKey)) {
+                // This check is needed to make sure that mapped entities and source entities
+                // have the same record keys!
+                throw new Error("Source entity does not have the expected record key");
+            }   
+
             const disclosedScopes = new Map<string, number>();
             const mappedEntity = await projection.map(
                 sourceEntity, 
@@ -995,7 +1017,6 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             
         const mappedEnvelopeType = entityEnvelopeType(projection.type);
         const pk = _partitionKeys.view(viewKey);
-        const rk = (key: string): string => _rowKeys.entity(key, commitVersion);
 
         // Write the new entities (ignoring nulls - those are deletions)
         for (const [key, props] of toBeWritten) {
@@ -1441,6 +1462,252 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return !!output;
     };
 
+    #shredPiiKeys = async (signal?: AbortSignal): Promise<boolean> => {
+        const latestVersion = (await this.#getLatestCommit())?.version || 0;
+
+        if (latestVersion === 0) {
+            return true;
+        }
+
+        const shreddedVersion = await this.#getShredVersion();
+        if (shreddedVersion >= latestVersion) {
+            return true;
+        }
+
+        const [
+            shreddedScopes,
+            completedVersion,
+        ] = await this.#getShreddedScopes(shreddedVersion, latestVersion, signal);
+
+        for (const scope of shreddedScopes) {
+            await this.#deletePiiKey(scope, completedVersion);
+        }
+
+        await this.#storeShredVersion(completedVersion);
+        return completedVersion >= latestVersion;
+    };
+
+    #shredDisclosingViews = async (signal?: AbortSignal): Promise<boolean> => {
+        for (const viewKey of this.#getActiveViews(proj => _isDisclosingViewKind(proj.kind))) {
+            if (!this.#shredView(viewKey, signal)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    #shredView = async (viewKey: string, signal?: AbortSignal): Promise<boolean> => {
+        const header = await this.#getViewHeader(viewKey);
+        
+        if (!header || !_isDisclosingViewKind(header.kind)) {
+            return true;
+        }
+
+        if (header.kind === "mapped-entities") {
+            return await this.#shredMappedEntityView(viewKey, header.shred_version, signal);
+        }
+
+        throw new Error(`Don't know how to shred view of kind: ${header.kind}`);
+    }
+
+    #shredMappedEntityView = async (viewKey: string, after: number, signal?: AbortSignal): Promise<boolean> => {
+        const until = (await this.#getLatestCommit())?.version || 0;
+
+        if (until === 0) {
+            return true;
+        }
+    
+        let prevCommit = 0;
+        for await (const commit of this.#getShreddingCommits(after, until)) {
+            if (!commit.shredded) {
+                continue;
+            }
+
+            for (const scope of commit.shredded) {
+                if (!await this.#remapDisclosingEntities(viewKey, scope, commit.version, signal)) {
+                    if (prevCommit > 0) {
+                        this.#storeViewHeaderForShred(viewKey, prevCommit);
+                    }
+                    return false;
+                }
+            }
+
+            if (signal?.aborted) {
+                this.#storeViewHeaderForShred(viewKey, commit.version);
+                return false;
+            }
+
+            prevCommit = commit.version;
+        }
+
+        this.#storeViewHeaderForShred(viewKey, until);
+        return true;
+    }
+
+    #remapDisclosingEntities = async (
+        viewKey: string, 
+        scope: string, 
+        version: number, 
+        signal?: AbortSignal
+    ): Promise<boolean> => {
+        const source = new _DriverQuerySource(
+            this.#driver,
+            this.#id,
+            _partitionKeys.view(viewKey),
+            record => record,
+        );
+
+        const where: FilterSpec[] = [{            
+            path: ["value", "disclosed", scope],
+            operator: "<=",
+            operand: version
+        }];
+
+        const query = new _QueryImpl(source, [], Object.freeze(where));
+        const mapping = this.#model.views[viewKey];
+
+        if (mapping.kind !== "mapped-entities") {
+            throw new Error("Only mapped entities can be remapped (duh!)");
+        }
+
+        for await (const record of query.all()) {
+            await this.#remapEntity(viewKey, mapping, record);
+
+            if (signal?.aborted) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    #remapEntity = async (
+        viewKey: string,
+        mapping: EntityMapping,
+        oldMappedRecord: OutputRecord,
+    ): Promise<void> => {
+        const recordKey = oldMappedRecord.key;
+        const sourceRecord = await this.#driver.read(this.#id, _partitionKeys.view(mapping.source), recordKey);       
+        const sourceProjection = this.#model.views[mapping.source];
+
+        if (!sourceRecord) {
+            throw new Error(`Source entity not found: ${recordKey}`);
+        }
+
+        if (sourceProjection?.kind !== "entities") {
+            throw new Error("The source of an entity mapping must be an entity view");
+        }
+
+        if (sourceProjection.key !== mapping.key) {
+            throw new Error("Entity mapping must use the same entity key prop as the source projection");
+        }
+
+        const sourceEnvelopeType = entityEnvelopeType(sourceProjection.type);
+        const sourceEnvelope = sourceEnvelopeType.fromJsonValue(sourceRecord.value);
+        const sourceEntity = sourceEnvelope.entity;
+        const disclosedScopes = new Map<string, number>();
+        const mappedEntity = await mapping.map(
+            sourceEntity, 
+            value => this.disclose(value, (scope, version) => disclosedScopes.set(scope, version)),
+        );
+        const mappedEnvelopeType = entityEnvelopeType(mapping.type);
+        const oldMappedEnvelope = mappedEnvelopeType.fromJsonValue(oldMappedRecord.value);
+        const newMappedEnvelope: EntityEnvelope = {
+            valid_from: oldMappedEnvelope.valid_from,
+            valid_until: oldMappedEnvelope.valid_until,
+            entity: mappedEntity,
+            disclosed: disclosedScopes,
+        };
+        const input: InputRecord = {
+            key: oldMappedRecord.key,
+            value: mappedEnvelopeType.toJsonValue(newMappedEnvelope),
+            replace: oldMappedRecord.token,
+            ttl: oldMappedRecord.ttl,
+        };
+        await this.#writeSuccess(_partitionKeys.view(viewKey), input);
+    }
+
+    #storeViewHeaderForShred = async (viewKey: string, shredded: number): Promise<void> => {
+        const output = await this.#getViewHeaderRecord(viewKey);
+        if (output) {
+            const {shred_version, ...rest} = _viewHeader.fromJsonValue(output.value);
+            if (shred_version < shredded) {
+                const header: _ViewHeader = {
+                    shred_version: shredded,
+                    ...rest,
+                };
+                const value = _viewHeader.toJsonValue(header);
+                const input: InputRecord = {
+                    key: output.key,
+                    replace: output.token,
+                    ttl: output.ttl,
+                    value,
+                };
+                await this.#driver.write(this.#id, _partitionKeys.views, input);
+            }
+        }
+    }
+
+    #getShredVersion = async (): Promise<number> => {
+        const output = await this.#driver.read(this.#id, _partitionKeys.pii, _rowKeys.piiShred);
+        if (!output) {
+            return 0;
+        }
+        return nonNegativeIntegerType.fromJsonValue(output.value);
+    };
+
+    #storeShredVersion = async (value: number): Promise<void> => {
+        for (;;) {
+            const output = await this.#driver.read(this.#id, _partitionKeys.pii, _rowKeys.piiShred);
+            if (!output || nonNegativeIntegerType.fromJsonValue(output.value) < value) {
+                const input: InputRecord = {
+                    key: _rowKeys.piiShred,
+                    value,
+                    replace: output?.token ?? null,
+                    ttl: -1,
+                };
+                if (!await this.#driver.write(this.#id, _partitionKeys.pii, input)) {
+                    continue; 
+                }
+            }
+            return;
+        }
+    }
+
+    #getShreddedScopes = async (
+        after: number, 
+        until: number,
+        signal?: AbortSignal
+    ): Promise<[Set<string>, number]> => {
+        const shredded = new Set<string>();
+
+        for await (const commit of this.#getShreddingCommits(after, until)) {
+            if (!commit.shredded) {
+                continue;
+            }
+
+            for (const scope of commit.shredded) {
+                shredded.add(scope);
+            }
+
+            if (signal?.aborted) {
+                return [shredded, commit.version];
+            }
+        }
+
+        return [shredded, until];
+    }
+
+    #getShreddingCommits = (
+        after: number, 
+        until: number,
+    ): AsyncIterable<_Commit> => this.#getCommitQuery({
+        first: after,
+        excludeFirst: true,
+        last: until,
+    }).where("shredded", "is", "defined").all();
+
     do = async <K extends string & keyof Model["actions"]>(
         key: K, 
         input: TypeOf<Model["actions"][K]["input"]>, 
@@ -1514,6 +1781,14 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }};
     }
 
+    shred = async (options: AbortOptions = {}): Promise<boolean> => {
+        const { signal } = options;
+        return (
+            await this.#shredPiiKeys(signal) &&
+            await this.#shredDisclosingViews(signal)
+        );
+    }
+
     stat = async (): Promise<DomainStoreStatus> => {
         const materialViewKeys = this.#getMaterialViews();        
         const views: Record<string, MaterializedViewStatus> = {};
@@ -1576,7 +1851,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return synced;
     }
 
-    purge = async (options: Partial<PurgeOptions> = {}): Promise<boolean> => {
+    purge = async (options: AbortOptions = {}): Promise<boolean> => {
         const { signal } = options;
         const infoMap = await this.#getSyncInfoMap(this.#getMaterialViews());
         const purgeVersion = _getMinSyncVersion(infoMap.values()) - 1;

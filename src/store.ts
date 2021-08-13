@@ -44,6 +44,20 @@ export interface DomainStore<Model extends DomainModel> {
     ): AsyncIterable<ChangeType<Model["events"]>>;
 
     /**
+     * Obfuscates all disclosed and encrypted PII that has been shredded.
+     * 
+     * @param this - <i>(Ignored)</i> This function uses implicit `this` binding
+     * @param options - <i>(Optional)</i> Purge options
+     * 
+     * @returns A promise that resolves with a boolean value indicating whether
+     * the operation ran to completion. 
+     * 
+     * When it resolves to `false` the operation should be run again until it 
+     * eventually completes.
+     */
+    shred(this: void, options?: AbortOptions): Promise<boolean>;
+
+    /**
      * Returns status of the current store
      * @param this - <i>(Ignored)</i> This function uses implicit `this` binding
      */
@@ -66,12 +80,12 @@ export interface DomainStore<Model extends DomainModel> {
      * @param options - <i>(Optional)</i> Purge options
      * 
      * @returns A promise that resolves with a boolean value indicating whether
-     * the purge operation ran to completion. 
+     * the operation ran to completion. 
      * 
-     * When it resolves to `false` the purge operation should be run again until it 
+     * When it resolves to `false` the operation should be run again until it 
      * eventually completes.
      */
-    purge(this: void, options?: Partial<PurgeOptions>): Promise<boolean>;
+    purge(this: void, options?: AbortOptions): Promise<boolean>;
     
     /**
      * Gets a view snapshot
@@ -210,12 +224,12 @@ export interface SyncOptions<K extends string = string> {
 }
 
 /**
- * Options for purging views
+ * Provides an optional abort signal
  * @public
  */
-export interface PurgeOptions {
-    /** An abort signal that shall be observed while views are purged */
-    readonly signal: AbortSignal;
+export interface AbortOptions {
+    /** An abort signal that shall be observed */
+    readonly signal?: AbortSignal;
 }
 
 /**

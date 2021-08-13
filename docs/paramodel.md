@@ -22,6 +22,7 @@ Run-time domain model for event-sourcing.
 
 |  Interface | Description |
 |  --- | --- |
+|  [AbortOptions](./paramodel.abortoptions.md) | Provides an optional abort signal |
 |  [ActionContext](./paramodel.actioncontext.md) | The context in which an action is executed |
 |  [ActionDefinition](./paramodel.actiondefinition.md) | Settings that define an action |
 |  [ActionHandler](./paramodel.actionhandler.md) | A domain action handler |
@@ -44,7 +45,6 @@ Run-time domain model for event-sourcing.
 |  [Page](./paramodel.page.md) | A page of items |
 |  [PageOptions](./paramodel.pageoptions.md) | Options for getting a page |
 |  [PiiString](./paramodel.piistring.md) | An encrypted and obfuscated string that contains personally identifiable information (PII) |
-|  [PurgeOptions](./paramodel.purgeoptions.md) | Options for purging views |
 |  [Queryable](./paramodel.queryable.md) | A queryable collection |
 |  [QueryDefinition](./paramodel.querydefinition.md) | Settings that define a query handler |
 |  [QueryHandler](./paramodel.queryhandler.md) | A query handler - which is a stateless view projection |

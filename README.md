@@ -8,18 +8,6 @@ Run-time domain model for event-sourcing.
 
 ----
 
-- TODO: Add store.shred() for shredding PII keys and remapping mapped entities that
-  disclosed one of the shredded scopes.
-
-  First delete the key (if it's version is less than or equal to the shredded version)
-  
-  Then, query all materialized view states that disclosed the shredded scope:
-
-  For each such state, rewrite it - possibly ending up without "undisclosed state" because
-  no more disclosed scopes remain.
-
-  Finally, update the pii sync record to the newly synced version.
-
 - TODO: Add store.views() for iterating over all views
 
 - TODO: Add provider.stores() for iterating over all stores (this requires store to be registered somehow)

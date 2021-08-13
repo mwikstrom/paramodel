@@ -11,6 +11,11 @@ import { Type } from 'paratype';
 import { TypeOf } from 'paratype';
 
 // @public
+export interface AbortOptions {
+    readonly signal?: AbortSignal;
+}
+
+// @public
 export interface ActionContext<Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Scope = unknown, Input = unknown, Output = unknown> {
     conflict(this: void, message?: string): Conflict;
     emit<K extends string & keyof Events>(this: void, key: K, arg: TypeOf<Events[K]>): void;
@@ -167,8 +172,9 @@ export interface DomainProvider {
 export interface DomainStore<Model extends DomainModel> {
     disclose<T>(this: void, value: T): Promise<Disclosed<T>>;
     do<K extends string & keyof Model["actions"]>(this: void, key: K, input: TypeOf<Model["actions"][K]["input"]>, options?: ActionOptions): Promise<ActionResultType<Model, K>>;
-    purge(this: void, options?: Partial<PurgeOptions>): Promise<boolean>;
+    purge(this: void, options?: AbortOptions): Promise<boolean>;
     read(this: void, options?: Partial<ReadOptions<string & keyof Model["events"]>>): AsyncIterable<ChangeType<Model["events"]>>;
+    shred(this: void, options?: AbortOptions): Promise<boolean>;
     stat(this: void): Promise<DomainStoreStatus>;
     sync<K extends string & keyof Model["views"]>(this: void, options?: Partial<SyncOptions<K>>): Promise<number>;
     view<K extends string & keyof Model["views"]>(this: void, key: K, options?: Partial<ViewOptions>): Promise<ViewOf<Model["views"][K]> | undefined>;
@@ -361,11 +367,6 @@ export const piiStringType: Type<PiiString>;
 export type PossibleKeysOf<T> = {
     [P in keyof T]: T[P] extends (string | number | unknown) ? P extends string ? P : never : never;
 }[keyof T];
-
-// @public
-export interface PurgeOptions {
-    readonly signal: AbortSignal;
-}
 
 // @public
 export interface Queryable<T> {
