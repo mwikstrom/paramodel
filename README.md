@@ -8,6 +8,16 @@ Run-time domain model for event-sourcing.
 
 ----
 
+- TODO: Split store impl into functions
+
+- TODO: Use LRU cache for PII keys. Delete from cache when committing a shredded scope.
+
+- TODO: Validate model: 
+  Dependencies must exist AND not cause loop.
+  Dependency of a materialized view cannot be disclosing.
+  Events for mutators must exist. 
+  Mapping keys must be equal.
+
 - TODO: Memory driver continuation tokens must be improved (can't just skip over stuff)
 
 - TODO: Add store.views() for iterating over all views
