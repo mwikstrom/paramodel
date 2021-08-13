@@ -61,6 +61,7 @@ import {
     _PiiStringAuthData
 } from "./pii-crypto";
 import { EntityMapping } from "../entity-mapping";
+import { _topologySort } from "./topology-sort";
 
 /** @internal */
 export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model> {
@@ -719,10 +720,15 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return synced;
     }
 
+    #sortViewKeysByDependencyOrder = (keys: ReadonlySet<string>): string[] => _topologySort(
+        keys, 
+        key => Array.from(this.#model.views[key]?.dependencies ?? []).filter(dep => keys.has(dep))
+    )
+
     #syncCommit = async (commit: _Commit, infoMap: Map<string, _SyncViewInfo>, keys: Set<string>): Promise<boolean> => {
-        // TODO: Must sync views in an order that ensures that dependencies are synced first
-        // NOTE: Computing that order may discover that there are circular dependencies...
-        for (const key of keys) {
+        const sortedKeys = this.#sortViewKeysByDependencyOrder(keys);
+
+        for (const key of sortedKeys) {
             const info = infoMap.get(key);
             const projection = this.#model.views[key];
             
