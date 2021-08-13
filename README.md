@@ -8,8 +8,6 @@ Run-time domain model for event-sourcing.
 
 ----
 
-- TODO: Entity envelope disclosed prop shall be a map: scope -> version
-
 - TODO: View header must store shred version, otherwise unmodelled views will continue
   to disclose shredded data after they're re-added...
 

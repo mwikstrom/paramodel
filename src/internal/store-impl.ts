@@ -1,11 +1,10 @@
 import { 
-    arrayType,
     JsonValue, 
     jsonValueType, 
+    mapType, 
     nonNegativeIntegerType, 
     positiveIntegerType, 
     recordType, 
-    stringType, 
     Type, 
     TypeOf
 } from "paratype";
@@ -149,7 +148,10 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return _createPiiString(data);
     }
 
-    #discloseString = async (pii: PiiString, onDisclosed?: (scope: string) => void): Promise<string> => {  
+    #discloseString = async (
+        pii: PiiString, 
+        onDisclosed?: (scope: string, version: number) => void
+    ): Promise<string> => {  
         const data = pii._getData();
         const key = await this.#getPiiKey(data.scp);
         let result = data.obf;
@@ -158,7 +160,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             if (typeof plain === "string") {
                 result = plain;
                 if (onDisclosed) {
-                    onDisclosed(data.scp);
+                    onDisclosed(data.scp, key.ver);
                 }
             }
         }                
@@ -937,10 +939,10 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             const sourceEnvelope = sourceEnvelopeType.fromJsonValue(record.value);
             const sourceEntity = sourceEnvelope.entity;
             const sourceEntityKey = sourceEntity[sourceProjection.key] as string;
-            const disclosedScopes = new Set<string>();
+            const disclosedScopes = new Map<string, number>();
             const mappedEntity = await projection.map(
                 sourceEntity, 
-                value => this.disclose(value, scope => disclosedScopes.add(scope)),
+                value => this.disclose(value, (scope, version) => disclosedScopes.set(scope, version)),
             );
             const mappedEntityKey = mappedEntity[projection.key] as string;
 
@@ -952,7 +954,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             envelopeMetadata.set(mappedEntityKey, {
                 valid_from: sourceEnvelope.valid_from,
                 valid_until: sourceEnvelope.valid_until,
-                disclosed: Array.from(disclosedScopes),
+                disclosed: disclosedScopes,
             });
         }
 
@@ -1456,7 +1458,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
     }
 
-    disclose = async <T>(value: T, onDisclosed?: (scope: string) => void): Promise<Disclosed<T>> => {
+    disclose = async <T>(value: T, onDisclosed?: (scope: string, version: number) => void): Promise<Disclosed<T>> => {
         if (piiStringType.test(value)) {
             const mapped = await this.#discloseString(value, onDisclosed);
             return mapped as Disclosed<T>;
@@ -1627,14 +1629,14 @@ type EntityEnvelope<T = Record<string, unknown>> = {
     valid_from: number;
     valid_until: number;
     entity: T;
-    disclosed?: string[];
+    disclosed?: Map<string, number>;
 };
 
 const entityEnvelopeType = <T>(valueType: Type<T>): Type<EntityEnvelope<T>> => recordType({
     valid_from: positiveIntegerType,
     valid_until: positiveIntegerType,
     entity: valueType,
-    disclosed: arrayType(stringType),
+    disclosed: mapType(positiveIntegerType),
 }, {
     optional: ["disclosed"],
 }).restrict(
