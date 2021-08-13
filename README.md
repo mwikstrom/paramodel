@@ -8,9 +8,6 @@ Run-time domain model for event-sourcing.
 
 ----
 
-- TODO: View header must store shred version, otherwise unmodelled views will continue
-  to disclose shredded data after they're re-added...
-
 - TODO: Add store.shred() for shredding PII keys and remapping mapped entities that
   disclosed one of the shredded scopes.
 

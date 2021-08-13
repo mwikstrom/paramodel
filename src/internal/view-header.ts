@@ -12,6 +12,7 @@ export type _ViewHeader = {
     readonly last_change_timestamp: Date;
     readonly purged_from_version: number;
     readonly purged_until_version: number;
+    readonly shred_version: number;
 };
 
 /** @internal */
@@ -40,6 +41,7 @@ export const _viewHeader: Type<_ViewHeader> = recordType({
     last_change_timestamp: timestampType,
     purged_from_version: nonNegativeIntegerType,
     purged_until_version: nonNegativeIntegerType,
+    shred_version: nonNegativeIntegerType,
 });
 
 /** @internal */
@@ -74,6 +76,7 @@ export const _getSyncInfoFromRecord = (record: OutputRecord | undefined): _SyncV
     let last_change_timestamp: Date | undefined = void(0);
     let purged_from_version = 0;
     let purged_until_version = 0;
+    let shred_version = 0;
 
     if (record) {
         const header = _viewHeader.fromJsonValue(record.value);
@@ -85,6 +88,7 @@ export const _getSyncInfoFromRecord = (record: OutputRecord | undefined): _SyncV
         last_change_timestamp = header.last_change_timestamp;
         purged_from_version = header.purged_from_version;
         purged_until_version = header.purged_until_version;
+        shred_version = header.shred_version;
     }
 
     return Object.freeze({
@@ -96,6 +100,7 @@ export const _getSyncInfoFromRecord = (record: OutputRecord | undefined): _SyncV
         last_change_timestamp,
         purged_from_version, 
         purged_until_version, 
+        shred_version,
     });
 };
 
@@ -160,6 +165,7 @@ const _getViewHeaderForPurge = (
         last_change_timestamp: prev.last_change_timestamp,
         purged_from_version: 0,
         purged_until_version: Math.max(prev.purged_until_version, purgeVersion),
+        shred_version: prev.shred_version,
     });
 
     return header;
@@ -191,6 +197,7 @@ const _getViewHeaderForCommit = (
             last_change_timestamp,
             purged_from_version: prev.purged_from_version,
             purged_until_version: prev.purged_until_version,
+            shred_version: prev.shred_version,
         });
 
         return header;
@@ -215,6 +222,7 @@ const _getViewHeaderForCommit = (
             last_change_timestamp: prev.last_change_timestamp,
             purged_from_version,
             purged_until_version,
+            shred_version: prev.shred_version,
         });
 
         return header;
