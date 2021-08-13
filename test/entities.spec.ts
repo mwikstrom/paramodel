@@ -13,6 +13,11 @@ describe("DomainStore.view-entities", () => {
         const result = await store.do("register_account", { owner_id: "jane_doe", account_name: "Jane's savings" });
         const view = await store.view("accounts", { sync: result.committed });
         expect(await view?.count()).toBe(1);
+        const account = await view?.get(1);
+        expect(account?.owner_id).toBe("jane_doe");
+        expect(String(account?.account_name)).toBe("");
+        expect(account?.balance).toBe(0);
+        expect(account?.account_id).toBe(1);
     });
 
     it("can read entity before and after sync", async () => {
