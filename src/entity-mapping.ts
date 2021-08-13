@@ -22,7 +22,7 @@ export interface EntityMapping<
     readonly source: Source;
     readonly dependencies: ReadonlySet<string & keyof Views>;
     map(
-        source: TypeOf<EntityViews<Views>[Source]["type"]>, 
+        source: Record<string, unknown> | TypeOf<EntityViews<Views>[Source]["type"]>,
         disclose: <T>(value: T) => Promise<Disclosed<T>>
     ): Promise<Props>;
     auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number] | Source>>;

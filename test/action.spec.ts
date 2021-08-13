@@ -19,14 +19,14 @@ describe("DomainStore.do", () => {
 
     it("valid action is accepted", async () => {
         const store = await createAccountStore();
-        const result = await store.do("register_account", { owner_id: "jane_doe" });
+        const result = await store.do("register_account", { owner_id: "jane_doe", account_name: "Jane's savings" });
         expect(result.status).toBe("success");
         expect(result.output).toBe(1);
     });
 
     it("action can be forbidden", async () => {
         const store = await createAccountStore();
-        const result = await store.do("register_account", { owner_id: "other" });
+        const result = await store.do("register_account", { owner_id: "other", account_name: "Other stuff" });
         expect(result.status).toBe("forbidden");
     });
 });

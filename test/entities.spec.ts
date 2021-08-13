@@ -10,14 +10,14 @@ describe("DomainStore.view-entities", () => {
 
     it("can read entity after commit", async () => {
         const store = await createAccountStore();
-        const result = await store.do("register_account", { owner_id: "jane_doe" });
+        const result = await store.do("register_account", { owner_id: "jane_doe", account_name: "Jane's savings" });
         const view = await store.view("accounts", { sync: result.committed });
         expect(await view?.count()).toBe(1);
     });
 
     it("can read entity before and after sync", async () => {
         const store = await createAccountStore();
-        await store.do("register_account", { owner_id: "jane_doe" });
+        await store.do("register_account", { owner_id: "jane_doe", account_name: "Jane's savings" });
         const before = await store.view("accounts");
         await store.sync();
         const after = await store.view("accounts");
@@ -29,7 +29,7 @@ describe("DomainStore.view-entities", () => {
 
     it("can update entity", async () => {
         const store = await createAccountStore();
-        const a1 = await store.do("register_account", { owner_id: "jane_doe" });
+        const a1 = await store.do("register_account", { owner_id: "jane_doe", account_name: "Jane's savings" });
         expect([a1.status, a1.message].filter(x => x).join(": ")).toBe("success");
         const { output: account_id } = a1;
         positiveIntegerType.assert(account_id);        

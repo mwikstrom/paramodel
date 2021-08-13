@@ -11,7 +11,7 @@ describe("DomainStore.view-state", () => {
 
     it("can read state after commit", async () => {
         const store = await createAccountStore();
-        const result = await store.do("register_account", { owner_id: "jane_doe" });
+        const result = await store.do("register_account", { owner_id: "jane_doe", account_name: "Jane's savings" });
         const view = await store.view("next_account_id", { sync: result.committed });
         expect(view).toBeDefined();
         const state = await view?.read();
@@ -20,7 +20,7 @@ describe("DomainStore.view-state", () => {
 
     it("can read state before and after sync", async () => {
         const store = await createAccountStore();
-        await store.do("register_account", { owner_id: "jane_doe" });
+        await store.do("register_account", { owner_id: "jane_doe", account_name: "Jane's savings" });
         const before = await store.view("next_account_id");
         await store.sync();
         const after = await store.view("next_account_id");
@@ -30,8 +30,8 @@ describe("DomainStore.view-state", () => {
 
     it("action see latest state", async () => {
         const store = await createAccountStore();
-        await store.do("register_account", { owner_id: "jane_doe" });
-        const result = await store.do("register_account", { owner_id: "jane_doe" });
+        await store.do("register_account", { owner_id: "jane_doe", account_name: "Jane's savings" });
+        const result = await store.do("register_account", { owner_id: "jane_doe", account_name: "Jane's savings" });
         expect(result.output).toBe(2);
     });
 });

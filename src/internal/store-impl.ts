@@ -1,10 +1,11 @@
-import deepEqual from "deep-equal";
 import { 
+    arrayType,
     JsonValue, 
     jsonValueType, 
     nonNegativeIntegerType, 
     positiveIntegerType, 
     recordType, 
+    stringType, 
     Type, 
     TypeOf
 } from "paratype";
@@ -37,7 +38,7 @@ import { _Commit, _commitType, _getChangesFromCommit } from "./commit";
 import { _parseVersionFromViewStateRowKey, _partitionKeys, _rowKeys } from "./data-keys";
 import { _logInfo } from "./log";
 import { _QueryImpl } from "./query-impl";
-import { _DriverQuerySource, _QuerySource } from "./query-source";
+import { _DriverQuerySource, _OutputRecordTransform, _QuerySource } from "./query-source";
 import { 
     _getMinSyncVersion, 
     _getSyncInfoFromRecord, 
@@ -62,6 +63,7 @@ import {
 } from "./pii-crypto";
 import { EntityMapping } from "../entity-mapping";
 import { _topologySort } from "./topology-sort";
+import { _typedJsonEqual } from "./json-equal";
 
 /** @internal */
 export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model> {
@@ -147,7 +149,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return _createPiiString(data);
     }
 
-    #discloseString = async (pii: PiiString): Promise<string> => {  
+    #discloseString = async (pii: PiiString, onDisclosed?: (scope: string) => void): Promise<string> => {  
         const data = pii._getData();
         const key = await this.#getPiiKey(data.scp);
         let result = data.obf;
@@ -155,6 +157,9 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             const plain = _decryptPii(key, data);
             if (typeof plain === "string") {
                 result = plain;
+                if (onDisclosed) {
+                    onDisclosed(data.scp);
+                }
             }
         }                
         return result;
@@ -198,24 +203,13 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         return first ? first.valid_from - 1 : INF_VERSION;
     }
 
-    #createEntityQueryable = <T extends Record<string, unknown>>(
+    #createEntityQueryableCore = <T>(
         viewKey: string,
-        type: Type<T>,
         version: number,
         mode: "valid_range" | "valid_until" | "valid_from",
-        metaMap?: WeakMap<T, EntityMetadata>,
+        path: readonly string[],
+        transform: _OutputRecordTransform<T>,
     ): Queryable<T> => {
-        const envelopeType = entityEnvelopeType(type);
-        const transform = (record: OutputRecord): T => {
-            const { value, key, token, ttl } = record;
-            const envelope = envelopeType.fromJsonValue(value);
-            const entity = envelope.entity;
-            if (metaMap) {
-                const meta: EntityMetadata = Object.freeze({ key, token, ttl, envelope });
-                metaMap.set(entity, meta);
-            }
-            return entity;
-        };
         const partitionKey = _partitionKeys.view(viewKey);
         const source = new _DriverQuerySource(
             this.#driver,
@@ -258,7 +252,40 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             throw new Error("Invalid version mode");
         }
 
-        return new _QueryImpl(source, ["value", "entity"], Object.freeze(where));
+        return new _QueryImpl(source, path, Object.freeze(where));
+    }
+
+    #createEntityRecordQueryable = (
+        viewKey: string,
+        version: number,
+        mode: "valid_range" | "valid_until" | "valid_from",
+    ): Queryable<OutputRecord> => this.#createEntityQueryableCore(
+        viewKey,
+        version,
+        mode,
+        [],
+        record => record
+    );
+
+    #createEntityQueryable = <T extends Record<string, unknown>>(
+        viewKey: string,
+        type: Type<T>,
+        version: number,
+        mode: "valid_range" | "valid_until" | "valid_from",
+        metaMap?: WeakMap<T, EntityMetadata>,
+    ): Queryable<T> => {
+        const envelopeType = entityEnvelopeType(type);
+        const transform = (record: OutputRecord): T => {
+            const { value, key, token, ttl } = record;
+            const envelope = envelopeType.fromJsonValue(value);
+            const entity = envelope.entity;
+            if (metaMap) {
+                const meta: EntityMetadata = Object.freeze({ key, token, ttl, envelope });
+                metaMap.set(entity, meta);
+            }
+            return entity;
+        };
+        return this.#createEntityQueryableCore(viewKey, version, mode, ["value", "entity"], transform);
     }
 
     #createReadonlyEntityCollection = async <T extends Record<string, unknown>>(
@@ -777,11 +804,11 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         const changes = _getChangesFromCommit(commit, this.#model.events, projection.mutators);
         const snapshot = this.#createViewSnapshotFunc(commit.version, projection.dependencies, [viewKey]);
         const metaMap = new WeakMap<Record<string, unknown>, EntityMetadata>();
-        const baseVerison = commit.version - 1;
+        const baseVersion = commit.version - 1;
         const base = await this.#createReadonlyEntityCollection(
             viewKey,
             projection,
-            baseVerison,
+            baseVersion,
             [viewKey],
             undefined,
             metaMap,
@@ -790,9 +817,13 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         const pk = _partitionKeys.view(viewKey);
         const rk = (key: string): string => _rowKeys.entity(key, commit.version);
         const envelopeType = entityEnvelopeType(projection.type);
-        const written = new Map<string, Record<string, unknown> | null>();
-        const put: EntityProjectionState["put"] = props => void(written.set(props[projection.key] as string, props));
-        const del: EntityProjectionState["del"] = key => void(written.set(key as string, null));
+        const toBeWritten = new Map<string, Record<string, unknown> | null>();
+        const put: EntityProjectionState["put"] = props => void(
+            toBeWritten.set(props[projection.key] as string, props)
+        );
+        const del: EntityProjectionState["del"] = key => void(
+            toBeWritten.set(key as string, null)
+        );
         const state: EntityProjectionState = {
             base,
             put,
@@ -803,43 +834,19 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             await projection.apply(change, state, snapshot);
         }
 
-        const validUntilBase = this.#createEntityQueryable(viewKey, projection.type, baseVerison, "valid_until");
-        const alreadyMarkedWithValidUntil = new Set<string>();
-        for await (const entity of validUntilBase.all()) {
-            const key = entity[projection.key] as string;
-            if (!written.has(key)) {
-                throw new Error(
-                    `Detected non-deterministic entity projection of view "${viewKey}". ` + 
-                    `Entity "${key}" was marked as valid until ${baseVerison} in an earlier sync ` +
-                    `but was not written now for commit ${commit.version}.`
-                );
-            }
-            alreadyMarkedWithValidUntil.add(key);
-        }
-
-        const validFromCommit = this.#createEntityQueryable(viewKey, projection.type, commit.version, "valid_from");
-        const alreadyWritten = new Set<string>();
-        for await (const entity of validFromCommit.all()) {
-            const key = entity[projection.key] as string;
-            const expected = written.get(key);
-            if (expected === void(0)) {
-                throw new Error(
-                    `Detected non-deterministic entity projection of view "${viewKey}". ` + 
-                    `Entity "${key}" was marked as valid from ${commit.version} in an earlier sync ` +
-                    "but was not written now."
-                );
-            } else if (!deepEqual(entity, expected, { strict: true })) {
-                throw new Error(
-                    `Detected non-deterministic entity projection of view "${viewKey}". ` + 
-                    `Entity "${key}" in version ${commit.version} ` +
-                    "was written with a different value in an earlier sync."
-                );
-            }
-            alreadyWritten.add(key);
-        }
+        const {
+            alreadyMarkedWithValidUntil,
+            alreadyWritten,
+        } = await this.#getAlreadySyncedEntities(
+            viewKey,
+            projection,
+            baseVersion,
+            commit.version,
+            toBeWritten
+        );
 
         // Write the new entities (ignoring nulls - those are deletions)
-        for (const [key, props] of written) {
+        for (const [key, props] of toBeWritten) {
             if (alreadyWritten.has(key)) {
                 continue;
             }
@@ -871,7 +878,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
 
         // Mark written entities with 'valid_until' base version
-        for (const key of written.keys()) {
+        for (const key of toBeWritten.keys()) {
             if (alreadyMarkedWithValidUntil.has(key)) {
                 continue;
             }
@@ -887,13 +894,13 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 throw new Error("Entity metadata was not populated");
             }
 
-            if (baseVerison < meta.envelope.valid_from) {
+            if (baseVersion < meta.envelope.valid_from) {
                 throw new Error("Attempt to write invalid entity envelope");
             }
 
             const envelope: EntityEnvelope = {
                 valid_from: meta.envelope.valid_from,
-                valid_until: baseVerison,
+                valid_until: baseVersion,
                 entity: meta.envelope.entity,
             };
 
@@ -912,11 +919,219 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             await this.#writeSuccess(pk, input);
         }
 
-        return written.size > 0;
+        return toBeWritten.size > 0;
     }
 
-    #syncMappedEntities = async (version: number, projection: EntityMapping, viewKey: string): Promise<boolean> => {
-        throw new Error("TODO: Implement syncMappedEntities");
+    #syncMappedEntities = async (
+        commitVersion: number, 
+        projection: EntityMapping, 
+        viewKey: string
+    ): Promise<boolean> => {
+        const sourceProjection = this.#model.views[projection.source];
+        const baseVersion = commitVersion - 1;
+
+        if (sourceProjection?.kind !== "entities") {
+            throw new Error("The source of an entity mapping must be an entity view");
+        }
+
+        if (sourceProjection.key !== projection.key) {
+            throw new Error("Entity mapping must use the same entity key prop as the source projection");
+        }
+
+        const sourceEnvelopeType = entityEnvelopeType(sourceProjection.type);
+        const toBeWritten = new Map<string, Record<string, unknown> | null>();
+        const envelopeMetadata = new Map<string, Omit<EntityEnvelope, "entity">>();
+        
+        for await (const record of this.#createEntityRecordQueryable(
+            projection.source,
+            commitVersion,
+            "valid_from"
+        ).all()) {            
+            const sourceEnvelope = sourceEnvelopeType.fromJsonValue(record.value);
+            const sourceEntity = sourceEnvelope.entity;
+            const sourceEntityKey = sourceEntity[sourceProjection.key] as string;
+            const disclosedScopes = new Set<string>();
+            const mappedEntity = await projection.map(
+                sourceEntity, 
+                value => this.disclose(value, scope => disclosedScopes.add(scope)),
+            );
+            const mappedEntityKey = mappedEntity[projection.key] as string;
+
+            if (mappedEntityKey !== sourceEntityKey) {
+                throw new Error("Mapped entity must have the same key as the source entity");
+            }
+
+            toBeWritten.set(mappedEntityKey, mappedEntity);
+            envelopeMetadata.set(mappedEntityKey, {
+                valid_from: sourceEnvelope.valid_from,
+                valid_until: sourceEnvelope.valid_until,
+                disclosed: Array.from(disclosedScopes),
+            });
+        }
+
+        for await (const record of this.#createEntityRecordQueryable(
+            projection.source,
+            baseVersion,
+            "valid_until"
+        ).all()) {
+            const sourceEnvelope = sourceEnvelopeType.fromJsonValue(record.value);
+            const sourceEntity = sourceEnvelope.entity;
+            const sourceEntityKey = sourceEntity[sourceProjection.key] as string;
+            toBeWritten.set(sourceEntityKey, null);
+        }
+
+        const {
+            alreadyMarkedWithValidUntil,
+            alreadyWritten,
+        } = await this.#getAlreadySyncedEntities(
+            viewKey,
+            projection,
+            baseVersion,
+            commitVersion,
+            toBeWritten
+        );
+            
+        const mappedEnvelopeType = entityEnvelopeType(projection.type);
+        const pk = _partitionKeys.view(viewKey);
+        const rk = (key: string): string => _rowKeys.entity(key, commitVersion);
+
+        // Write the new entities (ignoring nulls - those are deletions)
+        for (const [key, props] of toBeWritten) {
+            if (alreadyWritten.has(key)) {
+                continue;
+            }
+
+            if (!props) {
+                continue; // entity was deleted
+            }
+
+            const metadata = envelopeMetadata.get(key);
+            if (!metadata) {
+                throw new Error("Missing metadata for mapped entity");
+            }
+
+            const envelope: EntityEnvelope = {
+                ...metadata,
+                entity: props,
+            };
+            
+            const value = mappedEnvelopeType.toJsonValue(
+                envelope, 
+                msg => new Error(`Could not serialize mapped entity: ${msg}`)
+            );
+
+            const input: InputRecord = {
+                key: rk(key),
+                value,
+                replace: null,
+                ttl: -1,
+            };
+
+            await this.#writeSuccess(pk, input);
+        }
+
+        const metaMap = new WeakMap<Record<string, unknown>, EntityMetadata>();
+        const base = await this.#createReadonlyEntityCollection(
+            viewKey,
+            projection,
+            baseVersion,
+            [viewKey],
+            undefined,
+            metaMap,
+        );
+
+        // Mark written entities with 'valid_until' base version
+        for (const key of toBeWritten.keys()) {
+            if (alreadyMarkedWithValidUntil.has(key)) {
+                continue;
+            }
+
+            const entity = await base.get(key);
+            
+            if (!entity) {
+                continue; // did not exist before (already purged)
+            }
+
+            const meta = metaMap.get(entity);
+            if (!meta) {
+                throw new Error("Entity metadata was not populated");
+            }
+
+            if (baseVersion < meta.envelope.valid_from) {
+                throw new Error("Attempt to write invalid entity envelope");
+            }
+
+            const envelope: EntityEnvelope = {
+                valid_from: meta.envelope.valid_from,
+                valid_until: baseVersion,
+                entity: meta.envelope.entity,
+                disclosed: meta.envelope.disclosed,
+            };
+
+            const value = mappedEnvelopeType.toJsonValue(
+                envelope,
+                msg => new Error(`Could not rewrite mapped entity envelope: ${msg}`)
+            );
+
+            const input: InputRecord = {
+                key: meta.key,
+                value: value,
+                replace: meta.token,
+                ttl: meta.ttl,
+            };
+
+            await this.#writeSuccess(pk, input);
+        }
+
+        return toBeWritten.size > 0;
+    }
+
+    #getAlreadySyncedEntities = async (
+        viewKey: string,
+        projection: EntityProjection | EntityMapping,
+        baseVersion: number,
+        commitVersion: number,
+        toBeWritten: Map<string, Record<string, unknown> | null>,
+    ): Promise<{
+        alreadyMarkedWithValidUntil: Set<string>,
+        alreadyWritten: Set<string>,
+    }> => {
+        const validUntilBase = this.#createEntityQueryable(viewKey, projection.type, baseVersion, "valid_until");
+        const alreadyMarkedWithValidUntil = new Set<string>();
+        for await (const entity of validUntilBase.all()) {
+            const key = entity[projection.key] as string;
+            if (!toBeWritten.has(key)) {
+                throw new Error(
+                    `Detected non-deterministic entity projection of view "${viewKey}". ` + 
+                    `Entity "${key}" was marked as valid until ${baseVersion} in an earlier sync ` +
+                    `but was not written now for commit ${commitVersion}.`
+                );
+            }
+            alreadyMarkedWithValidUntil.add(key);
+        }
+
+        const validFromCommit = this.#createEntityQueryable(viewKey, projection.type, commitVersion, "valid_from");
+        const alreadyWritten = new Set<string>();
+        for await (const entity of validFromCommit.all()) {
+            const key = entity[projection.key] as string;
+            const expected = toBeWritten.get(key);
+            if (expected === void(0)) {
+                throw new Error(
+                    `Detected non-deterministic entity projection of view "${viewKey}". ` + 
+                    `Entity "${key}" was marked as valid from ${commitVersion} in an earlier sync ` +
+                    "but was not written now."
+                );
+            } else if (expected === null || !_typedJsonEqual(projection.type, entity, expected)) {
+                throw new Error(
+                    `Detected non-deterministic entity projection of view "${viewKey}". ` + 
+                    `Entity "${key}" in version ${commitVersion} ` +
+                    "was written with a different value in an earlier sync."
+                );
+            }
+            alreadyWritten.add(key);
+        }
+
+        return { alreadyMarkedWithValidUntil, alreadyWritten };
     }
 
     #syncState = async (commit: _Commit, projection: StateProjection, key: string): Promise<boolean> => {
@@ -1262,16 +1477,16 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
     }
 
-    disclose = async <T>(value: T): Promise<Disclosed<T>> => {
+    disclose = async <T>(value: T, onDisclosed?: (scope: string) => void): Promise<Disclosed<T>> => {
         if (piiStringType.test(value)) {
-            const mapped = await this.#discloseString(value);
+            const mapped = await this.#discloseString(value, onDisclosed);
             return mapped as Disclosed<T>;
         }
 
         if (Array.isArray(value)) {
             const mapped = new Array<unknown>();
             for (const item of value) {
-                mapped.push(await this.disclose(item));
+                mapped.push(await this.disclose(item, onDisclosed));
             }
             return mapped as Disclosed<T>;
         }
@@ -1279,7 +1494,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         if (value !== null && typeof value === "object") {
             const mapped = new Map();
             for (const key in value) {
-                mapped.set(key, await this.disclose(value[key]));
+                mapped.set(key, await this.disclose(value[key], onDisclosed));
             }
             return Object.fromEntries(mapped);
         }
@@ -1433,12 +1648,16 @@ type EntityEnvelope<T = Record<string, unknown>> = {
     valid_from: number;
     valid_until: number;
     entity: T;
+    disclosed?: string[];
 };
 
 const entityEnvelopeType = <T>(valueType: Type<T>): Type<EntityEnvelope<T>> => recordType({
     valid_from: positiveIntegerType,
     valid_until: positiveIntegerType,
     entity: valueType,
+    disclosed: arrayType(stringType),
+}, {
+    optional: ["disclosed"],
 }).restrict(
     "Entity envelope \"valid_from\" must be less than or equal to \"valid_until\"", 
     ({valid_from, valid_until}) => valid_from <= valid_until,

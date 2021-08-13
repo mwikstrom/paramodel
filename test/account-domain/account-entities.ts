@@ -87,7 +87,7 @@ const mutators: EntityChangeHandlers<AccountChanges, AccountProps, "account_id">
     money_withdrawn,
 };
 
-export const accountAuth: EntityAuthFunc<AccessScope, Pick<AccountProps, "account_id" | "owner_id">> = async (
+const auth: EntityAuthFunc<AccessScope, AccountProps> = async (
     { where }, 
     { user_id },
 ) => where("owner_id", "==", user_id);
@@ -96,5 +96,5 @@ export const accounts = defineEntity({
     type: accountPropsType,
     key: "account_id",
     mutators,
-    auth: accountAuth,
+    auth,
 });
