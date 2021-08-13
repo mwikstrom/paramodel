@@ -92,11 +92,14 @@ export class _ActionContextImpl<
         const result: _ActionContextRunResult<Output> = {
             changes: Array.from(this.#emittedChanges),
             events: [...this.#emittedEvents],
-            shredded: Array.from(this.#shredded),
             status: this.#status,
             message: this.#message,
             output: this.#output,
         };
+
+        if (this.#shredded.size > 0) {
+            result.shredded = Array.from(this.#shredded);
+        }
 
         return result;
     }
@@ -149,7 +152,7 @@ export type _ActionContextRunResult<Output> = {
     changes: readonly string[];
     events: readonly Omit<Change<JsonValue>, "version" | "timestamp" | "position">[];
     status: "success" | "conflict" | "forbidden" | "aborted" | "rejected" | "failed";
-    shredded: readonly string[];
+    shredded?: readonly string[];
     message: string | undefined;
     output: Output | undefined;
 };
