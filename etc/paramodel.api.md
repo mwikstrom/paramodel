@@ -179,7 +179,7 @@ export interface DomainStoreStatus {
     readonly position: number;
     readonly timestamp?: Date;
     readonly version: number;
-    readonly views: Readonly<Record<string, ViewStatus>>;
+    readonly views: Readonly<Record<string, MaterializedViewStatus>>;
 }
 
 // @public
@@ -309,6 +309,20 @@ export type IsOperand<T> = ((T extends undefined ? "defined" : never) | (T exten
 
 // @public
 export type IsOperator = "is" | "is-not";
+
+// @public
+export interface MaterializedViewStatus {
+    readonly active: boolean;
+    readonly kind: string;
+    readonly last_change_timestamp?: Date;
+    readonly last_change_version: number;
+    readonly purged_from_version: number;
+    readonly purged_until_version: number;
+    readonly shred_version: number;
+    readonly sync_position: number;
+    readonly sync_timestamp?: Date;
+    readonly sync_version: number;
+}
 
 // @public
 export type OutputRecord = {
@@ -531,17 +545,6 @@ export interface ViewOptions {
 
 // @public
 export type ViewSnapshotFunc<R extends ReadModel> = <K extends string & keyof R>(this: void, key: K, options?: Partial<Pick<ViewOptions, "auth">>) => Promise<ViewOf<R[K]>>;
-
-// @public
-export interface ViewStatus {
-    readonly last_change_timestamp?: Date;
-    readonly last_change_version: number;
-    readonly purged_from_version: number;
-    readonly purged_until_version: number;
-    readonly sync_position: number;
-    readonly sync_timestamp?: Date;
-    readonly sync_version: number;
-}
 
 // @public
 export type WriteModel<K extends string = string, T extends ActionHandler = AnyActionHandler> = Readonly<Record<K, T>>;

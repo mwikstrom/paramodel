@@ -9,5 +9,5 @@ Status for each defined view
 <b>Signature:</b>
 
 ```typescript
-readonly views: Readonly<Record<string, ViewStatus>>;
+readonly views: Readonly<Record<string, MaterializedViewStatus>>;
 ```

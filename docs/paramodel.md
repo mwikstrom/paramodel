@@ -40,6 +40,7 @@ Run-time domain model for event-sourcing.
 |  [EntityView](./paramodel.entityview.md) | A snapshot of entities |
 |  [FilterSpec](./paramodel.filterspec.md) | Specifies a data record filter condition |
 |  [InputRecord](./paramodel.inputrecord.md) | A data record to be written |
+|  [MaterializedViewStatus](./paramodel.materializedviewstatus.md) | Status for a materialized view |
 |  [Page](./paramodel.page.md) | A page of items |
 |  [PageOptions](./paramodel.pageoptions.md) | Options for getting a page |
 |  [PiiString](./paramodel.piistring.md) | An encrypted and obfuscated string that contains personally identifiable information (PII) |
@@ -58,7 +59,6 @@ Run-time domain model for event-sourcing.
 |  [StateView](./paramodel.stateview.md) | A simple state snapshot |
 |  [SyncOptions](./paramodel.syncoptions.md) | Options for synchronizing views |
 |  [ViewOptions](./paramodel.viewoptions.md) | Options for getting a view snapshot |
-|  [ViewStatus](./paramodel.viewstatus.md) | Status for a view |
 
 ## Variables
 

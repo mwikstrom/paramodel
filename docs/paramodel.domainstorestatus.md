@@ -19,5 +19,5 @@ export interface DomainStoreStatus
 |  [position](./paramodel.domainstorestatus.position.md) | number | The total number of committed change events |
 |  [timestamp?](./paramodel.domainstorestatus.timestamp.md) | Date | <i>(Optional)</i> Timestamp of the latest commit, or <code>undefined</code> when change history is empty |
 |  [version](./paramodel.domainstorestatus.version.md) | number | The latest comitted version number |
-|  [views](./paramodel.domainstorestatus.views.md) | Readonly&lt;Record&lt;string, [ViewStatus](./paramodel.viewstatus.md)<!-- -->&gt;&gt; | Status for each defined view |
+|  [views](./paramodel.domainstorestatus.views.md) | Readonly&lt;Record&lt;string, [MaterializedViewStatus](./paramodel.materializedviewstatus.md)<!-- -->&gt;&gt; | Status for each defined view |
 
