@@ -1,5 +1,13 @@
 import { numberType, positiveIntegerType, recordType, stringType, Type } from "paratype";
-import { Change, defineEntity, EntityAuthFunc, EntityChangeHandlers, EntityProjectionFunc } from "../../src";
+import { 
+    Change, 
+    defineEntity, 
+    EntityAuthFunc, 
+    EntityChangeHandlers, 
+    EntityProjectionFunc, 
+    PiiString, 
+    piiStringType 
+} from "../../src";
 import { AccessScope } from "./access-scope";
 import { 
     AccountChanges, 
@@ -10,25 +18,27 @@ import {
     MoneyWithdrawn 
 } from "./change-model";
 
-type AccountProps = {
+export type AccountProps = {
     account_id: number;
     owner_id: string;
+    account_name: PiiString;
     balance: number;
 };
 
 const accountPropsType: Type<AccountProps> = recordType({
     account_id: positiveIntegerType,
     owner_id: stringType,
+    account_name: piiStringType,
     balance: numberType,
 });
 
 const account_registered: EntityProjectionFunc<AccountProps, "account_id", Change<AccountRegistered>> = async (
-    { arg: { account_id, owner_id } },
+    { arg: { account_id, owner_id, account_name } },
     { base: { get }, put },
 ) => {
     const found = await get(account_id);
     if (!found) {
-        put({ account_id, owner_id, balance: 0 });
+        put({ account_id, owner_id, account_name, balance: 0 });
     }
 };
 
@@ -77,7 +87,7 @@ const mutators: EntityChangeHandlers<AccountChanges, AccountProps, "account_id">
     money_withdrawn,
 };
 
-const auth: EntityAuthFunc<AccessScope, AccountProps> = async (
+export const accountAuth: EntityAuthFunc<AccessScope, Pick<AccountProps, "account_id" | "owner_id">> = async (
     { where }, 
     { user_id },
 ) => where("owner_id", "==", user_id);
@@ -86,5 +96,5 @@ export const accounts = defineEntity({
     type: accountPropsType,
     key: "account_id",
     mutators,
-    auth,
+    auth: accountAuth,
 });

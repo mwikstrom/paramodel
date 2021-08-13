@@ -1,7 +1,7 @@
 import { Type, TypeOf } from "paratype";
 import { EntityMapping } from "./entity-mapping";
 import { EntityAuthFunc } from "./entity-projection";
-import { EntityViews } from "./entity-view";
+import { EntityViews, PossibleKeysOf } from "./entity-view";
 import { ReadModel } from "./model";
 import { Disclosed } from "./pii";
 
@@ -11,7 +11,7 @@ import { Disclosed } from "./pii";
  */
 export interface EntityMappingDefinition<
     Props extends Record<string, unknown>,
-    Key extends EntityViews<Views>[Source]["key"],
+    Key extends PossibleKeysOf<Props>,
     Source extends (string & keyof EntityViews<Views>),
     Scope = unknown,
     Views extends ReadModel = ReadModel,
@@ -51,7 +51,7 @@ export interface EntityMappingDefinition<
  */
 export function defineEntityMapping<
     Props extends Record<string, unknown>,
-    Key extends EntityViews<Views>[Source]["key"],
+    Key extends PossibleKeysOf<Props>,
     Source extends (string & keyof EntityViews<Views>),
     Scope = unknown,
     Views extends ReadModel = ReadModel,

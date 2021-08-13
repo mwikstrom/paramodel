@@ -1,8 +1,10 @@
 import { numberType, positiveIntegerType, recordType, stringType } from "paratype";
+import { PiiString, piiStringType } from "../../src";
 
 export type AccountRegistered = {
     account_id: number;
     owner_id: string;
+    account_name: PiiString;
 }
 
 export type AccountDeleted = {
@@ -28,6 +30,7 @@ export type MoneyTransferred = {
 const account_registered = recordType<AccountRegistered>({
     account_id: positiveIntegerType,
     owner_id: stringType,
+    account_name: piiStringType,
 });
 
 const account_deleted = recordType<AccountDeleted>({

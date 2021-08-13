@@ -1,4 +1,5 @@
 import { accounts } from "./account-entities";
+import { disclosed_accounts } from "./disclosed-account-entities";
 import { next_account_id } from "./next-account-id";
 import { number_of_accounts } from "./number-of-accounts";
 import { total_balance } from "./total-balance";
@@ -14,6 +15,7 @@ export const baseAccountViews = {
 export const accountViews = {
     ...baseAccountViews,
     average_balance,
+    disclosed_accounts,
 };
 
 export type BaseAccountViews = typeof baseAccountViews;
