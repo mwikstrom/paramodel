@@ -9,7 +9,7 @@ Settings that define an entity mapping
 <b>Signature:</b>
 
 ```typescript
-export interface EntityMappingDefinition<Props extends Record<string, unknown>, Key extends EntityViews<Views>[Source]["key"], Source extends (string & keyof EntityViews<Views>), Scope = unknown, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []> 
+export interface EntityMappingDefinition<Props extends Record<string, unknown>, Key extends PossibleKeysOf<Props>, Source extends (string & keyof EntityViews<Views>), Scope = unknown, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []> 
 ```
 
 ## Properties

@@ -7,14 +7,14 @@
 <b>Signature:</b>
 
 ```typescript
-map(source: TypeOf<EntityViews<Views>[Source]["type"]>, disclose: <T>(value: T) => Promise<Disclosed<T>>): Promise<Props>;
+map(source: Record<string, unknown> | TypeOf<EntityViews<Views>[Source]["type"]>, disclose: <T>(value: T) => Promise<Disclosed<T>>): Promise<Props>;
 ```
 
 ## Parameters
 
 |  Parameter | Type | Description |
 |  --- | --- | --- |
-|  source | TypeOf&lt;[EntityViews](./paramodel.entityviews.md)<!-- -->&lt;Views&gt;\[Source\]\["type"\]&gt; |  |
+|  source | Record&lt;string, unknown&gt; \| TypeOf&lt;[EntityViews](./paramodel.entityviews.md)<!-- -->&lt;Views&gt;\[Source\]\["type"\]&gt; |  |
 |  disclose | &lt;T&gt;(value: T) =&gt; Promise&lt;[Disclosed](./paramodel.disclosed.md)<!-- -->&lt;T&gt;&gt; |  |
 
 <b>Returns:</b>

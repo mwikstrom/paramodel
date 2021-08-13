@@ -9,7 +9,7 @@ Creates an [EntityMappingDefinition](./paramodel.entitymappingdefinition.md)
 <b>Signature:</b>
 
 ```typescript
-export declare function defineEntityMapping<Props extends Record<string, unknown>, Key extends EntityViews<Views>[Source]["key"], Source extends (string & keyof EntityViews<Views>), Scope = unknown, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(this: void, definition: EntityMappingDefinition<Props, Key, Source, Scope, Views, Dependencies>): EntityMapping<Props, Key, Source, Scope, Views, Dependencies>;
+export declare function defineEntityMapping<Props extends Record<string, unknown>, Key extends PossibleKeysOf<Props>, Source extends (string & keyof EntityViews<Views>), Scope = unknown, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(this: void, definition: EntityMappingDefinition<Props, Key, Source, Scope, Views, Dependencies>): EntityMapping<Props, Key, Source, Scope, Views, Dependencies>;
 ```
 
 ## Parameters

@@ -31,9 +31,3 @@ Run-time domain model for event-sourcing.
 
 - TODO: Continuation tokens must include version and timestamp and shall expire when too old
   (older than purge ttl) - or be renewed in case version is still not purged!
-
-- TODO: (Maybe) move view headers into a separate partition so that all views can be
-  discovered (not only those that currently are modelled)
-
-  This change is important for purging PII, because we may otherwise end up with lingering
-  disclosed PIIs after the key was shredded.

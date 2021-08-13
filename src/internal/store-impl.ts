@@ -185,11 +185,6 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         );
         const where: FilterSpec[] =[
             {
-                path: ["key"],
-                operator: "!=",
-                operand: _rowKeys.viewHeader,
-            },
-            {
                 path: ["value", "entity", entityKeyProp],
                 operator: "==",
                 operand: entityKeyValue,
@@ -218,13 +213,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             transform,
         );
 
-        const where: FilterSpec[] =[
-            {
-                path: ["key"],
-                operator: "!=",
-                operand: _rowKeys.viewHeader,
-            }
-        ];
+        const where: FilterSpec[] =[];
 
         if (mode === "valid_range") {
             where.push({
@@ -406,7 +395,6 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         );
         const output = await new _QueryImpl(source, [], [])
             .by("key", "descending")
-            .where("key", "!=", _rowKeys.viewHeader)
             .where("key", "<=", _rowKeys.viewState(version))
             .first();
         return output;
@@ -543,9 +531,8 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
     );    
 
     #getViewHeaderRecord = (key: string): Promise<OutputRecord | undefined> => {
-        const partition = _partitionKeys.view(key);
-        const row = _rowKeys.viewHeader;
-        return this.#driver.read(this.#id, partition, row);
+        const partition = _partitionKeys.views;
+        return this.#driver.read(this.#id, partition, key);
     }
 
     #getViewHeader = async (key: string): Promise<_ViewHeader | undefined> => {
@@ -1168,9 +1155,8 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         prev: _SyncViewInfo,
         modified: boolean
     ): Promise<_SyncViewInfo | undefined> => this.#storeViewHeader(
-        key, 
         prev, 
-        info => _getViewHeaderRecordForCommit(commit, info, kind, modified)
+        info => _getViewHeaderRecordForCommit(key, commit, info, kind, modified)
     );
 
     #storeViewHeaderForPurge = async (
@@ -1189,18 +1175,16 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
         }
 
         return await this.#storeViewHeader(
-            key, 
             prev, 
-            info => _getViewHeaderRecordForPurge(purgeVersion, info, kind)
+            info => _getViewHeaderRecordForPurge(key, purgeVersion, info, kind)
         );
     }
 
     #storeViewHeader = async (
-        key: string, 
         prev: _SyncViewInfo, 
         update: (info: _SyncViewInfo) => InputRecord | undefined
     ): Promise<_SyncViewInfo | undefined> => {
-        const pk = _partitionKeys.view(key);
+        const pk = _partitionKeys.views;
         for (;;) {
             const input = update(prev);
             if (!input) {
@@ -1301,11 +1285,6 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
                 path: ["ttl"],
                 operator: "==",
                 operand: -1,
-            },
-            {
-                path: ["key"],
-                operator: "!=",
-                operand: _rowKeys.viewHeader,
             },
             condition
         ];

@@ -126,7 +126,7 @@ export function defineAction<Input, Output, Scope = unknown, Events extends Chan
 export function defineEntity<Props extends Record<string, unknown>, Key extends PossibleKeysOf<Props>, Scope = unknown, Events extends ChangeModel = ChangeModel, Views extends ReadModel = ReadModel, Mutators extends (string & keyof Events)[] = [], Dependencies extends (string & keyof Views)[] = []>(this: void, definition: EntityDefinition<Props, Key, Scope, Events, Views, Mutators, Dependencies>): EntityProjection<Props, Key, Events, Views, Scope>;
 
 // @public
-export function defineEntityMapping<Props extends Record<string, unknown>, Key extends EntityViews<Views>[Source]["key"], Source extends (string & keyof EntityViews<Views>), Scope = unknown, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(this: void, definition: EntityMappingDefinition<Props, Key, Source, Scope, Views, Dependencies>): EntityMapping<Props, Key, Source, Scope, Views, Dependencies>;
+export function defineEntityMapping<Props extends Record<string, unknown>, Key extends PossibleKeysOf<Props>, Source extends (string & keyof EntityViews<Views>), Scope = unknown, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []>(this: void, definition: EntityMappingDefinition<Props, Key, Source, Scope, Views, Dependencies>): EntityMapping<Props, Key, Source, Scope, Views, Dependencies>;
 
 // @public
 export function defineQuery<Views extends ReadModel, Result, Params extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, Dependencies extends (string & keyof Views)[] = []>(this: void, definition: QueryDefinition<Views, Result, Params, Scope, Dependencies>): QueryHandler<Params, Result, Pick<Views, Dependencies[number]>, Scope>;
@@ -200,7 +200,7 @@ export interface EntityDefinition<Props extends Record<string, unknown>, Key ext
 }
 
 // @public
-export interface EntityMapping<Props extends Record<string, unknown>, Key extends PossibleKeysOf<Props> = PossibleKeysOf<Props>, Source extends (string & keyof EntityViews<Views>) = string, Scope = unknown, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []> {
+export interface EntityMapping<Props extends Record<string, unknown> = Record<string, unknown>, Key extends PossibleKeysOf<Props> = PossibleKeysOf<Props>, Source extends (string & keyof EntityViews<Views>) = string, Scope = unknown, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []> {
     // (undocumented)
     auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number] | Source>>;
     // (undocumented)
@@ -210,7 +210,7 @@ export interface EntityMapping<Props extends Record<string, unknown>, Key extend
     // (undocumented)
     readonly kind: "mapped-entities";
     // (undocumented)
-    map(source: TypeOf<EntityViews<Views>[Source]["type"]>, disclose: <T>(value: T) => Promise<Disclosed<T>>): Promise<Props>;
+    map(source: Record<string, unknown> | TypeOf<EntityViews<Views>[Source]["type"]>, disclose: <T>(value: T) => Promise<Disclosed<T>>): Promise<Props>;
     // (undocumented)
     readonly source: Source;
     // (undocumented)
@@ -218,7 +218,7 @@ export interface EntityMapping<Props extends Record<string, unknown>, Key extend
 }
 
 // @public
-export interface EntityMappingDefinition<Props extends Record<string, unknown>, Key extends EntityViews<Views>[Source]["key"], Source extends (string & keyof EntityViews<Views>), Scope = unknown, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []> {
+export interface EntityMappingDefinition<Props extends Record<string, unknown>, Key extends PossibleKeysOf<Props>, Source extends (string & keyof EntityViews<Views>), Scope = unknown, Views extends ReadModel = ReadModel, Dependencies extends (string & keyof Views)[] = []> {
     auth?: EntityAuthFunc<Scope, Props, Pick<Views, Dependencies[number] | Source>>;
     dependencies?: Dependencies;
     key: Key;

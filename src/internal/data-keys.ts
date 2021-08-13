@@ -3,12 +3,12 @@ export const _partitionKeys = Object.freeze({
     history: "history",
     pii: "pii",
     view: (viewKey: string) => `view:${viewKey}`,
+    views: "views",
 });
 
 /** @internal */
 export const _rowKeys = Object.freeze({
     commit: (version: number) => version.toString(10).padStart(16, "0"),
-    viewHeader: "header",
     piiSync: "sync",
     piiScope: (scope: string) => `$${scope}`,
     viewState: (version: number) => `state:${version.toString(10).padStart(16, "0")}`,

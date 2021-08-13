@@ -1,7 +1,6 @@
 import { enumType, nonNegativeIntegerType, recordType, timestampType, Type } from "paratype";
 import { InputRecord, OutputRecord } from "../driver";
 import { _Commit } from "./commit";
-import { _rowKeys } from "./data-keys";
 
 /** @internal */
 export type _ViewHeader = {
@@ -102,26 +101,29 @@ export const _getSyncInfoFromRecord = (record: OutputRecord | undefined): _SyncV
 
 /** @internal */
 export const _getViewHeaderRecordForPurge = (
+    key: string,
     purgeVersion: number,
     prev: _SyncViewInfo,
     kind: _MaterialViewKind,
 ): InputRecord | undefined => {
     const header = _getViewHeaderForPurge(purgeVersion, prev, kind);
-    return _getViewHeaderRecord(header, prev.update_token);
+    return _getViewHeaderRecord(key, header, prev.update_token);
 };
 
 /** @internal */
 export const _getViewHeaderRecordForCommit = (
+    key: string,
     commit: _Commit,
     prev: _SyncViewInfo,
     kind: _MaterialViewKind,
     modified: boolean,
 ): InputRecord | undefined => {
     const header = _getViewHeaderForCommit(commit, prev, kind, modified);
-    return _getViewHeaderRecord(header, prev.update_token);
+    return _getViewHeaderRecord(key, header, prev.update_token);
 };
 
 const _getViewHeaderRecord = (
+    key: string,
     header: _ViewHeader | undefined,
     token: string | null,
 ): InputRecord | undefined => {
@@ -131,7 +133,7 @@ const _getViewHeaderRecord = (
 
     const jsonHeader = _viewHeader.toJsonValue(header, msg => new Error(`Failed to serialize view header: ${msg}`));
     const input: InputRecord = {
-        key: _rowKeys.viewHeader,
+        key,
         value: jsonHeader,
         replace: token,
         ttl: -1,
