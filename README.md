@@ -14,6 +14,8 @@ Run-time domain model for event-sourcing.
 
 - TODO: Support fast sweeping sync (not storing every commit, like a purge on the fly sort of)
 
+- TODO: Purge should return more than just "done"!? - aborting too early prevent progress...
+
 - TODO: Add entity-mapper projection, that can disclose PII in the mapping function.
 
   In the future, add support for auto-mapping (disclosing all PII). For now, mapping has
