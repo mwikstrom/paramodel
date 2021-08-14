@@ -427,7 +427,7 @@ export class _StoreImpl<Model extends DomainModel> implements DomainStore<Model>
             };
         const query: QueryView<P, T>["query"] = (
             authError && auth ? async params => {
-                const result = await auth(exec, snapshot, params, this.#scope);
+                const result = await auth(exec, snapshot, params, this.#scope, disclose);
                 if (result === Forbidden) {
                     throw authError();
                 }

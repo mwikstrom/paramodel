@@ -53,4 +53,5 @@ export type QueryAuthFunc<
     view: ViewSnapshotFunc<R>, 
     params: P, 
     scope: Scope, 
+    disclose: <T>(value: T) => Promise<Disclosed<T>>,
 ) => Promise<T | Forbidden>;
