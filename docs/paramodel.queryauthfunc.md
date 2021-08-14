@@ -9,7 +9,7 @@ The query authorization function
 <b>Signature:</b>
 
 ```typescript
-export declare type QueryAuthFunc<R extends ReadModel = ReadModel, P extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, T = unknown> = (this: void, exec: QueryExecFunc<R, P, Scope, T>, view: ViewSnapshotFunc<R>, params: P, scope: Scope) => Promise<T | Forbidden>;
+export declare type QueryAuthFunc<R extends ReadModel = ReadModel, P extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, T = unknown> = (this: void, exec: QueryExecFunc<R, P, Scope, T>, view: ViewSnapshotFunc<R>, params: P, scope: Scope, disclose: <T>(value: T) => Promise<Disclosed<T>>) => Promise<T | Forbidden>;
 ```
-<b>References:</b> [ReadModel](./paramodel.readmodel.md)<!-- -->, [QueryExecFunc](./paramodel.queryexecfunc.md)<!-- -->, [ViewSnapshotFunc](./paramodel.viewsnapshotfunc.md)<!-- -->, [Forbidden](./paramodel.forbidden.md)
+<b>References:</b> [ReadModel](./paramodel.readmodel.md)<!-- -->, [QueryExecFunc](./paramodel.queryexecfunc.md)<!-- -->, [ViewSnapshotFunc](./paramodel.viewsnapshotfunc.md)<!-- -->, [Disclosed](./paramodel.disclosed.md)<!-- -->, [Forbidden](./paramodel.forbidden.md)
 

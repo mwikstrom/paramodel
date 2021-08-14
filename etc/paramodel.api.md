@@ -387,7 +387,7 @@ export interface Queryable<T> {
 }
 
 // @public
-export type QueryAuthFunc<R extends ReadModel = ReadModel, P extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, T = unknown> = (this: void, exec: QueryExecFunc<R, P, Scope, T>, view: ViewSnapshotFunc<R>, params: P, scope: Scope) => Promise<T | Forbidden>;
+export type QueryAuthFunc<R extends ReadModel = ReadModel, P extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, T = unknown> = (this: void, exec: QueryExecFunc<R, P, Scope, T>, view: ViewSnapshotFunc<R>, params: P, scope: Scope, disclose: <T>(value: T) => Promise<Disclosed<T>>) => Promise<T | Forbidden>;
 
 // @public
 export interface QueryDefinition<Views extends ReadModel, Result, Params extends Record<string, unknown> = Record<string, unknown>, Scope = unknown, Dependencies extends (string & keyof Views)[] = []> {
